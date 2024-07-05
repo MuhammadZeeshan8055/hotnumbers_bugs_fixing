@@ -1,0 +1,11 @@
+.idea
+node_modules
+notes
+tests
+logs
+page-editor
+assets/images/site-images
+public/cache
+vendor
+writable
+.env

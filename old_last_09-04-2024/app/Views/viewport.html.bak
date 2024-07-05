@@ -1,0 +1,43 @@
+
+
+<html>
+
+<head>
+<link rel="stylesheet" href="flexslider.css" type="text/css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+<script src="jquery.flexslider.js"></script>
+</head>
+
+<body>
+
+<div class="flexslider">
+  <ul class="slides">
+   <li>
+      <img src="images/kitchen_adventurer_caramel.jpg" />
+	  <p>hoooo</p>
+    </li>
+    <li>
+      <img src="images/kitchen_adventurer_cheesecake_brownie.jpg" />
+    </li>
+    <li>
+      <img src="images/kitchen_adventurer_donut.jpg" />
+    </li>
+  </ul>
+</div>
+
+
+<!-- Place in the <head>, after the three links -->
+<script type="text/javascript" charset="utf-8">
+  $(window).load(function() {
+    $('.flexslider').flexslider();
+  });
+</script>
+
+
+
+
+
+
+</body>
+
+</html>

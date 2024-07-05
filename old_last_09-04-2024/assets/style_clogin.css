@@ -1,0 +1,135 @@
+
+
+.woocommerce nav.woocommerce-MyAccount-navigation {
+    width: 100%;
+    margin: 2em auto;
+    padding-bottom: 2em;
+}
+
+
+
+.woocommerce nav.woocommerce-MyAccount-navigation ul {
+    max-width: 100%;
+    width: 100%;
+    font-size: 17px;
+    line-height: 26px;
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+}
+
+@media (min-width: 767px){
+    .woocommerce nav.woocommerce-MyAccount-navigation ul {
+        padding-left: 0;
+    }   
+}
+
+.woocommerce nav.woocommerce-MyAccount-navigation ul > li {
+    display: inline-block;
+    position: relative;
+}
+
+.woocommerce nav.woocommerce-MyAccount-navigation ul li.is-active {
+    background-color: var(--red);
+    color: #fff;
+}
+
+.woocommerce nav.woocommerce-MyAccount-navigation ul li.is-active a {
+    cursor: default;
+}
+
+.woocommerce nav.woocommerce-MyAccount-navigation ul li.is-active a:after,
+.woocommerce nav.woocommerce-MyAccount-navigation ul li:hover a:after {
+    content: "";
+    height: 0;
+    width: 0;
+    border-top: solid #f2f2f2;
+    border-left: solid transparent;
+    border-right: solid transparent;
+    float: right;
+    margin-right: -34px;
+    margin-top: -7px;
+    position: absolute;
+    border-width: 8px;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.woocommerce nav.woocommerce-MyAccount-navigation ul li.is-active a:after {
+    border-top: 8px solid var(--red);
+}
+
+.woocommerce nav.woocommerce-MyAccount-navigation ul li {
+    padding: 8px 20px;
+    background-color: rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    margin-bottom: 2px;
+}
+
+.woocommerce nav.woocommerce-MyAccount-navigation {
+    width: 100%;
+    position: relative;
+    display: block;
+    float: left;
+    margin: 0em;
+}
+
+.woocommerce .woocommerce-MyAccount-content {
+    width: 100%;
+    position: relative;
+    display: block;
+    float: left;
+    margin: 0 auto;
+}
+
+.woocommerce .woocommerce-MyAccount-content p {
+    text-align: left;
+}
+
+html body p a, html body p a:link {
+    text-decoration: underline;
+}
+
+.woocommerce .woocommerce-message .button,  .woocommerce .woocommerce-info .button {
+    display: inline;
+    margin: 0 2em 0 0;
+}
+
+html body .wrapper input[type=text]:focus, html body .wrapper input[type=text]:focus{
+   background-color: rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid #d62135;
+}
+
+fieldset {
+    display: block;
+    margin-inline-start: 2px;
+    margin-inline-end: 2px;
+    padding-block-start: 0.35em;
+    padding-inline-start: 0.75em;
+    padding-inline-end: 0.75em;
+    padding-block-end: 0.625em;
+    min-inline-size: min-content;
+    border-width: 2px;
+    border-style: groove;
+    border-color: rgb(192, 192, 192);
+    border-image: initial;
+}
+
+
+legend {
+    display: block;
+    padding-inline-start: 2px;
+    padding-inline-end: 2px;
+    border-width: initial;
+    border-style: none;
+    border-color: initial;
+    border-image: initial;
+}
+
+
+@media (max-width: 767px){
+    .woocommerce nav.woocommerce-MyAccount-navigation ul li.is-active a:after {
+        content: none;
+    }
+}

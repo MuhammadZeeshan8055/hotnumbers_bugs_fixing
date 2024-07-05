@@ -1,0 +1,214 @@
+.input_field {
+  position: relative;
+  padding: 2px 0px 10px;
+
+  &:last-child {
+    padding-bottom: 0;
+  }
+
+  > *:not(div) {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  > label {
+    position: relative;
+    top: 0;
+    left: 0;
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.8);
+    font-weight: 500;
+    padding: 0px 6px 6px 0;
+    display: inline-block;
+    text-transform: capitalize;
+  }
+
+  .caption {
+    margin: 0;
+    font-size: 12px;
+    padding-bottom: 10px;
+    color: #aaa;
+  }
+
+  &.checkbox {
+    input, label {
+      display: inline-block;
+      width: auto;
+      vertical-align: middle;
+    }
+  }
+
+  input, textarea, select, table {
+    color: #000000a8;
+  }
+
+  input, textarea {
+    width: 100%;
+    padding: 8px 13px;
+    border: 1px solid rgb(0 0 0 / 8%);
+    border-radius: var(--border-radius);
+    max-width: calc(100% - 10px);
+    margin: 0px;
+    margin-bottom: 0;
+    font-size: 14px;
+    transition: border 0.3s ease;
+
+    &:not(.select2-search__field):focus {
+      outline: none;
+      border: 1px solid var(--base-color) !important;
+    }
+
+    &[readonly] {
+      background-color:#f2f5f7;
+    }
+
+    &::placeholder {
+      opacity: 0.5;
+      font-style: italic;
+    }
+  }
+
+  select {
+    width: 100%;
+    padding: 5px 12px;
+    border-radius: var(--border-radius);
+    border-color: #ebebeb;
+
+    &:focus {
+      outline: none;
+    }
+  }
+  select[readonly].select2 + .select2-container .select2-selection {
+    pointer-events: none;
+    background-color: #f2f5f7;
+  }
+
+  textarea:not(.select2-search__field) {
+    min-height: 101px;
+    border: 1px solid #00000033;
+    line-height: 22px;
+    transition: all 0.3s ease;
+  }
+
+  &.checkbox {
+    position: relative;
+    display: inline-block;
+    label {
+      background-color: transparent;
+      color: #000;
+      padding: 8px 20px 8px 18px;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      pointer-events: none;
+      user-select: none;
+      font-weight: 500;
+      box-shadow: 0 0 2px inset rgba(0,0,0,0.2);
+      transition: all 0.2s ease;
+      &:not(.checkbox-hide):before {
+        content: "\ea9c";
+        margin-right: 8px;
+        font: normal normal normal 1em/1 "lineicons";
+        color: inherit;
+        flex-shrink: 0;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        vertical-align: middle;
+        position: relative;
+        top: -1px;
+      }
+    }
+    input {
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      position: absolute;
+      left: 0;
+      top: 0;
+      cursor: pointer;
+      z-index: 10;
+      max-width: initial;
+      &:checked + label {
+        background-color: var(--color-2);
+        color: #ffff;
+        &:not(.checkbox-hide):before {
+          content: "\ead1";
+        }
+      }
+    }
+
+  }
+
+  &.inline-checkbox {
+    position: relative;
+    display: inline-block;
+    input {
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      position: absolute;
+      left: 0;
+      top: 0;
+      cursor: pointer;
+      z-index: 10;
+      max-width: initial;
+      &:checked + label {
+        background-color: var(--color-2);
+        &:before {
+          content: "\ead2";
+        }
+      }
+    }
+
+    label {
+      padding-left: 0;
+      position: relative;
+      transition: all 0.2s ease;
+      &::selection {
+        background-color: transparent;
+      }
+      &:before {
+        content: "";
+        margin-right: 6px;
+        font: normal normal normal 1em/1 "lineicons";
+        color: inherit;
+        flex-shrink: 0;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        vertical-align: middle;
+        position: relative;
+        top: -1px;
+        font-size:10px;
+        border: 1px solid #aaa;
+        padding: 3px;
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+        transition: all 0.2s ease;
+        border-radius: 4px;
+      }
+    }
+
+    &:has(input:checked) {
+      label {
+        color: var(--color-2);
+      }
+      label:before {
+        background-color: var(--color-2);
+        color: #fff;
+        content: "\ead1";
+        border-color: var(--color-2);
+      }
+    }
+  }
+
+  i {
+    position: relative;
+    z-index: 10;
+  }
+
+  i.lni-question-circle {
+    margin-left: 5px;
+    position: relative;
+    top: 2px;
+  }
+}

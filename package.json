@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@ckeditor/ckeditor5-basic-styles": "^35.3.1",
+    "@ckeditor/ckeditor5-build-classic": "^35.3.1",
+    "ckeditor5": "^35.3.1"
+  }
+}

@@ -1,0 +1,28 @@
+.select2-container {
+  .select2-selection {
+    background-color: #fff;
+    border-bottom: 1px solid #000;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    border-radius: 0;
+    padding: 8px 14px;
+    height: auto;
+  }
+  .select2-selection__arrow {
+    height: 100% !important;
+  }
+  .select2-dropdown {
+    border-radius: 0;
+    border: 1px solid #000;
+    border-top: none;
+  }
+  .select2-results__option {
+    padding: 8px 12px;
+    margin-bottom: 0;
+    &.select2-results__option--highlighted {
+      background-color: var(--red);
+      color: #fff;
+    }
+  }
+}

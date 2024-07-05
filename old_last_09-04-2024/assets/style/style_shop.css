@@ -1,0 +1,253 @@
+
+html body .underbanner {
+    position: relative;
+    display: block;
+    /*background: url(\../assets/images/shop/banner.jpg);*/
+    background-size: cover !important;
+    background-position: 50% 50% !important;
+    background-repeat: no-repeat !important;
+    background-color: #000;
+    width: 100%;
+    height: 240px;
+    margin: 0;
+    padding: 0;
+}
+
+
+#shop {
+    padding-top: 1em;
+}
+
+
+#shop .body.woocommerce {
+    position: relative;
+    padding: 3em 0;
+}
+#shop .body.woocommerce:before {
+    content: '';
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+#shop > .container {
+    max-width: initial;
+    padding-left: 0;
+    padding-right: 0;
+}
+#shop .woocommerce-breadcrumb {
+    max-width: 1200px;
+    margin: auto;
+    margin-bottom:2em;
+}
+
+.shop_container .woocommerce ul.products li > div {
+    overflow: hidden;
+    position: relative;
+}
+
+
+.woocommerce .home-container {
+    position: relative;
+    display: block;
+    padding-top: 3em;
+    padding-bottom: 3em;
+    margin: 0 auto;
+}
+
+.woocommerce .home-container .woocommerce-breadcrumb {
+    margin: 0 0 2em;
+    font-weight: 600;
+    font-size: 11px;
+    text-align: left;
+    text-transform: uppercase;
+    color: #d62135;
+}
+
+.woocommerce .home-container .woocommerce-breadcrumb a {
+    color: #030405;
+}
+
+.woocommerce .woocommerce-breadcrumb a {
+    color: #555;
+}
+
+.pull-left {
+    float: left;
+}
+
+.pull-right {
+    float: right;
+}
+
+
+
+.woocommerce ul.products, .woocommerce-page ul.products {
+    clear: both;
+    *zoom: 1;
+}
+
+.woocommerce .products ul, .woocommerce ul.products {
+    margin: 0 0 1em;
+    padding: 0;
+    list-style: none outside;
+    clear: both;
+    *zoom: 1;
+}
+
+.shop_container .woocommerce ul.products li {
+    width: 50%;
+    float: left;
+    padding: 4px;
+    margin-top: 0;
+    margin-bottom: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.woocommerce .products ul li, .woocommerce ul.products li {
+    list-style: none outside;
+}
+
+.shop_container .woocommerce ul.products li a {
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+    display: block;
+    height: 400px;
+    overflow: hidden;
+    position: relative;
+}
+
+.shop_container .woocommerce ul.products li a img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+.shop_container .woocommerce ul.products li a span {
+    display: block;
+    position: absolute;
+    bottom: 0.5em;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    color: #fff;
+    font-size: 62px;
+    height: auto;
+    line-height: 1;
+    font-weight: 500;
+    padding: 0 22px;
+    font-size: 48px;
+}
+
+.woocommerce {
+    padding-bottom: 4em;
+}
+
+.woocommerce {
+    display: inline-block;
+    width: 100%;
+}
+
+.shop_container .bottom_arrow {
+    position: absolute;
+    bottom: -25px;
+    left: 50%;
+    transform: translate(-50%);
+    width: 100%;
+    text-align: center;
+}
+
+.woocommerce img, .woocommerce-page img {
+    height: auto;
+    max-width: 100%;
+}
+
+
+.shop_container .woocommerce ul.products li a:hover {
+    border: 2px solid #fff;
+}
+
+
+
+html body a:active {
+    text-decoration: none;
+    color: inherit;
+}
+
+
+
+#footer .container .payment_logos, footer .container .payment_logos {
+    margin: 4em auto 0;
+}
+
+#footer .container .payment_logos, footer .container .payment_logos {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    position: relative;
+    margin: 1em auto 0;
+    clear: both;
+    width: 100%;
+    height: auto;
+}
+
+
+
+
+.shop_container .bottom_arrow {
+    position: absolute;
+    bottom: -21px;
+    left: 50%;
+    transform: translate(-50%);
+    width: 100%;
+    text-align: center;
+}
+
+
+.shop_container .bottom_arrow:before {
+    width: auto;
+    height: auto;
+    content: '';
+    border-color: #000 transparent transparent;
+    border-style: solid;
+    border-width: 40px 60px;
+    padding: 0px;
+    position: absolute;
+    left: 50%;
+    z-index: -1;
+    transform: translate(-50%);
+    margin-top: 10px;
+}
+
+
+
+/**** media size *****************/
+@media (max-width: 1420px){
+    html body .container {
+        padding: 0em 2em;
+        max-width: 1000px;
+    }
+}
+
+
+@media (max-width: 768px){
+    html body .container {
+        padding: 0em 2em;
+    }
+}
+
+@media screen and (max-width: 768px), screen and (max-height: 500px){
+    html body .underbanner {
+        height: 150px;
+    }    
+}
+

@@ -1,0 +1,144 @@
+
+
+
+
+.woocommerce {
+    display: inline-block;
+    width: 100%;
+}
+
+.woocommerce {
+    padding-bottom: 4em;
+}
+
+.container.home-container {
+    position: relative;
+    display: block;
+    padding-top: 2em;
+    padding-bottom: 3em;
+    margin: 0 auto;
+}
+
+
+html body h5 {
+    margin: 5px 0 15px;
+    font-size: 1.4em;
+    line-height: 1.1em;
+}
+
+
+
+.shop_container .body.woocommerce hr {
+    border-top: 2px solid #fff;
+}
+
+.flex-viewport {
+    max-height: 2000px;
+    -webkit-transition: all 1s ease;
+    -moz-transition: all 1s ease;
+    -ms-transition: all 1s ease;
+    -o-transition: all 1s ease;
+    transition: all 1s ease;
+}
+
+.shop_container hr:after {
+    content: '';
+    display: block;
+    border-width: 8px;
+    border-style: solid;
+    position: absolute;
+    border-color: #d2d2d2 transparent transparent;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+
+.product_footer {
+    padding-top: 3em;
+}
+
+.woocommerce ul.products li.product, .woocommerce-page ul.products li.product {
+    float: left;
+    margin: 0 3.8% 2.992em 0;
+    padding: 0;
+    position: relative;
+    width: 22.05%;
+    margin-left: 0;
+}
+
+.woocommerce ul.products li.product a {
+    text-decoration: none;
+}
+
+.woocommerce ul.products li.product a img {
+    width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 0 1em;
+    box-shadow: none;
+    border: 1px solid #dadada;
+    border-radius: 6px;
+}
+
+.woocommerce ul.products li.product a {
+    text-decoration: none;
+}
+
+.woocommerce ul.products li.product .price {
+    color: #d62135;
+    display: block;
+    font-weight: bold;
+    margin-bottom: 0.5em;
+    font-size: 1.3em;
+    letter-spacing: 1px;
+}
+
+.product_footer ul.products li.product .price {
+    font-size: 20px;
+    margin-top: 8px;
+}
+
+/**** coffee pack 3x *****/
+div.product-addon-totals {
+    margin: 20px 0 40px 0;
+    padding: 20px 0 0 0;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+    overflow: hidden;
+}
+
+div.product-addon-totals ul {
+    list-style: none;
+    margin: 0;
+}
+
+div.product-addon-totals ul li {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+}
+
+div.product-addon-totals .wc-pao-subtotal-line {
+    justify-content: flex-end;
+    border-top: 1px solid #eee;
+    padding: 10px 0;
+    margin-top: 20px;
+}
+
+div.product-addon-totals ul li {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+}
+
+@media (max-width: 575px){
+    .product_footer ul.products li.product .woocommerce-loop-product__title {
+        font-size: 14px !important;
+    }
+}
+
+
+
+.shop_container .text-center {
+    text-align: center;
+}

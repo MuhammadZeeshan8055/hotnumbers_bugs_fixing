@@ -1,0 +1,217 @@
+<?php
+
+use PHPMailer\PHPMailer\Exception;
+
+ function generate_order_id() {
+        $order_id = rand();
+        $master = model('MasterModel');
+        $check_db = $master->query("SELECT order_id FROM tbl_orders WHERE order_id=$order_id LIMIT 1");
+        if(empty($check_db)) {
+            return $order_id;
+        }else {
+            $this->generate_order_id();
+        }
+    }
+
+public function stripeCharge($data=[]) {
+
+    try {
+        Stripe\Stripe::setApiKey(getenv('stripe.secret'));
+        $master = model('MasterModel');
+        $user = $master->getRow('tbl_users',['user_id'=>$data['customer_id']]);
+        $data_stripe = $data;
+        $token = $data['token'];
+        $shipping_addr = $data['shipping'];
+        $cart = $this->get_cart();
+
+        unset($data_stripe['customer_id']);
+        unset($data_stripe['grand_total']);
+        unset($data_stripe['token']);
+        unset($data_stripe['shipping']);
+
+        if(empty($user['stripe_id'])) {
+            $stripe_customer = Stripe\Customer::create($data_stripe);
+            if($stripe_customer) {
+                $stripe_user_id = $stripe_customer->id;
+                $master->insertData('tbl_users',['stripe_id'=>$stripe_user_id],'user_id',$user['user_id']);
+            }
+        }
+        else {
+            $stripe_user_id = $user['stripe_id'];
+            $stripe_customer = Stripe\Customer::retrieve($stripe_user_id);
+            if(empty($stripe_customer) || $stripe_customer['deleted']==1) {
+                $stripe_customer = Stripe\Customer::create($data_stripe);
+                if($stripe_customer) {
+                    $stripe_user_id = $stripe_customer->id;
+                    $master->insertData('tbl_users',['stripe_id'=>$stripe_user_id],'user_id',$user['user_id']);
+                }
+            }
+        }
+
+        if(empty($stripe_user_id)) {
+            echo json_encode(['error'=>true,'message'=>'Customer error']);
+            exit;
+        }
+
+        $amount = floor($cart['subtotal'] * 100);
+
+        if(!$amount) {
+            echo json_encode(['error'=>true,'message'=>'Invalid amount']);
+            exit;
+        }
+
+        Stripe\Customer::createSource($stripe_user_id,['source'=>$token]);
+
+        $charge = Stripe\Charge::create([
+            'amount' => $amount,
+            'currency' => 'gbp',
+            'description' => $data['name'],
+            'customer' => $stripe_user_id,
+            'shipping' => $shipping_addr,
+            'metadata'=>$data['metadata']
+        ]);
+
+        return $charge;
+
+    }catch(Exception $e) {
+        return $e->errorMessage();
+    }
+
+}
+public function paypal_charge($order_id) {
+
+    $orderModel = model('OrderModel');
+    $order = $orderModel->get_order_by_id($order_id);
+
+    $paypal = new Paypal_lib();
+
+    pr($order,false);
+
+    if(!empty($order['items'])) {
+        $i = 0;
+
+        $meta = $order['order_meta'];
+
+        foreach($order['items'] as $i=>$product) {
+            $i++;
+            $paypal->add_field('item_name_'.$i,$product['product_name']);
+            $paypal->add_field('amount_'.$i,$product['item_meta']['line_total']);
+            $paypal->add_field('quantity_'.$i,$product['item_meta']['qty']);
+        }
+        $i++;
+        $paypal->add_field('item_name_'.$i,"Shipping + VAT");
+        $paypal->add_field('amount_'.$i,$meta['order_shipping']+$meta['order_tax']);
+
+        // $paypal->add_field('tax_cart',$order['tax']);
+        // $paypal->add_field('handling',$order['shipping_cost']);
+
+        $paypal->add_field('custom',$order_id);
+
+
+        $paypal->add_field('cmd','_cart');
+        $paypal->add_field('upload','1');
+        $paypal->add_field('rm','2');
+
+        $paypal->add_field('first_name',$order['billing_address']['first_name']);
+        $paypal->add_field('last_name',$order['billing_address']['last_name']);
+        $paypal->add_field('address1',$order['billing_address']['address_1']);
+        $paypal->add_field('address2',$order['billing_address']['address_2']);
+        $paypal->add_field('city',$order['billing_address']['city']);
+        $paypal->add_field('zip',$order['billing_address']['postcode']);
+        $paypal->add_field('country',$order['billing_address']['country']);
+    }
+
+    echo $paypal->paypal_form();
+}
+
+public function paypal_charge_subscribe($order_id) {
+    $orderModel = model('OrderModel');
+    $subscriptionModel = model('SubscriptionModel');
+    $order = $orderModel->get_order($order_id,'subscription');
+
+    $paypal = new Paypal_lib();
+
+    if(!empty($order['products'])) {
+        $i = 0;
+        foreach($order['products'] as $i=>$product) {
+            $i++;
+            $paypal->add_field('item_name',$product['product_name']);
+            $paypal->add_field('a3',$product['product_price']+$product['product_qty']+$order['shipping_cost']+$order['tax']);
+            $paypal->add_field('quantity',$product['product_qty']);
+        }
+        $i++;
+        //$paypal->add_field('item_name_'.$i,"Shipping charges");
+        // $paypal->add_field('amount_'.$i,$order['shipping_cost']+$order['tax']);
+
+        $paypal->add_field('first_name',$order['billing_fname']);
+        $paypal->add_field('last_name',$order['billing_lname']);
+        $paypal->add_field('address1',$order['billing_address1']);
+        $paypal->add_field('address2',$order['billing_address2']);
+        $paypal->add_field('city',$order['billing_city']);
+        $paypal->add_field('state',$order['billing_state']);
+        $paypal->add_field('zip',$order['billing_postcode']);
+        $paypal->add_field('country',$order['billing_country']);
+
+        $paypal->add_field('cmd','_xclick-subscriptions');
+
+        $subscription = $subscriptionModel->get_subscription($order_id);
+
+        $order['subscription'] = $subscription;
+
+        $type = $subscription['type'];
+        $duration = explode(' ',$subscription['duration']);
+        $duration_count = $duration[0];
+        $duration_type = $duration[1];
+
+        $curr_date = new \DateTime();
+        $sub_end_date = new \DateTime('+'.$subscription['duration']);
+
+        $days_diff = $curr_date->diff($sub_end_date);
+        $month_days = $days_diff->days;
+        $month_weeks = floor($month_days / 7);
+
+        $paypal->add_field('src',1);
+
+        if($duration_type === "months") {
+            $paypal->add_field('t3','M');
+            $paypal->add_field('p3',$duration_count);
+            $paypal->add_field('srt',$month_weeks);
+        }
+
+
+    }
+
+    pr($order,false);
+    echo $paypal->paypal_form();
+    ?>
+
+    <form action="https://www.sandbox.paypal.com/cgi-bin/webscr" method="post">
+        <!-- Identify your business so that you can collect the payments. -->
+        <input type="hidden" name="business" value="bilal.signumconcepts-buyer@gmail.com">
+
+        <!-- Specify a Subscribe button. -->
+        <input type="hidden" name="cmd" value="_xclick-subscriptions">
+
+        <!-- Identify the subscription. -->
+        <input type="hidden" name="item_name" value="Alice's Monthly Digest">
+        <input type="hidden" name="item_number" value="DIG Weekly">
+
+        <!-- a3 - amount to billed each recurrence
+        p3 - number of time periods between each recurrence
+        t3 - time period (D=days, W=weeks, M=months, Y=years) -->
+
+        <!-- Set the terms of the recurring payments. -->
+        <input type="hidden" name="a3" value="69.95">
+        <input type="hidden" name="p3" value="1">
+        <input type="hidden" name="t3" value="M">
+
+        <!-- Set recurring payments to stop after 6 billing cycles. -->
+        <!-- src = recurring payment -->
+        <input type="hidden" name="src" value="1">
+        <input type="hidden" name="srt" value="6">
+
+        <!-- Display the payment button. -->
+        <input type="image"  name="submit"  src="https://www.paypalobjects.com/en_US/i/btn/btn_subscribe_LG.gif"   alt="Subscribe"> <img
+            alt="" width="1" height="1" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif"></form>
+    <?php
+}
