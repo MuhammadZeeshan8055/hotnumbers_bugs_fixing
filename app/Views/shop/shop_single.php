@@ -169,9 +169,9 @@
                                         $price_text = '<span class="woocommerce-Price-currencySymbol">'.$discount_html.' '._price(number_format($price,2)).' per item</span>';
                                     }
 
-                                    if(!$price) {
-                                        $price_text = '';
-                                    }
+                                    // if(!$price) {
+                                    //     $price_text = '';
+                                    // }
 
                                     $in_stock = empty($attributes) ? in_stock($product) : true;
                                     $has_quantity = true;
