@@ -437,6 +437,7 @@ class Users extends BaseController
                 'phone_number',
                 'email_address',
                 'message',
+                '',
                 'status',
                 'date_created'
             ];
