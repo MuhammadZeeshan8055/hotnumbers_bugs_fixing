@@ -1117,11 +1117,6 @@ function datatable_query($table,$rows,$sort_cols,$group='',$extraQuery='',$custo
 
     $db = db_connect();
 
-    //  pr($query_count);
-
-    //  echo "<br><br>";
-
-    // pr($sort_cols);
 
     $total_records = $db->query($query_count)->getNumRows();
 
@@ -1129,10 +1124,7 @@ function datatable_query($table,$rows,$sort_cols,$group='',$extraQuery='',$custo
         $query .= " LIMIT $start,$length";
     }
 
-
     $records = $db->query($query)->getResultArray();
-
-    // pr($records);
 
     $output = [
         'draw'=>$_GET['draw'],
