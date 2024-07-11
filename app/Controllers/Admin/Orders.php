@@ -1075,32 +1075,67 @@ class Orders extends MyController
 
         $this->data['subscriptionForm'] = (object) $this->master->getRow('tbl_settings', ['title' => 'subscriptionForm']);
 
-        if($this->request->getPost('save_method')) {
+        // if($this->request->getPost('save_method')) {
+        //     $data = $this->request->getPost();
+        //     $db_data = [];
+
+        //     foreach($data['subscription_type']['name'] as $i=>$name) {
+        //         $value = $data['subscription_type']['value'][$i];
+        //         $db_data['subscription_type'][$value] = $name;
+        //     }
+        //     foreach($data['subscription_duration']['name'] as $i=>$name) {
+        //         $value = $data['subscription_duration']['value'][$i];
+        //         $db_data['subscription_duration'][$value] = $name;
+        //     }
+
+        //     $db_data_json = json_encode($db_data);
+
+        //     $this->master->query("UPDATE tbl_settings SET value='$db_data_json' WHERE title='subscriptionForm'");
+
+        //     notice_success('Settings saved successfully');
+
+        //     return redirect()->back();
+        // }
+
+
+       
+        if ($this->request->getMethod() === 'post') {
             $data = $this->request->getPost();
-            $db_data = [];
-
-            foreach($data['subscription_type']['name'] as $i=>$name) {
-                $value = $data['subscription_type']['value'][$i];
-                $db_data['subscription_type'][$value] = $name;
-            }
-            foreach($data['subscription_duration']['name'] as $i=>$name) {
-                $value = $data['subscription_duration']['value'][$i];
-                $db_data['subscription_duration'][$value] = $name;
-            }
-
-            $db_data_json = json_encode($db_data);
-
+        
+            // Transform $data array to desired format
+            $transformed_data = [
+                'subscription-type' => array_combine($data['subscription-type']['value'], $data['subscription-type']['name']),
+                'duration' => array_combine($data['duration']['value'], $data['duration']['name']),
+            ];
+        
+            // Convert $transformed_data array to JSON format
+            $db_data_json = json_encode($transformed_data);
+        
+            $db_data_json;
+           
+            
             $this->master->query("UPDATE tbl_settings SET value='$db_data_json' WHERE title='subscriptionForm'");
 
             notice_success('Settings saved successfully');
 
             return redirect()->back();
         }
+        
 
-        if($this->request->getPost('subscription_reminder_save')) {
+
+
+        // if($this->request->getPost('subscription_reminder_save')) {
+        //     $reminder = $this->request->getPost('subscription_reminder');
+        //     $this->master->query("UPDATE tbl_settings SET value='$reminder' WHERE title='subscriptionReminderDay'");
+
+        //     return redirect()->back();
+        // }
+
+
+        if ($this->request->getMethod() === 'post' && $this->request->getPost('form_submitted')) {
+            // Process form submission
             $reminder = $this->request->getPost('subscription_reminder');
             $this->master->query("UPDATE tbl_settings SET value='$reminder' WHERE title='subscriptionReminderDay'");
-
             return redirect()->back();
         }
 

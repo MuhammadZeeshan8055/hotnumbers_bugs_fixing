@@ -15,9 +15,27 @@
 <?php
 $masterModel = model('MasterModel');
 $productModel = model('ProductsModel');
-$categories = $masterModel->query("SELECT id, name, slug FROM tbl_categories WHERE show_in_menu=1 AND status=1 ORDER BY sort_order");
+// $categories = $masterModel->query("SELECT id, name, slug FROM tbl_categories WHERE show_in_menu=1 AND status=1 ORDER BY sort_order");
+// $role = current_user_role();
+// $user_role_id = $role['id'];
+
+
 $role = current_user_role();
 $user_role_id = $role['id'];
+$categories = $masterModel->query("SELECT 
+    tbl_categories.id, 
+    tbl_categories.name, 
+    tbl_categories.slug 
+FROM 
+    tbl_categories 
+JOIN 
+    tbl_user_role_meta 
+    ON FIND_IN_SET(tbl_categories.id, tbl_user_role_meta.meta_value) > 0
+WHERE 
+   tbl_user_role_meta.role_id = '$user_role_id' 
+ORDER BY 
+    sort_order");
+
 ?>
 
 <!--menu nav ---------------->

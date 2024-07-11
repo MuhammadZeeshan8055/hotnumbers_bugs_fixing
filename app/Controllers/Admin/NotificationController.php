@@ -48,8 +48,8 @@ class NotificationController extends BaseController
                 'notification_id',
                 'content',
                 'from_user',
-                'type',
-                'action_url',
+                // 'type',
+                // 'action_url',
                 'is_read',
                 'date_created',
             ];

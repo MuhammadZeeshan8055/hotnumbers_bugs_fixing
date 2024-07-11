@@ -51,7 +51,8 @@ class Categories extends BaseController
             }
             echo json_encode(['success'=>1]);
         }
-        exit;
+        _render_page('/' . ADMIN . '/index', $this->data);
+
     }
 
     public function page_categories()
@@ -72,7 +73,7 @@ class Categories extends BaseController
     {
         $parent = 1;
         $this->data['productModel'] = model('ProductsModel');
-        $this->data['categories'] = $this->master->getRows($this->table,['group_name'=>'post']);
+        $this->data['categories'] = $this->master->getRows($this->table,['group_name'=>'product_cat']);
         $this->data['content'] = ADMIN . "/categories/page-listing";
         $this->data['media'] = model('Media');
         $this->data['parent'] = $parent;

@@ -48,8 +48,9 @@ class Users extends BaseController
             $sort_cols = [
                 'u.user_id',
                 'u.status',
-                'u.display_name',
                 'u.username',
+                'u.display_name',
+                'u.role',
                 'u.email',
                 'u.last_active'
             ];

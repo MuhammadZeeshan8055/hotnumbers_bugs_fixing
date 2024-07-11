@@ -33,6 +33,7 @@
                     <?php if($group === "shop") { ?>
                         <th data-sortable="false">Product Count</th>
                     <?php } ?>
+                    <th data-sortable="false" width="120" class="text-center">Show In Menu</th>
                     <th data-sortable="false" width="120" class="text-center">Status</th>
 
                     <th data-sortable="false" width="220" class="text-center">Actions</th>
@@ -56,6 +57,7 @@
                         <?php if($group === "shop") { ?>
                             <td width="100"> <?php echo $prod_count ?></td>
                         <?php } ?>
+                        <td> <?php echo $cate->show_in_menu ? 'Yes':'No' ?></td>
                         <td> <?php echo $cate->status ? 'Active':'Inactive' ?></td>
 
                         <td>

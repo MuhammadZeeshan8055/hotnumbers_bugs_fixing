@@ -2,6 +2,16 @@
     <div>
 
         <?php
+
+            function getLastSegmentOfURL() {
+                $url = $_SERVER['REQUEST_URI'];
+                $urlParts = explode('/', rtrim($url, '/')); // Explode URL by '/' and remove trailing '/'
+                return end($urlParts); // Return the last element in the array
+            }
+
+            $lastSegment = getLastSegmentOfURL();
+
+
             if (session('msg')) :
                 message_notice(session('msg'));
             endif;
@@ -17,7 +27,7 @@
         &nbsp;
         <?php if(!empty($order_data)) { ?>
         <div class="d-inline-block" style="margin-bottom: -5px;">
-            <a href="<?php echo admin_url().'orders/view/'._order_number($order_data['order_id']) ?>" style="padding: 8px 11px 6px" class="btn btn-sm pull-right btn-primary bg-black">View Order</a>
+            <a href="<?php echo admin_url().'orders/view/'.$lastSegment ?>" style="padding: 8px 11px 6px" class="btn btn-sm pull-right btn-primary bg-black">View Order</a>
         </div>
         <?php } ?>
 

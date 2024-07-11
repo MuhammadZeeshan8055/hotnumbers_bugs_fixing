@@ -29,9 +29,11 @@
 
             ?>
 
-            <form class="mt-60" action="" method="post"
+            <form class="mt-60" action="<?php echo base_url('admin/subscription-settings') ?>" method="post"
                   enctype="multipart/form-data">
-
+                  
+                <!-- <input type="hidden" name="subscription_form_submitted" value="1"> -->
+                
                 <h4 class="mt-40">Subscription Settings</h4>
 
 
@@ -172,8 +174,9 @@
             </form>
             <br>
 
-            <form class="mt-20" action="" method="post"
+            <form class="mt-20" action="<?php echo base_url('admin/subscription-settings') ?>" method="post"
                   enctype="multipart/form-data">
+                  <input type="hidden" name="form_submitted" value="1">
                 <div class="row" style="width:80%">
                         <div class="col-lg-12">
 

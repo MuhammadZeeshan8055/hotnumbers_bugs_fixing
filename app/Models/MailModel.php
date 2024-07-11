@@ -384,10 +384,10 @@ class MailModel extends Model {
             $sort_cols = [
                 'mail_id',
                 'mail_to',
-                'mail_from',
-                'mail_subject',
                 'mail_cc',
                 'mail_bcc',
+                'mail_from',
+                'mail_subject',
                 'status',
                 'send_date'
             ];

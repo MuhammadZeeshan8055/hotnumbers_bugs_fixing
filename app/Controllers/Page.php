@@ -289,7 +289,7 @@ class Page extends MyController
             else {
                 notice_success('Something went wrong during submission. Please try again','message');
             }
-            return redirect()->to('work-with-us#contact-form');
+            return redirect()->back();
         }
     }
 
