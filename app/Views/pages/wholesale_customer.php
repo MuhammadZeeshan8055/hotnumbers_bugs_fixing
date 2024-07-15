@@ -11,11 +11,36 @@
     <div class="container">
         <div class="heading top-page">
             <h1>Wholesale<br/>Customers</h1>
-            <h2>Login in to your Wholesale Account</h2>
+            <?php
+            if(is_wholesaler()){
+            ?>
+                 
+            <?php
+            }else{
+            ?>
+                <h2>Login in to your Wholesale Account</h2>
+            <?php
+            }
+            ?>
+           
         </div>
-        <div class="has_btn_bottom ">
-            <a class="button button_lrg button_red button_bottom" href="<?php echo base_url('account') ?>"> Login </a>
-        </div>
+        <?php
+        if(is_wholesaler()){
+        ?>
+            <div class="has_btn_bottom ">
+                <a class="button button_lrg button_red button_bottom" href="<?php echo base_url('account') ?>"> View Account </a>
+            </div>
+        <?php
+        }else{
+         
+        ?>
+            <div class="has_btn_bottom ">
+                <a class="button button_lrg button_red button_bottom" href="<?php echo base_url('account') ?>"> Login </a>
+            </div>
+        <?php
+        }
+        ?>
+        
     </div>
 </section>
 <!-- section 1 end --->
@@ -138,62 +163,72 @@
 <section id="contact-form" class="txt-block no_border_bottom margins_inherit" style="">
     <div class="container">
         <div class="text three_quarter align_center">
+            <?php
+            if(is_wholesaler()){
+            ?>
+                 
+            <?php
+            }else{
+            ?>
+                 <h2>Request an account</h2>
 
-            <h2>Request an account</h2>
-
-            <div class="message d-table" style="width: 100%">
-                <?php echo get_message('register_success') ?>
-            </div>
-            <br>
-            <div class="text-block">
-                <div role="form" lang="en-US" dir="ltr">
-                    <div class="screen-reader-response">
-                        <p role="status" aria-live="polite" aria-atomic="true"></p> <ul></ul>
-                    </div>
-
-                    <form action="<?php echo base_url('wholesale-request') ?>" onsubmit="this.send.disabled=true" method="post" class="validate">
-
-                        <div class="row pt-3">
-                            <div class="col-md-6">
-                                <!-- your name --->
-                                <input type="text" name="your_name" required="required" data-error="Your name is required" data-type="name" value="<?php echo old('your_name') ?>" size="40" class="form-control" aria-required="true" aria-invalid="false" placeholder="Full name*" />
-                                <?php echo error_message(@$form_error['your_name']) ?>
-                            </div>
-                            <div class="col-md-6">
-                                <!-- company name --->
-                                <input type="text" name="company_name" value="<?php echo old('company_name') ?>" size="40" class="form-control" aria-invalid="false" placeholder="Company name" />
-                                <?php echo error_message(@$form_error['company_name']) ?>
-                            </div>
-                        </div>
-
-                        <div class="row pt-3">
-                            <div class="col-md-6">
-                                <!-- your number --->
-                                <input type="text" name="your_number" value="<?php echo old('your_number') ?>" size="40" class="form-control" aria-invalid="false" placeholder="Telephone number*" />
-                                <?php echo error_message(@$form_error['your_number']) ?>
-                            </div>
-                            <div class="col-md-6">
-                                <!-- email --->
-                                <input type="text" name="your_email" required="required" data-error="Your email address is required" value="<?php echo old('your_email') ?>" size="40" class="form-control" aria-required="true" aria-invalid="false" placeholder="Email*" />
-                                <?php echo error_message(@$form_error['your_email']) ?>
-                            </div>
-                        </div>
-
-                        <div class="row pt-3">
-                            <div class="col-md-12">
-                                <!-- your message -->
-                                <textarea name="your_message" cols="40" rows="10" class="form-control" aria-invalid="false" placeholder="Your message (optional)"><?php echo old('your_message') ?></textarea>
-                                <?php echo error_message(@$form_error['your_message']) ?>
-                            </div>
-                        </div>
-
-                        <div class="c-1">
-                            <!-- submit --->
-                            <button type="submit" class="form-control btn btn-primary" name="send" style="font-size: 20px;">Send</button>
-                        </div>
-                    </form>
+                <div class="message d-table" style="width: 100%">
+                    <?php echo get_message('register_success') ?>
                 </div>
-            </div>
+                <br>
+                <div class="text-block">
+                    <div role="form" lang="en-US" dir="ltr">
+                        <div class="screen-reader-response">
+                            <p role="status" aria-live="polite" aria-atomic="true"></p> <ul></ul>
+                        </div>
+
+                        <form action="<?php echo base_url('wholesale-request') ?>" onsubmit="this.send.disabled=true" method="post" class="validate">
+
+                            <div class="row pt-3">
+                                <div class="col-md-6">
+                                    <!-- your name --->
+                                    <input type="text" name="your_name" required="required" data-error="Your name is required" data-type="name" value="<?php echo old('your_name') ?>" size="40" class="form-control" aria-required="true" aria-invalid="false" placeholder="Full name*" />
+                                    <?php echo error_message(@$form_error['your_name']) ?>
+                                </div>
+                                <div class="col-md-6">
+                                    <!-- company name --->
+                                    <input type="text" name="company_name" value="<?php echo old('company_name') ?>" size="40" class="form-control" aria-invalid="false" placeholder="Company name" />
+                                    <?php echo error_message(@$form_error['company_name']) ?>
+                                </div>
+                            </div>
+
+                            <div class="row pt-3">
+                                <div class="col-md-6">
+                                    <!-- your number --->
+                                    <input type="text" name="your_number" value="<?php echo old('your_number') ?>" size="40" class="form-control" aria-invalid="false" placeholder="Telephone number*" />
+                                    <?php echo error_message(@$form_error['your_number']) ?>
+                                </div>
+                                <div class="col-md-6">
+                                    <!-- email --->
+                                    <input type="text" name="your_email" required="required" data-error="Your email address is required" value="<?php echo old('your_email') ?>" size="40" class="form-control" aria-required="true" aria-invalid="false" placeholder="Email*" />
+                                    <?php echo error_message(@$form_error['your_email']) ?>
+                                </div>
+                            </div>
+
+                            <div class="row pt-3">
+                                <div class="col-md-12">
+                                    <!-- your message -->
+                                    <textarea name="your_message" cols="40" rows="10" class="form-control" aria-invalid="false" placeholder="Your message (optional)"><?php echo old('your_message') ?></textarea>
+                                    <?php echo error_message(@$form_error['your_message']) ?>
+                                </div>
+                            </div>
+
+                            <div class="c-1">
+                                <!-- submit --->
+                                <button type="submit" class="form-control btn btn-primary" name="send" style="font-size: 20px;">Send</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            <?php
+            }
+            ?>
+           
         </div>
     </div>
 </section>
