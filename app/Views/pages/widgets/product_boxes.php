@@ -24,7 +24,7 @@
                         ?>
 
                         <article>
-                            <a class="link" href="<?php echo site_url().'products/'.$getprod->slug ?>" title="<?php echo $getprod->title ?>">
+                            <a class="link" href="<?php echo site_url().'shop/product/'.$getprod->slug ?>" title="<?php echo $getprod->title ?>">
                                 <div class="featured">
                                     <img src="<?php echo $image_url ?>">
                                     <div class="details">
