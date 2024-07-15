@@ -71,6 +71,7 @@ class Orders extends MyController
                 'o.shipping_address',
                 'o.payment_method',
                 $order_shipping_title,
+                'o.order_type',
                  $order_total_field
             ];
 
@@ -1098,7 +1099,14 @@ class Orders extends MyController
         // }
 
 
-       
+        if ($this->request->getMethod() === 'post' && $this->request->getPost('form_submitted')) {
+            // Process form submission
+            $reminder = $this->request->getPost('subscription_reminder');
+            $this->master->query("UPDATE tbl_settings SET value='$reminder' WHERE title='subscriptionReminderDay'");
+            return redirect()->back();
+        }
+
+        
         if ($this->request->getMethod() === 'post') {
             $data = $this->request->getPost();
         
@@ -1132,12 +1140,7 @@ class Orders extends MyController
         // }
 
 
-        if ($this->request->getMethod() === 'post' && $this->request->getPost('form_submitted')) {
-            // Process form submission
-            $reminder = $this->request->getPost('subscription_reminder');
-            $this->master->query("UPDATE tbl_settings SET value='$reminder' WHERE title='subscriptionReminderDay'");
-            return redirect()->back();
-        }
+      
 
         $this->data['content'] = ADMIN . "/orders/subscription_form";
 
