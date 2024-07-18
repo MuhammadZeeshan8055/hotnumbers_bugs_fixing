@@ -59,13 +59,73 @@ class Subscription extends BaseController
             $pid = $product->id;
 
             $total_price = 0;
+            
+            // backup 
 
-            foreach($postdata['attribute_bag-size'] as $size) {
-                $variation = $ProductsModel->product_variation($pid, ['attribute_size'=>$size]);
-                if(!empty($variation)) {
-                    $total_price += !empty($variation['values']['sale_price']) ? $variation['values']['sale_price'] : $variation['values']['regular_price'];
+            // foreach($postdata['attribute_bag-size'] as $size) {
+            //     $variation = $ProductsModel->product_variation($pid, ['attribute_size'=>$size]);
+            //     if(!empty($variation)) {
+            //         $total_price += !empty($variation['values']['sale_price']) ? $variation['values']['sale_price'] : $variation['values']['regular_price'];
+            //     }
+            // }
+
+            // foreach ($_POST['attribute_bag-size'] as $size) {
+            //     // Retrieve the quantity for the current size
+            //  $quantity_key = 'quantity_' . strtolower(str_replace(' ', '_', $size));
+            //  $quantity = $_POST[$quantity_key];
+            
+            //     // Process each size with its associated quantity
+            //     $variation = $ProductsModel->product_variation($pid, ['attribute_size' => $size]);
+            
+            //     if (!empty($variation)) {
+            //         $price = !empty($variation['values']['sale_price']) ? $variation['values']['sale_price'] : $variation['values']['regular_price'];
+            //       echo $total_price += $price * $quantity; // Adjust total price based on quantity
+            //     }
+            // }
+            
+            
+            // working
+            
+            // foreach ($_POST['attribute_bag-size'] as $size) {
+            //     // Retrieve the quantity for the current size
+            //     $quantity_key = 'quantity_' . strtolower(str_replace(' ', '_', $size));
+            //     $quantity = $_POST[$quantity_key];
+            
+            //     // Process each size with its associated quantity
+            //     $variation = $ProductsModel->product_variation($pid, ['attribute_size' => $size]);
+            
+            //     if (!empty($variation)) {
+            //         $price = !empty($variation['values']['sale_price']) ? $variation['values']['sale_price'] : $variation['values']['regular_price'];
+            
+            //         // Adjust the format of size to include quantity
+            //         $sizes[] = $size . ' (' . $quantity . ')';
+                    
+            //         // Accumulate total price based on quantity
+            //         $total_price += $price * $quantity;
+            //     }
+            // }
+            
+            
+            
+            foreach ($_POST['attribute_bag-size'] as $size) {
+                // Retrieve the quantity for the current size
+                $quantity_key = 'quantity_' . strtolower(str_replace(' ', '_', $size));
+                $quantity = $_POST[$quantity_key];
+            
+                // Process each size with its associated quantity
+                $variation = $ProductsModel->product_variation($pid, ['attribute_size' => $size]);
+            
+                if (!empty($variation)) {
+                    $price = !empty($variation['values']['sale_price']) ? $variation['values']['sale_price'] : $variation['values']['regular_price'];
+            
+                    // Adjust the format of size to include quantity
+                    $sizes[] = $size . ' (qty: ' . $quantity . ')';
+                    
+                    // Accumulate total price based on quantity
+                    $total_price += $price * $quantity;
                 }
             }
+           
 
             $subscription = [
                 'enable' => 1,
@@ -74,12 +134,32 @@ class Subscription extends BaseController
                 'expire' => 0,
                 'price' => $total_price
             ];
+            
+            // backup 
 
+            // $variations = [
+            //     'sizes' => array_values($postdata['attribute_bag-size']),
+            //     'period' => $interval,
+            //     'flavour'=> $postdata['attribute_flavour'],
+            //     'grind'=> $postdata['attribute_grind'],
+            // ];
+            
+            
+            // working 
+            
+            // $variations = [
+            //     'sizes' => $sizes, // Use the adjusted sizes array
+            //     'period' => $interval,
+            //     'flavour' => $postdata['attribute_flavour'],
+            //     'grind' => $postdata['attribute_grind'],
+            // ];
+            
+            
             $variations = [
-                'sizes' => array_values($postdata['attribute_bag-size']),
+                'sizes' => $sizes, // Use the adjusted sizes array
                 'period' => $interval,
-                'flavour'=> $postdata['attribute_flavour'],
-                'grind'=> $postdata['attribute_grind'],
+                'flavour' => $postdata['attribute_flavour'],
+                'grind' => $postdata['attribute_grind'],
             ];
 
             $sale_price = $product->sale_price;

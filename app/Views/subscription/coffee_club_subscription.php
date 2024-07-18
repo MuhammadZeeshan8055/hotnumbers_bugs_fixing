@@ -183,9 +183,13 @@
                                             foreach($sizes as $price=>$size) {
                                                 $size_list[] = trim($size);
                                                 ?>
-                                                <div class="input_button" style="width: 32%">
-                                                    <input type="checkbox" required="" data-price="<?php echo $price ?>" name="attribute_bag-size[]" class="styled" value="<?php echo $size ?>" placeholder="<?php echo $size ?>">
-                                                    <label><?php echo $size ?></label>
+                                                <div class="fields-wrapper">
+                                                    <div class="input_button">
+                                                        <input type="checkbox" required="" data-price="<?php echo $price ?>" name="attribute_bag-size[]" class="styled" value="<?php echo $size ?>" placeholder="<?php echo $size ?>">
+                                                        <label><?php echo $size ?></label>
+                                                        
+                                                    </div>
+                                                    <input type="number" name="quantity_<?php echo strtolower(str_replace(' ', '_', $size)); ?>" class="quantity-input" value="1" min="1">
                                                 </div>
                                             <?php
                                             }

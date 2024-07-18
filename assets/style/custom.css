@@ -25160,6 +25160,13 @@ textarea.form-control-lg {
     display: none !important;
   }
 }
+.fields-wrapper {
+  display: flex !important;
+}
+.fields-wrapper input.quantity-input {
+  height: 42px;
+  margin-top: 4px;
+}
 
 
 /*# sourceMappingURL=custom.css.map */
