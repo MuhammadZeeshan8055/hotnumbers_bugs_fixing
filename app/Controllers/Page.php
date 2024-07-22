@@ -144,7 +144,7 @@ class Page extends MyController
                     notice_success('Request sent successfully. Our representative will contact you shortly.','message');
                 }else {
                     notice_success('Could not submit your request.','message');
-                };
+                }
 
                 return redirect()->to(base_url('contact-us#contact'));
             }
