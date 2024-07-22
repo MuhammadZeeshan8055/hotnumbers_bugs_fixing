@@ -1194,11 +1194,11 @@ class Orders extends MyController
             $sort_cols = [
                 'o.order_id',
                 'o.customer_user',
-                '',
+                'item.order_item_id',
                 '',
                 'o.order_date',
                 '',
-                '',
+                'o.parent_id',
                 '',
                 '',
                 'o.status'
