@@ -109,7 +109,8 @@ class Page extends MyController
                 $number = esc(strip_tags($data['number']));
                 $email = esc(strip_tags($data['email']));
                 $message = esc(strip_tags($data['message']));
-
+                $smtp_id=esc(strip_tags($data['smtp_id']));
+            
                 $mail = new MailModel();
 
                 $mailbody = '
@@ -140,7 +141,9 @@ class Page extends MyController
                     </table>
                 </div>';
 
-                if($mail->send_email($admin_mail,$mailbody,['subject'=>'Contact Form - Hot Numbers'])) {
+              
+               if ($mail->send_email($admin_mail, $mailbody, ['subject' => 'Contact Form - Hot Numbers', 'smtp_id' => $smtp_id])) {
+
                     notice_success('Request sent successfully. Our representative will contact you shortly.','message');
                 }else {
                     notice_success('Could not submit your request.','message');
@@ -273,6 +276,7 @@ class Page extends MyController
             </div>
             ';
 
+            $smtp_id=$post['smtp_id'];
             $recruitment_email = get_setting('website.recruitment_email');
             $mailModel->subject("Career form submission");
             $document = $this->request->getFile('cv_document');
@@ -280,8 +284,8 @@ class Page extends MyController
             $filename = 'cv-'.$post['your_name'].'-'.rand().'.'.$ext;
             $document->move(WRITEPATH.'uploads/cv',$filename,true);
             $mailModel->attach(WRITEPATH.'uploads/cv/'.$filename);
-
-            $send = $mailModel->send_email($recruitment_email, $mail_body);
+            
+            $send = $mailModel->send_email($recruitment_email, $mail_body,['smtp_id'=>$smtp_id]);
 
             if($send) {
                 notice_success('Your application has been submitted. Thank you for your interest in joining our team.','message');

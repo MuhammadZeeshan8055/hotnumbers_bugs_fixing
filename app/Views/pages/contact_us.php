@@ -86,8 +86,10 @@
                         <br>
 
                         <form action="" method="post" class="validate">
-                            <div></div>
-
+                            
+                            <div class="email_id">
+                                <input type="hidden" name="smtp_id" value="1" >
+                            </div>
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="row row-fluid">

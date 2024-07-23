@@ -133,7 +133,11 @@
                     </div>
 
                     <form action="<?php echo base_url('recruitment-post') ?>" enctype="multipart/form-data" onsubmit="this.send.disabled=true" method="post" class="validate" autocomplete="off">
-
+                    
+                        <div class="email_id">
+                            <input type="hidden" name="smtp_id" value="1" >
+                        </div>
+                        
                         <div class="row pt-3">
                             <div class="col-md-6 col-sm-12">
                                 <input type="text" name="your_name" required data-error="Your name is required" data-type="name" value="<?php echo old('your_name') ?>" size="40" class="form-control" aria-required="true" aria-invalid="false" placeholder="Full name*" />
