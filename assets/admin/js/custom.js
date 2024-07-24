@@ -928,28 +928,23 @@ function browse_media_sidebar_close() {
 }
 
 function media_gallery_upload() {
-    $(document).on('submit','.media_gallery_upload', function(e) {
+    $(document).on('submit', '.media_gallery_upload', function(e) {
         e.preventDefault();
         const url = this.getAttribute('action');
         const formData = new FormData(this);
 
         $('#upload_media_progress').remove();
-        $(this).after('<div id="upload_media_progress"><progress value="0" max="100%"></progress></div>');
+        $(this).after('<div id="upload_media_progress"><progress value="0" max="100"></progress></div>');
+
         $.ajax({
             xhr: function() {
                 var xhr = new window.XMLHttpRequest();
                 xhr.upload.addEventListener("progress", function(evt) {
                     if (evt.lengthComputable) {
-                        var percentComplete = evt.loaded / evt.total;
-                        percentComplete = parseInt(percentComplete * 100);
-                        $('#upload_media_progress > progress').attr('value',percentComplete);
-                        $('#upload_media_progress > progress').text(percentComplete);
-                        if (percentComplete === 100) {
-                            $('#upload_media_progress').remove();
-                        }
+                        var percentComplete = (evt.loaded / evt.total) * 100;
+                        $('#upload_media_progress > progress').attr('value', percentComplete);
                     }
                 }, false);
-
                 return xhr;
             },
             url: url,
@@ -959,11 +954,36 @@ function media_gallery_upload() {
             cache: false,
             processData: false,
             success: function(result) {
+                result = JSON.parse(result); // Parse JSON string to object
+                if (result.success == 1) {
+                    alert(result.message); // Show success message
+                    // location.reload(true); // Reloads the page from the server
+                    let url = admin_url + '/media-library-frame?q=';
+                    $('.media-gallery-rows').html('<div style="text-align: center; width: 100%"><img width="100" src="'+site_url+'/assets/images/loader-2.svg"></div>');
+                    $.get(url, function(data) {
+                        let html = $(data).find('.media-gallery-rows').html();
+                        $('.media-gallery-rows').html(html);
+                        $('.pagination a').removeClass('active');
 
+                        // Clear form inputs
+                        $('.media_gallery_upload')[0].reset();
+                
+                        // media_library_click_handle();
+                    });
+                } else {
+                    alert(result.message); // Show error message
+                }
+            },
+            error: function(xhr, status, error) {
+                alert("An error occurred while uploading: " + error); // Handle AJAX error
+            },
+            complete: function() {
+                $('#upload_media_progress').remove(); // Remove progress bar when complete
             }
         });
     });
 }
+
 
 media_gallery_upload();
 

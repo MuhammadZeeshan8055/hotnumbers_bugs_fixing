@@ -43,7 +43,7 @@
                                 ?>
                                 <tr class="text-center">
                                     <td class="text-left"><?php echo $notification['content'] ?></td>
-                                    <td><a class="edit_row btn btn-primary btn-sm red" href="<?php echo site_url() ?>admin/products/add/<?php echo $notification['action_url'] ?>">View</a> </td>
+                                    <td><a class="edit_row btn btn-primary btn-sm red" href="<?php echo site_url() ?>admin/<?php echo $notification['action_url'] ?>">View</a> </td>
                                 </tr>
                             <?php } ?>
                             </tbody>
@@ -76,7 +76,7 @@
                         <tr>
                             <td class="text-left"><?php echo $sale->title ?></td>
                             <td class="text-left"><?php echo $sale->total_sales ?></td>
-                            <td><a class="edit_row btn btn-primary btn-sm red" href="<?php echo site_url() ?>admin/products/add/<?php echo $sale->id ?>">View</a> </td>
+                            <td><a class="edit_row btn btn-primary btn-sm red" href="<?php echo site_url() ?>admin/<?php echo $sale->id ?>">View</a> </td>
                         </tr>
                     <?php } ?>
                     </tbody>

@@ -116,28 +116,26 @@ class MediaController extends BaseController
         if(!empty($files['upload_files'])) {
             $files = $files['upload_files'];
             $media = model('Media');
-            $success = false;
+            $success = true; // Assume success initially
+    
             foreach($files as $file) {
-                $uploads = $media->store_image($file,'products');
-                if(!empty($uploads['success'])) {
-                    $success = true;
-                }else {
+                $uploads = $media->store_image($file, 'products');
+                if(empty($uploads['success'])) {
                     $success = false;
-                    break;
+                    break; // If any upload fails, break out and set success to false
                 }
             }
-            if(!$success) {
-                echo json_encode(['success'=>0,'message'=>'Failed to upload some file(s).']);
-                //return redirect()->to($_SERVER['HTTP_REFERER']);
-            }else {
-                echo json_encode(['success'=>1,'message'=>'Files uploaded successfully']);
-            //    notice_success('Files uploaded successfully.');
-               // return redirect()->to($_SERVER['HTTP_REFERER']);
+    
+            if($success) {
+                echo json_encode(['success' => 1, 'message' => 'Files uploaded successfully']);
+            } else {
+                echo json_encode(['success' => 0, 'message' => 'Failed to upload some file(s)']);
             }
-            exit;
-
+    
+            exit; // Exit to prevent further output
         }
     }
+    
 
     public function delete_media($del_id=0) {
         if(!empty($del_id)) {
