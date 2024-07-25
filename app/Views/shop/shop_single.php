@@ -413,6 +413,15 @@
                                                 $('#single_variation_data').html(res);
                                                 $('#single_variation_data').slideDown();
                                                 $('#add_to_basket').slideDown();
+
+                                                // Extract error message
+                                                var errorMessage = $('.woocommerce-variation-box .error-message').text();
+                                                
+                                                if(errorMessage=='Out of stock'){
+                                                    $('.single_add_to_cart_button').prop('disabled', true);
+                                                }else{
+                                                    $('.single_add_to_cart_button').prop('disabled', false);
+                                                }
                                             }
                                             else {
                                                 <?php if($product->type == "variable") { ?>

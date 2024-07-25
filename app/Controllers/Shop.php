@@ -308,6 +308,13 @@ class Shop extends BaseController
                                 else {
                                     ?>
                                 <p class="error-message"><?php echo $variation_json['error'] ?></p>
+                                <div class="woocommerce-variation-price">
+                                    <span class="price">
+                                        <span class="woocommerce-Price-amount amount">
+                                            <span id="item-price"><?php echo $variation_json['calculated_price_html'] ?></span>
+                                        </span>
+                                    </span>
+                                </div>
                                 <?php
                                 }?>
                             </div>

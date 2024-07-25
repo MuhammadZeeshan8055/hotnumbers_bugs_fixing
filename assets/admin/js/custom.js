@@ -956,10 +956,10 @@ function media_gallery_upload() {
             success: function(result) {
                 result = JSON.parse(result); // Parse JSON string to object
                 if (result.success == 1) {
-                    alert(result.message); // Show success message
+                    // alert(result.message); // Show success message
                     // location.reload(true); // Reloads the page from the server
                     let url = admin_url + '/media-library-frame?q=';
-                    $('.media-gallery-rows').html('<div style="text-align: center; width: 100%"><img width="100" src="'+site_url+'/assets/images/loader-2.svg"></div>');
+                    // $('.media-gallery-rows').html('<div style="text-align: center; width: 100%"><img width="100" src="'+site_url+'/assets/images/loader-2.svg"></div>');
                     $.get(url, function(data) {
                         let html = $(data).find('.media-gallery-rows').html();
                         $('.media-gallery-rows').html(html);
