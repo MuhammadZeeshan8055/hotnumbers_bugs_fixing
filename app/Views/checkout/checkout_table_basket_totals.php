@@ -256,10 +256,24 @@ if(!empty($cart_tax) && $cart['total_tax'] && get_setting('display_tax_price') =
 
 <tr class="order-total">
     <th>Total</th>
-    <td data-title="Total"><strong><span class="woocommerce-Price-amount amount">
+    <td data-title="Total">
+        <strong>
+            <span class="woocommerce-Price-amount amount">
                 <bdi>
                     <span style="margin-right: -4px"><?php echo currency_symbol ?></span>
-                    <span id="total_shipping_amount"><?php echo number_format($cart['cart_total'], 2);?></span></bdi></span></strong>
+                    <span id="total_shipping_amount">
+                        <?php
+                        if(!empty($cart['has_shipping'])) {
+                            $grand_total= $cart['cart_total'];
+                        }else{
+                            $grand_total= $cart['cart_total']-$cart['shipping_cost'];
+                        }
+                            echo number_format($grand_total, 2); 
+                        ?>
+                    </span>
+                </bdi>
+            </span>
+        </strong>
 
         <span id="shipping-vat" style="font-size: 15px;margin-left: 5px;"><?php if($cart['total_tax'] && get_setting('display_tax_price') == 'including_tax') {echo '(includes '._price($cart['total_tax']).' '.$cart['tax_name'].')';} ?></span>
 

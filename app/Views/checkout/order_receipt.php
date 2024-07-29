@@ -38,6 +38,7 @@ if(!empty($order)) {
         <tbody>
         <?php
 
+        $payment_method=$order['payment_method'];
         $shipping_method = '';
         $discount = '';
         $free_shipping_count = 0;
@@ -365,6 +366,16 @@ if(!empty($order)) {
                         <th style="text-align: left">Total: </th>
                         <td style=" padding-top: 10px; text-align: right"><?php echo _price($order_subtotal); ?> <?php if($vat && $display_tax_price === "including_tax") {echo '<div><small>(includes '._price($vat).' '.$tax_name.')</small></div>';} ?></td>
                     </tr>
+                    <?php
+                    if(!empty($payment_method)) {
+                        ?>
+                        <tr align="top" style="vertical-align: top;text-align: left">
+                            <td>Payment Method: </td>
+                            <td style="padding-bottom: 10px; text-align: right"><?php echo $payment_method ?></td>
+                        </tr>
+                        <?php
+                    }
+                    ?>
 
                     <?php
                      if(!empty($order_meta['order_refund'])) {

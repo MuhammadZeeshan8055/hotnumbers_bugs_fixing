@@ -7,6 +7,15 @@ if(get_setting('currency')) {
     define('currency_symbol','£');
 }
 
+function has_subscription($uid) {
+
+    $sql="SELECT tbl_orders.customer_user,tbl_order_items.order_id,tbl_order_item_meta.item_id,tbl_order_item_meta.meta_key,tbl_order_item_meta.meta_value FROM `tbl_orders` join tbl_order_items ON tbl_orders.order_id=tbl_order_items.order_id join tbl_order_item_meta on tbl_order_items.order_item_id=tbl_order_item_meta.item_id where tbl_order_item_meta.meta_key='type' and tbl_order_item_meta.meta_value='club_subscription' and tbl_orders.customer_user='$uid'";
+    $master = model('MasterModel');
+    $q = $master->query($sql, true, true);
+    return $q;
+}
+
+
 function php_errors() {
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);
@@ -67,7 +76,10 @@ function _order_number($number, $prefix='') {
 
     if(!empty($q['role']) && $q['role'] == "wholesale_customer") {
         $prefix = 'HNW';
-    }else {
+    }elseif(!empty($q['role']) && $q['role'] == "internal") {
+        $prefix = 'HNI';
+    }
+    else {
         $prefix = 'HNR';
     }
     $number = strlen($number) < 4 ? sprintf("%04d", $number) : $number;

@@ -227,7 +227,7 @@
 
                                     <div class="col-lg-12 mb-15">
                                         <div class="input_field">
-                                            <label>Location &nbsp; <small style="text-transform: initial">(wrap text in apostrophe (') to link with google map)</small></label>
+                                            <label>Location</label>
                                             <input type="text" name="address"
                                                    value="<?php echo $data['address'] ?>">
                                         </div>

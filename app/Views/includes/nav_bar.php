@@ -86,9 +86,7 @@ ORDER BY
                 <li class="menu-item mt-15" style="margin-top: 18px">
                     <a href="<?php echo base_url('coffee-club-subscription') ?>">Subscriptions</a>
                 </li>
-                <li class="menu-item" style="margin-bottom:;"><a
-                        href="<?php echo base_url('shop/category/equipment') ?>">Equipment</a>
-                </li>
+               
             </ul>
             </li>
             <li class="separator"></li>

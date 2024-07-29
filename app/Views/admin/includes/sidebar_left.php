@@ -10,6 +10,12 @@ $unread_notifications = $unread_notifications['total'];
 
 $req_count = $masterModel->getRow('tbl_request_acc',['status'=>'pending'],'','COUNT(req_id) AS count');
 $wholesale_acc_count = $req_count['count'];
+
+if(is_logged_in()) {
+    $user = model('UserModel');
+
+    $get_user = $user->get_user();
+}
 ?>
 <div class="row no-gutters">
     <div id="mySidebar">
@@ -217,6 +223,9 @@ $wholesale_acc_count = $req_count['count'];
 
     <div class="admin_nav_bar flex_end">
         <button class="openbtn" onclick="openNav()">☰</button>
+
+        <a href="<?php echo base_url()?>" target="_blank">Logged in as <?=$get_user->email?></a>
+
         <a href="<?php echo base_url()?>" target="_blank">Open Website</a>
 
         <a data-confirm="Are you sure to logout?" href="#" data-href="<?php echo base_url(ADMIN."/logout")?>">Logout</a>

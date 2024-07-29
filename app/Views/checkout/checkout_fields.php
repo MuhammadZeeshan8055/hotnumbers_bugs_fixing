@@ -81,12 +81,26 @@
                         >*</abbr></label>
                     <?php echo form_input('billing_phone', set_value('billing_phone',$form_data['billing_phone']),['class'=>'input-text','data-error'=>'Contact phone number is required','type'=>'tel','required'=>'required']) ?>
                 </div>
-
+                <?php
+                    if (is_logged_in()) {
+                ?>
                 <div class="form-row validate-email"
-                     id="billing_email_field"><label for="billing_email">Email Address&nbsp;<abbr
+                     id="billing_email_field" style="display:none"><label for="billing_email">Email Address&nbsp;<abbr
                         >*</abbr></label>
                     <?php echo form_input('billing_email', set_value('billing_email',$form_data['billing_email']),['class'=>'input-text','data-error'=>'Your email address is required','type'=>'email','required'=>'required','id'=>'email_address_input']) ?>
                 </div>
+                <?php
+                    }else{
+                ?>
+                    <div class="form-row validate-email"
+                        id="billing_email_field"><label for="billing_email">Email Address&nbsp;<abbr
+                            >*</abbr></label>
+                        <?php echo form_input('billing_email', set_value('billing_email',$form_data['billing_email']),['class'=>'input-text','data-error'=>'Your email address is required','type'=>'email','required'=>'required','id'=>'email_address_input']) ?>
+                    </div>
+
+                <?php
+                    }
+                ?>
             </div>
         </div>
     </div>
