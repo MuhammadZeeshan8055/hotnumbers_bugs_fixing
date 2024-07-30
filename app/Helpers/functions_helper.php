@@ -9,12 +9,26 @@ if(get_setting('currency')) {
 
 function has_subscription($uid) {
 
-    $sql="SELECT tbl_orders.customer_user,tbl_order_items.order_id,tbl_order_item_meta.item_id,tbl_order_item_meta.meta_key,tbl_order_item_meta.meta_value FROM `tbl_orders` join tbl_order_items ON tbl_orders.order_id=tbl_order_items.order_id join tbl_order_item_meta on tbl_order_items.order_item_id=tbl_order_item_meta.item_id where tbl_order_item_meta.meta_key='type' and tbl_order_item_meta.meta_value='club_subscription' and tbl_orders.customer_user='$uid'";
+    // $sql="SELECT tbl_orders.customer_user,tbl_order_items.order_id,tbl_order_item_meta.item_id,tbl_order_item_meta.meta_key,tbl_order_item_meta.meta_value FROM `tbl_orders` join tbl_order_items ON tbl_orders.order_id=tbl_order_items.order_id join tbl_order_item_meta on tbl_order_items.order_item_id=tbl_order_item_meta.item_id where tbl_order_item_meta.meta_key='type' and tbl_order_item_meta.meta_value='club_subscription' and tbl_orders.customer_user='$uid'";
+    $sql="SELECT tbl_orders.customer_user,tbl_order_items.order_id FROM `tbl_orders` join tbl_order_items ON tbl_orders.order_id=tbl_order_items.order_id where tbl_orders.order_type='shop_subscription' and tbl_orders.customer_user='$uid';";
     $master = model('MasterModel');
     $q = $master->query($sql, true, true);
     return $q;
 }
 
+function already_has_subscription_in_cart($uid){
+    $sql = "SELECT * FROM tbl_carts WHERE user_id = '$uid' AND JSON_CONTAINS(cart_data, '{\"type\": \"club_subscription\"}', '$.products') order by id desc LIMIT 1";
+    $master = model('MasterModel');
+    $q = $master->query($sql, true, true);
+    return $q;
+}
+
+function global_wholesale_discount_value(){
+    $sql = "SELECT JSON_UNQUOTE(JSON_EXTRACT(value, '$.4.role_discount')) AS role_discount FROM tbl_settings WHERE title = 'user_discount'";
+    $master = model('MasterModel');
+    $q = $master->query($sql, true, true);
+    return $q;
+}
 
 function php_errors() {
     ini_set('display_errors', 1);

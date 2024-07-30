@@ -283,6 +283,1030 @@ class Orders extends MyController
 
     }
 
+    public function whole_sale_orders()
+    {
+        $userModel = model('UserModel');
+
+        if($this->request->getGet('get_data')) {
+
+            $payment_method_field = "(SELECT meta_value FROM tbl_order_meta WHERE order_id=o.order_id AND meta_key='payment_method' LIMIT 1)";
+            $order_total_field = "(SELECT meta_value FROM tbl_order_meta WHERE order_id=o.order_id AND meta_key='order_total' LIMIT 1)";
+            $first_name_field = "(SELECT meta_value FROM tbl_order_meta WHERE order_id=o.order_id AND meta_key='billing_first_name' LIMIT 1)";
+            $shipping_addr_field = "(SELECT meta_value FROM tbl_order_meta WHERE order_id=o.order_id AND meta_key='shipping_address_index' LIMIT 1)";
+            $order_shipping_title = "(SELECT meta_value FROM tbl_order_meta WHERE order_id=o.order_id AND meta_key='order_shipping_title' LIMIT 1)";
+            $shipping_cost = "(SELECT meta_value FROM tbl_order_meta WHERE order_id=o.order_id AND meta_key='shipping_cost' LIMIT 1)";
+            $username_field = "(SELECT username FROM tbl_users WHERE user_id=o.customer_user LIMIT 1)";
+            $role_field = "(SELECT roles.name FROM tbl_users AS user JOIN tbl_user_roles AS roles ON roles.id=user.role WHERE user.user_id=o.customer_user LIMIT 1)";
+
+            $rows = [
+                'o.order_id',
+                'o.order_title',
+                'o.order_date',
+                'o.order_type',
+                'o.payment_method',
+                'o.status',
+                ''=>['searchable'=>0],
+                'o.customer_user',
+                'o.shipping_address',
+                "$username_field AS customer_username",
+                "$payment_method_field AS payment_method",
+                "$order_total_field AS order_total",
+                "$first_name_field AS billing_first_name",
+                "$shipping_addr_field AS shipping_address_index",
+                "$order_shipping_title AS order_shipping_title",
+                "$shipping_cost AS shipping_cost",
+                "$role_field AS user_role",
+            ];
+
+            $sort_cols = [
+                '',
+                'o.order_id',
+                'o.order_date',
+                'o.status',
+                $username_field,
+                $role_field,
+                'o.shipping_address',
+                'o.payment_method',
+                $order_shipping_title,
+                'o.order_type',
+                 $order_total_field
+            ];
+
+            $where = " AND item.item_type='line_item'";
+
+            $get = $this->request->getGet();
+
+            if(!empty($get['status'])) {
+                $where .= " AND o.status='".$get['status']."'";
+            }
+
+            if(!empty($get['date'])) {
+                $where .= " AND DATE_FORMAT(o.order_date,'%m-%Y')='".$get['date']."'";
+            }
+
+            if(!empty($get['role'])) {
+                $where .= " AND $role_field='".$get['role']."'";
+            }
+
+            if(!empty($get['customer'])) {
+                $where .= " AND o.customer_user='".$get['customer']."'";
+            }
+
+            if(!empty($get['order_type'])) {
+                $where .= " AND o.order_type='".$get['order_type']."'";
+            }
+
+            $output = datatable_query("tbl_orders AS o JOIN tbl_order_meta AS meta ON o.order_id=meta.order_id JOIN tbl_order_items AS item ON item.order_id=o.order_id AND $role_field='Wholesale Customer'",$rows,$sort_cols,"GROUP BY o.order_id",$where);
+
+            $records = $output['records'];
+
+
+            unset($output['records']);
+
+            foreach($records as $i=>$row) {
+
+                $metas = $this->master->getRows('tbl_order_meta',['order_id'=>$row['order_id']]);
+
+                $price = 0;
+
+                $customer_name = [];
+
+                $has_subscription = false;
+
+                foreach($metas AS $meta) {
+
+                    if($meta->meta_key === "order_total") {
+                        $price += $meta->meta_value;
+                    }
+                    if($meta->meta_key === "order_shipping") {
+                        //$price += floatval($meta->meta_value);
+                    }
+                    if($meta->meta_key === "order_tax") {
+                        //$price += floatval($meta->meta_value);
+                    }
+                    if($meta->meta_key === "cart_discount") {
+                        //$price -= floatval($meta->meta_value);
+                    }
+
+                    if(($meta->meta_key === "billing_first_name" || $meta->meta_key === "billing_last_name")) {
+                        $customer_name[] = $meta->meta_value;
+                    }
+
+                    if($meta->meta_key === "has_subscription" && $meta->meta_value == 1) {
+                        $has_subscription = true;
+                    }
+                }
+
+                $shipping_address = json_decode($row['shipping_address'],true);
+
+                $shipping_address = [
+                    @$shipping_address['shipping_first_name'].' '.@$shipping_address['shipping_last_name'],
+                    @$shipping_address['shipping_address_1'].' '.@$shipping_address['shipping_address_2'],
+                    @$shipping_address['shipping_city'].' '.@$shipping_address['shipping_postcode'],
+                    @$shipping_address['shipping_country']
+                ];
+
+                $shipping_address = implode(', ',$shipping_address);
+
+                $shipping_address = str_replace(', ,',',',$shipping_address);
+
+                $shipping_address = '<a target="_blank" href="https://maps.google.com/maps?&q='.$shipping_address.'">'.$shipping_address.'</a>';
+
+                $customer_name = implode(" ",$customer_name);
+
+                $status = !empty($row['status']) ? str_replace('_',' ',$row['status']) : '';
+
+
+                $price = _price($price);
+
+                $roles = $userModel->get_user_roles($row['customer_user']);
+
+                $roles = ucfirst(implode(', ',$roles));
+
+                $actions = '<div class="list-dropdown"> <a href="" class="btn btn-primary btn-sm bg-red"><i class="lni lni-menu"></i></a>';
+                $actions .= '<ul class="dropdown">';
+
+                if($row['order_type'] == 'shop_subscription') {
+                    $actions .= '<li><a href="'.site_url().ADMIN . '/subscription'.'/'.$row['order_id'].'">View Subscription</a></li>';
+                }else {
+                    $actions .= '<li><a href="'.site_url().ADMIN . '/orders/view'.'/'.$row['order_id'].'">View Order</a></li>';
+                    if(!($row['status']==="processing" || $row['status']==="completed")) {
+                        $actions .= '<li><a href="'.site_url().ADMIN . '/orders/edit'.'/'.$row['order_id'].'">Edit Order</a> </li>';
+                    }
+
+
+                    if($status !== "completed") {
+                        $actions .= '<li><a href="'.admin_url().'change-order-status/completed?orders='.$row['order_id'].'&ref=order_list&send_email=1" href="">Mark as completed</a></li>';
+                    }
+                }
+
+
+
+                $actions .= '<li><a href="'.admin_url().'generate-pdf-slip/'.$row['order_id'].'" target="_blank">View order slip</a></li>';
+
+                if($row['payment_method'] === 'invoice') {
+                    $actions .= '<li><a href="'.admin_url().'generate-invoice-slip/'.$row['order_id'].'" target="_blank">View invoice slip</a></li>';
+                }
+
+
+                $actions .= '</ul></div>';
+
+
+                $order_type_text = 'Shop order';
+                $sub_icon = '';
+                if($row['order_type'] == 'shop_subscription') {
+                    $order_type_text = 'Subscription';
+                    $sub_icon .= '<span class="sub_icon" title="Subscription"><i class="lni lni-spinner"></i></span> ';
+                }
+
+                $shipping_title = !empty($row['shipping_cost']) ? $row['order_shipping_title'] : 'Free Shipping';
+
+
+
+                $order_icon = '<div style="padding-right: 20px;"><div style="min-width: 130px; width: fit-content"> <a title="View order #'._order_number($row['order_id']).'" href="'.admin_url().'orders/view/'.$row['order_id'].'">'.'#'._order_number($row['order_id']).' - '.$customer_name.'</a></div> '.$sub_icon.'  <a href="#" title="Preview order #'.$row['order_id'].'" class="preview-open" data-id="'.$row['order_id'].'"><i class="lni lni-eye"></i></a></div>';
+
+                $output['data'][] = [
+                    '<div class="input_field inline-checkbox"><label><input type="checkbox" class="checkrow" name="product-row[]" value="'.$row['order_id'].'"></label></div>',
+                    $order_icon,
+                    '<div title="'._datetime_full($row['order_date']).'" style="width:80px"><div>'.date('d M Y',strtotime($row['order_date'])).'</div><small>'.date('h:i A',strtotime($row['order_date'])).'</small></div>',
+                    ucfirst(_order_status($status)),
+                    '<a title="View customer: '.$row['billing_first_name'].'" href="'.admin_url().'users/edit/'.$row['customer_user'].'" target="_blank">'.$customer_name.'</a>',
+                    $roles,
+                    $shipping_address,
+                    payment_method_map($row['payment_method']),
+                    $shipping_title,
+                    $order_type_text,
+                    $price,
+                    '<div class="text-right" style="width: max-content;">'.$actions.'</div>'
+                ];
+            }
+
+            echo json_encode($output);
+
+            exit;
+
+        }
+
+        $order_counts = [];
+
+        $get_count = $this->master->query('SELECT COUNT(order_id) AS total FROM tbl_orders',true,true);
+        $order_counts['all'] = $get_count['total'];
+
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='completed'",true,true);
+        $order_counts['completed'] = $get_count['total'];
+
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='processing'",true,true);
+        $order_counts['processing'] = $get_count['total'];
+
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='pending'",true,true);
+        $order_counts['pending'] = $get_count['total'];
+
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='ready_to_ship'",true,true);
+        $order_counts['ready_to_ship'] = $get_count['total'];
+
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='cancelled'",true,true);
+        $order_counts['cancelled'] = $get_count['total'];
+
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='refund'",true,true);
+        $order_counts['refund'] = $get_count['total'];
+
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='failed'",true,true);
+        $order_counts['failed'] = $get_count['total'];
+
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='trashed'",true,true);
+        $order_counts['trashed'] = $get_count['total'];
+
+        $this->data['status'] = $this->request->getGet('status');
+
+        $this->data['customers'] = $userModel->get_users('user.user_id,user.display_name,user.username','any','any',false);
+
+        $masterModel = model('masterModel');
+
+        $order_dates = $masterModel->query("SELECT DISTINCT order_date FROM tbl_orders");
+        $order_months_arr = [];
+        foreach($order_dates as $date) {
+            $order_months_arr[date('m-Y',strtotime($date->order_date))] = date('F Y',strtotime($date->order_date));
+        }
+        $order_months_arr = array_unique($order_months_arr);
+        $order_months_arr = array_reverse($order_months_arr);
+
+        $this->data['order_months'] = $order_months_arr;
+
+        $this->data['order_count'] = $order_counts;
+
+        $this->data['content'] = ADMIN . "/orders/whole_sale_orders";
+
+        _render_page('/' . ADMIN . '/index', $this->data);
+
+    }
+    public function internal_orders()
+    {
+        $userModel = model('UserModel');
+
+        if($this->request->getGet('get_data')) {
+
+            $payment_method_field = "(SELECT meta_value FROM tbl_order_meta WHERE order_id=o.order_id AND meta_key='payment_method' LIMIT 1)";
+            $order_total_field = "(SELECT meta_value FROM tbl_order_meta WHERE order_id=o.order_id AND meta_key='order_total' LIMIT 1)";
+            $first_name_field = "(SELECT meta_value FROM tbl_order_meta WHERE order_id=o.order_id AND meta_key='billing_first_name' LIMIT 1)";
+            $shipping_addr_field = "(SELECT meta_value FROM tbl_order_meta WHERE order_id=o.order_id AND meta_key='shipping_address_index' LIMIT 1)";
+            $order_shipping_title = "(SELECT meta_value FROM tbl_order_meta WHERE order_id=o.order_id AND meta_key='order_shipping_title' LIMIT 1)";
+            $shipping_cost = "(SELECT meta_value FROM tbl_order_meta WHERE order_id=o.order_id AND meta_key='shipping_cost' LIMIT 1)";
+            $username_field = "(SELECT username FROM tbl_users WHERE user_id=o.customer_user LIMIT 1)";
+            $role_field = "(SELECT roles.name FROM tbl_users AS user JOIN tbl_user_roles AS roles ON roles.id=user.role WHERE user.user_id=o.customer_user LIMIT 1)";
+
+            $rows = [
+                'o.order_id',
+                'o.order_title',
+                'o.order_date',
+                'o.order_type',
+                'o.payment_method',
+                'o.status',
+                ''=>['searchable'=>0],
+                'o.customer_user',
+                'o.shipping_address',
+                "$username_field AS customer_username",
+                "$payment_method_field AS payment_method",
+                "$order_total_field AS order_total",
+                "$first_name_field AS billing_first_name",
+                "$shipping_addr_field AS shipping_address_index",
+                "$order_shipping_title AS order_shipping_title",
+                "$shipping_cost AS shipping_cost",
+                "$role_field AS user_role",
+            ];
+
+            $sort_cols = [
+                '',
+                'o.order_id',
+                'o.order_date',
+                'o.status',
+                $username_field,
+                $role_field,
+                'o.shipping_address',
+                'o.payment_method',
+                $order_shipping_title,
+                'o.order_type',
+                 $order_total_field
+            ];
+
+            $where = " AND item.item_type='line_item'";
+
+            $get = $this->request->getGet();
+
+            if(!empty($get['status'])) {
+                $where .= " AND o.status='".$get['status']."'";
+            }
+
+            if(!empty($get['date'])) {
+                $where .= " AND DATE_FORMAT(o.order_date,'%m-%Y')='".$get['date']."'";
+            }
+
+            if(!empty($get['role'])) {
+                $where .= " AND $role_field='".$get['role']."'";
+            }
+
+            if(!empty($get['customer'])) {
+                $where .= " AND o.customer_user='".$get['customer']."'";
+            }
+
+            if(!empty($get['order_type'])) {
+                $where .= " AND o.order_type='".$get['order_type']."'";
+            }
+
+            $output = datatable_query("tbl_orders AS o JOIN tbl_order_meta AS meta ON o.order_id=meta.order_id JOIN tbl_order_items AS item ON item.order_id=o.order_id AND $role_field='Internal'",$rows,$sort_cols,"GROUP BY o.order_id",$where);
+
+            $records = $output['records'];
+
+
+            unset($output['records']);
+
+            foreach($records as $i=>$row) {
+
+                $metas = $this->master->getRows('tbl_order_meta',['order_id'=>$row['order_id']]);
+
+                $price = 0;
+
+                $customer_name = [];
+
+                $has_subscription = false;
+
+                foreach($metas AS $meta) {
+
+                    if($meta->meta_key === "order_total") {
+                        $price += $meta->meta_value;
+                    }
+                    if($meta->meta_key === "order_shipping") {
+                        //$price += floatval($meta->meta_value);
+                    }
+                    if($meta->meta_key === "order_tax") {
+                        //$price += floatval($meta->meta_value);
+                    }
+                    if($meta->meta_key === "cart_discount") {
+                        //$price -= floatval($meta->meta_value);
+                    }
+
+                    if(($meta->meta_key === "billing_first_name" || $meta->meta_key === "billing_last_name")) {
+                        $customer_name[] = $meta->meta_value;
+                    }
+
+                    if($meta->meta_key === "has_subscription" && $meta->meta_value == 1) {
+                        $has_subscription = true;
+                    }
+                }
+
+                $shipping_address = json_decode($row['shipping_address'],true);
+
+                $shipping_address = [
+                    @$shipping_address['shipping_first_name'].' '.@$shipping_address['shipping_last_name'],
+                    @$shipping_address['shipping_address_1'].' '.@$shipping_address['shipping_address_2'],
+                    @$shipping_address['shipping_city'].' '.@$shipping_address['shipping_postcode'],
+                    @$shipping_address['shipping_country']
+                ];
+
+                $shipping_address = implode(', ',$shipping_address);
+
+                $shipping_address = str_replace(', ,',',',$shipping_address);
+
+                $shipping_address = '<a target="_blank" href="https://maps.google.com/maps?&q='.$shipping_address.'">'.$shipping_address.'</a>';
+
+                $customer_name = implode(" ",$customer_name);
+
+                $status = !empty($row['status']) ? str_replace('_',' ',$row['status']) : '';
+
+
+                $price = _price($price);
+
+                $roles = $userModel->get_user_roles($row['customer_user']);
+
+                $roles = ucfirst(implode(', ',$roles));
+
+                $actions = '<div class="list-dropdown"> <a href="" class="btn btn-primary btn-sm bg-red"><i class="lni lni-menu"></i></a>';
+                $actions .= '<ul class="dropdown">';
+
+                if($row['order_type'] == 'shop_subscription') {
+                    $actions .= '<li><a href="'.site_url().ADMIN . '/subscription'.'/'.$row['order_id'].'">View Subscription</a></li>';
+                }else {
+                    $actions .= '<li><a href="'.site_url().ADMIN . '/orders/view'.'/'.$row['order_id'].'">View Order</a></li>';
+                    if(!($row['status']==="processing" || $row['status']==="completed")) {
+                        $actions .= '<li><a href="'.site_url().ADMIN . '/orders/edit'.'/'.$row['order_id'].'">Edit Order</a> </li>';
+                    }
+
+
+                    if($status !== "completed") {
+                        $actions .= '<li><a href="'.admin_url().'change-order-status/completed?orders='.$row['order_id'].'&ref=order_list&send_email=1" href="">Mark as completed</a></li>';
+                    }
+                }
+
+
+
+                $actions .= '<li><a href="'.admin_url().'generate-pdf-slip/'.$row['order_id'].'" target="_blank">View order slip</a></li>';
+
+                if($row['payment_method'] === 'invoice') {
+                    $actions .= '<li><a href="'.admin_url().'generate-invoice-slip/'.$row['order_id'].'" target="_blank">View invoice slip</a></li>';
+                }
+
+
+                $actions .= '</ul></div>';
+
+
+                $order_type_text = 'Shop order';
+                $sub_icon = '';
+                if($row['order_type'] == 'shop_subscription') {
+                    $order_type_text = 'Subscription';
+                    $sub_icon .= '<span class="sub_icon" title="Subscription"><i class="lni lni-spinner"></i></span> ';
+                }
+
+                $shipping_title = !empty($row['shipping_cost']) ? $row['order_shipping_title'] : 'Free Shipping';
+
+
+
+                $order_icon = '<div style="padding-right: 20px;"><div style="min-width: 130px; width: fit-content"> <a title="View order #'._order_number($row['order_id']).'" href="'.admin_url().'orders/view/'.$row['order_id'].'">'.'#'._order_number($row['order_id']).' - '.$customer_name.'</a></div> '.$sub_icon.'  <a href="#" title="Preview order #'.$row['order_id'].'" class="preview-open" data-id="'.$row['order_id'].'"><i class="lni lni-eye"></i></a></div>';
+
+                $output['data'][] = [
+                    '<div class="input_field inline-checkbox"><label><input type="checkbox" class="checkrow" name="product-row[]" value="'.$row['order_id'].'"></label></div>',
+                    $order_icon,
+                    '<div title="'._datetime_full($row['order_date']).'" style="width:80px"><div>'.date('d M Y',strtotime($row['order_date'])).'</div><small>'.date('h:i A',strtotime($row['order_date'])).'</small></div>',
+                    ucfirst(_order_status($status)),
+                    '<a title="View customer: '.$row['billing_first_name'].'" href="'.admin_url().'users/edit/'.$row['customer_user'].'" target="_blank">'.$customer_name.'</a>',
+                    $roles,
+                    $shipping_address,
+                    payment_method_map($row['payment_method']),
+                    $shipping_title,
+                    $order_type_text,
+                    $price,
+                    '<div class="text-right" style="width: max-content;">'.$actions.'</div>'
+                ];
+            }
+
+            echo json_encode($output);
+
+            exit;
+
+        }
+
+        $order_counts = [];
+
+        $get_count = $this->master->query('SELECT COUNT(order_id) AS total FROM tbl_orders',true,true);
+        $order_counts['all'] = $get_count['total'];
+
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='completed'",true,true);
+        $order_counts['completed'] = $get_count['total'];
+
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='processing'",true,true);
+        $order_counts['processing'] = $get_count['total'];
+
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='pending'",true,true);
+        $order_counts['pending'] = $get_count['total'];
+
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='ready_to_ship'",true,true);
+        $order_counts['ready_to_ship'] = $get_count['total'];
+
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='cancelled'",true,true);
+        $order_counts['cancelled'] = $get_count['total'];
+
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='refund'",true,true);
+        $order_counts['refund'] = $get_count['total'];
+
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='failed'",true,true);
+        $order_counts['failed'] = $get_count['total'];
+
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='trashed'",true,true);
+        $order_counts['trashed'] = $get_count['total'];
+
+        $this->data['status'] = $this->request->getGet('status');
+
+        $this->data['customers'] = $userModel->get_users('user.user_id,user.display_name,user.username','any','any',false);
+
+        $masterModel = model('masterModel');
+
+        $order_dates = $masterModel->query("SELECT DISTINCT order_date FROM tbl_orders");
+        $order_months_arr = [];
+        foreach($order_dates as $date) {
+            $order_months_arr[date('m-Y',strtotime($date->order_date))] = date('F Y',strtotime($date->order_date));
+        }
+        $order_months_arr = array_unique($order_months_arr);
+        $order_months_arr = array_reverse($order_months_arr);
+
+        $this->data['order_months'] = $order_months_arr;
+
+        $this->data['order_count'] = $order_counts;
+
+        $this->data['content'] = ADMIN . "/orders/internal_orders";
+
+        _render_page('/' . ADMIN . '/index', $this->data);
+
+    }
+    public function retail_orders()
+    {
+        $userModel = model('UserModel');
+
+        if($this->request->getGet('get_data')) {
+
+            $payment_method_field = "(SELECT meta_value FROM tbl_order_meta WHERE order_id=o.order_id AND meta_key='payment_method' LIMIT 1)";
+            $order_total_field = "(SELECT meta_value FROM tbl_order_meta WHERE order_id=o.order_id AND meta_key='order_total' LIMIT 1)";
+            $first_name_field = "(SELECT meta_value FROM tbl_order_meta WHERE order_id=o.order_id AND meta_key='billing_first_name' LIMIT 1)";
+            $shipping_addr_field = "(SELECT meta_value FROM tbl_order_meta WHERE order_id=o.order_id AND meta_key='shipping_address_index' LIMIT 1)";
+            $order_shipping_title = "(SELECT meta_value FROM tbl_order_meta WHERE order_id=o.order_id AND meta_key='order_shipping_title' LIMIT 1)";
+            $shipping_cost = "(SELECT meta_value FROM tbl_order_meta WHERE order_id=o.order_id AND meta_key='shipping_cost' LIMIT 1)";
+            $username_field = "(SELECT username FROM tbl_users WHERE user_id=o.customer_user LIMIT 1)";
+            $role_field = "(SELECT roles.name FROM tbl_users AS user JOIN tbl_user_roles AS roles ON roles.id=user.role WHERE user.user_id=o.customer_user LIMIT 1)";
+
+            $rows = [
+                'o.order_id',
+                'o.order_title',
+                'o.order_date',
+                'o.order_type',
+                'o.payment_method',
+                'o.status',
+                ''=>['searchable'=>0],
+                'o.customer_user',
+                'o.shipping_address',
+                "$username_field AS customer_username",
+                "$payment_method_field AS payment_method",
+                "$order_total_field AS order_total",
+                "$first_name_field AS billing_first_name",
+                "$shipping_addr_field AS shipping_address_index",
+                "$order_shipping_title AS order_shipping_title",
+                "$shipping_cost AS shipping_cost",
+                "$role_field AS user_role",
+            ];
+
+            $sort_cols = [
+                '',
+                'o.order_id',
+                'o.order_date',
+                'o.status',
+                $username_field,
+                $role_field,
+                'o.shipping_address',
+                'o.payment_method',
+                $order_shipping_title,
+                'o.order_type',
+                 $order_total_field
+            ];
+
+            $where = " AND item.item_type='line_item'";
+
+            $get = $this->request->getGet();
+
+            if(!empty($get['status'])) {
+                $where .= " AND o.status='".$get['status']."'";
+            }
+
+            if(!empty($get['date'])) {
+                $where .= " AND DATE_FORMAT(o.order_date,'%m-%Y')='".$get['date']."'";
+            }
+
+            if(!empty($get['role'])) {
+                $where .= " AND $role_field='".$get['role']."'";
+            }
+
+            if(!empty($get['customer'])) {
+                $where .= " AND o.customer_user='".$get['customer']."'";
+            }
+
+            if(!empty($get['order_type'])) {
+                $where .= " AND o.order_type='".$get['order_type']."'";
+            }
+
+            $output = datatable_query("tbl_orders AS o JOIN tbl_order_meta AS meta ON o.order_id=meta.order_id JOIN tbl_order_items AS item ON item.order_id=o.order_id AND $role_field='Customer'",$rows,$sort_cols,"GROUP BY o.order_id",$where);
+
+            $records = $output['records'];
+
+
+            unset($output['records']);
+
+            foreach($records as $i=>$row) {
+
+                $metas = $this->master->getRows('tbl_order_meta',['order_id'=>$row['order_id']]);
+
+                $price = 0;
+
+                $customer_name = [];
+
+                $has_subscription = false;
+
+                foreach($metas AS $meta) {
+
+                    if($meta->meta_key === "order_total") {
+                        $price += $meta->meta_value;
+                    }
+                    if($meta->meta_key === "order_shipping") {
+                        //$price += floatval($meta->meta_value);
+                    }
+                    if($meta->meta_key === "order_tax") {
+                        //$price += floatval($meta->meta_value);
+                    }
+                    if($meta->meta_key === "cart_discount") {
+                        //$price -= floatval($meta->meta_value);
+                    }
+
+                    if(($meta->meta_key === "billing_first_name" || $meta->meta_key === "billing_last_name")) {
+                        $customer_name[] = $meta->meta_value;
+                    }
+
+                    if($meta->meta_key === "has_subscription" && $meta->meta_value == 1) {
+                        $has_subscription = true;
+                    }
+                }
+
+                $shipping_address = json_decode($row['shipping_address'],true);
+
+                $shipping_address = [
+                    @$shipping_address['shipping_first_name'].' '.@$shipping_address['shipping_last_name'],
+                    @$shipping_address['shipping_address_1'].' '.@$shipping_address['shipping_address_2'],
+                    @$shipping_address['shipping_city'].' '.@$shipping_address['shipping_postcode'],
+                    @$shipping_address['shipping_country']
+                ];
+
+                $shipping_address = implode(', ',$shipping_address);
+
+                $shipping_address = str_replace(', ,',',',$shipping_address);
+
+                $shipping_address = '<a target="_blank" href="https://maps.google.com/maps?&q='.$shipping_address.'">'.$shipping_address.'</a>';
+
+                $customer_name = implode(" ",$customer_name);
+
+                $status = !empty($row['status']) ? str_replace('_',' ',$row['status']) : '';
+
+
+                $price = _price($price);
+
+                $roles = $userModel->get_user_roles($row['customer_user']);
+
+                $roles = ucfirst(implode(', ',$roles));
+
+                $actions = '<div class="list-dropdown"> <a href="" class="btn btn-primary btn-sm bg-red"><i class="lni lni-menu"></i></a>';
+                $actions .= '<ul class="dropdown">';
+
+                if($row['order_type'] == 'shop_subscription') {
+                    $actions .= '<li><a href="'.site_url().ADMIN . '/subscription'.'/'.$row['order_id'].'">View Subscription</a></li>';
+                }else {
+                    $actions .= '<li><a href="'.site_url().ADMIN . '/orders/view'.'/'.$row['order_id'].'">View Order</a></li>';
+                    if(!($row['status']==="processing" || $row['status']==="completed")) {
+                        $actions .= '<li><a href="'.site_url().ADMIN . '/orders/edit'.'/'.$row['order_id'].'">Edit Order</a> </li>';
+                    }
+
+
+                    if($status !== "completed") {
+                        $actions .= '<li><a href="'.admin_url().'change-order-status/completed?orders='.$row['order_id'].'&ref=order_list&send_email=1" href="">Mark as completed</a></li>';
+                    }
+                }
+
+
+
+                $actions .= '<li><a href="'.admin_url().'generate-pdf-slip/'.$row['order_id'].'" target="_blank">View order slip</a></li>';
+
+                if($row['payment_method'] === 'invoice') {
+                    $actions .= '<li><a href="'.admin_url().'generate-invoice-slip/'.$row['order_id'].'" target="_blank">View invoice slip</a></li>';
+                }
+
+
+                $actions .= '</ul></div>';
+
+
+                $order_type_text = 'Shop order';
+                $sub_icon = '';
+                if($row['order_type'] == 'shop_subscription') {
+                    $order_type_text = 'Subscription';
+                    $sub_icon .= '<span class="sub_icon" title="Subscription"><i class="lni lni-spinner"></i></span> ';
+                }
+
+                $shipping_title = !empty($row['shipping_cost']) ? $row['order_shipping_title'] : 'Free Shipping';
+
+
+
+                $order_icon = '<div style="padding-right: 20px;"><div style="min-width: 130px; width: fit-content"> <a title="View order #'._order_number($row['order_id']).'" href="'.admin_url().'orders/view/'.$row['order_id'].'">'.'#'._order_number($row['order_id']).' - '.$customer_name.'</a></div> '.$sub_icon.'  <a href="#" title="Preview order #'.$row['order_id'].'" class="preview-open" data-id="'.$row['order_id'].'"><i class="lni lni-eye"></i></a></div>';
+
+                $output['data'][] = [
+                    '<div class="input_field inline-checkbox"><label><input type="checkbox" class="checkrow" name="product-row[]" value="'.$row['order_id'].'"></label></div>',
+                    $order_icon,
+                    '<div title="'._datetime_full($row['order_date']).'" style="width:80px"><div>'.date('d M Y',strtotime($row['order_date'])).'</div><small>'.date('h:i A',strtotime($row['order_date'])).'</small></div>',
+                    ucfirst(_order_status($status)),
+                    '<a title="View customer: '.$row['billing_first_name'].'" href="'.admin_url().'users/edit/'.$row['customer_user'].'" target="_blank">'.$customer_name.'</a>',
+                    $roles,
+                    $shipping_address,
+                    payment_method_map($row['payment_method']),
+                    $shipping_title,
+                    $order_type_text,
+                    $price,
+                    '<div class="text-right" style="width: max-content;">'.$actions.'</div>'
+                ];
+            }
+
+            echo json_encode($output);
+
+            exit;
+
+        }
+
+        $order_counts = [];
+
+        $get_count = $this->master->query('SELECT COUNT(order_id) AS total FROM tbl_orders',true,true);
+        $order_counts['all'] = $get_count['total'];
+
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='completed'",true,true);
+        $order_counts['completed'] = $get_count['total'];
+
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='processing'",true,true);
+        $order_counts['processing'] = $get_count['total'];
+
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='pending'",true,true);
+        $order_counts['pending'] = $get_count['total'];
+
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='ready_to_ship'",true,true);
+        $order_counts['ready_to_ship'] = $get_count['total'];
+
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='cancelled'",true,true);
+        $order_counts['cancelled'] = $get_count['total'];
+
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='refund'",true,true);
+        $order_counts['refund'] = $get_count['total'];
+
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='failed'",true,true);
+        $order_counts['failed'] = $get_count['total'];
+
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='trashed'",true,true);
+        $order_counts['trashed'] = $get_count['total'];
+
+        $this->data['status'] = $this->request->getGet('status');
+
+        $this->data['customers'] = $userModel->get_users('user.user_id,user.display_name,user.username','any','any',false);
+
+        $masterModel = model('masterModel');
+
+        $order_dates = $masterModel->query("SELECT DISTINCT order_date FROM tbl_orders");
+        $order_months_arr = [];
+        foreach($order_dates as $date) {
+            $order_months_arr[date('m-Y',strtotime($date->order_date))] = date('F Y',strtotime($date->order_date));
+        }
+        $order_months_arr = array_unique($order_months_arr);
+        $order_months_arr = array_reverse($order_months_arr);
+
+        $this->data['order_months'] = $order_months_arr;
+
+        $this->data['order_count'] = $order_counts;
+
+        $this->data['content'] = ADMIN . "/orders/retail_orders";
+
+        _render_page('/' . ADMIN . '/index', $this->data);
+
+    }
+    public function subscriptions_orders()
+    {
+        $userModel = model('UserModel');
+
+        if($this->request->getGet('get_data')) {
+
+            $payment_method_field = "(SELECT meta_value FROM tbl_order_meta WHERE order_id=o.order_id AND meta_key='payment_method' LIMIT 1)";
+            $order_total_field = "(SELECT meta_value FROM tbl_order_meta WHERE order_id=o.order_id AND meta_key='order_total' LIMIT 1)";
+            $first_name_field = "(SELECT meta_value FROM tbl_order_meta WHERE order_id=o.order_id AND meta_key='billing_first_name' LIMIT 1)";
+            $shipping_addr_field = "(SELECT meta_value FROM tbl_order_meta WHERE order_id=o.order_id AND meta_key='shipping_address_index' LIMIT 1)";
+            $order_shipping_title = "(SELECT meta_value FROM tbl_order_meta WHERE order_id=o.order_id AND meta_key='order_shipping_title' LIMIT 1)";
+            $shipping_cost = "(SELECT meta_value FROM tbl_order_meta WHERE order_id=o.order_id AND meta_key='shipping_cost' LIMIT 1)";
+            $username_field = "(SELECT username FROM tbl_users WHERE user_id=o.customer_user LIMIT 1)";
+            $role_field = "(SELECT roles.name FROM tbl_users AS user JOIN tbl_user_roles AS roles ON roles.id=user.role WHERE user.user_id=o.customer_user LIMIT 1)";
+
+            $rows = [
+                'o.order_id',
+                'o.order_title',
+                'o.order_date',
+                'o.order_type',
+                'o.payment_method',
+                'o.status',
+                ''=>['searchable'=>0],
+                'o.customer_user',
+                'o.shipping_address',
+                "$username_field AS customer_username",
+                "$payment_method_field AS payment_method",
+                "$order_total_field AS order_total",
+                "$first_name_field AS billing_first_name",
+                "$shipping_addr_field AS shipping_address_index",
+                "$order_shipping_title AS order_shipping_title",
+                "$shipping_cost AS shipping_cost",
+                "$role_field AS user_role",
+            ];
+
+            $sort_cols = [
+                '',
+                'o.order_id',
+                'o.order_date',
+                'o.status',
+                $username_field,
+                $role_field,
+                'o.shipping_address',
+                'o.payment_method',
+                $order_shipping_title,
+                'o.order_type',
+                 $order_total_field
+            ];
+
+            $where = " AND item.item_type='line_item'";
+
+            $get = $this->request->getGet();
+
+            if(!empty($get['status'])) {
+                $where .= " AND o.status='".$get['status']."'";
+            }
+
+            if(!empty($get['date'])) {
+                $where .= " AND DATE_FORMAT(o.order_date,'%m-%Y')='".$get['date']."'";
+            }
+
+            if(!empty($get['role'])) {
+                $where .= " AND $role_field='".$get['role']."'";
+            }
+
+            if(!empty($get['customer'])) {
+                $where .= " AND o.customer_user='".$get['customer']."'";
+            }
+
+            if(!empty($get['order_type'])) {
+                $where .= " AND o.order_type='".$get['order_type']."'";
+            }
+
+            $output = datatable_query("tbl_orders AS o JOIN tbl_order_meta AS meta ON o.order_id=meta.order_id JOIN tbl_order_items AS item ON item.order_id=o.order_id AND o.order_type='shop_subscription'",$rows,$sort_cols,"GROUP BY o.order_id",$where);
+
+            $records = $output['records'];
+
+
+            unset($output['records']);
+
+            foreach($records as $i=>$row) {
+
+                $metas = $this->master->getRows('tbl_order_meta',['order_id'=>$row['order_id']]);
+
+                $price = 0;
+
+                $customer_name = [];
+
+                $has_subscription = false;
+
+                foreach($metas AS $meta) {
+
+                    if($meta->meta_key === "order_total") {
+                        $price += $meta->meta_value;
+                    }
+                    if($meta->meta_key === "order_shipping") {
+                        //$price += floatval($meta->meta_value);
+                    }
+                    if($meta->meta_key === "order_tax") {
+                        //$price += floatval($meta->meta_value);
+                    }
+                    if($meta->meta_key === "cart_discount") {
+                        //$price -= floatval($meta->meta_value);
+                    }
+
+                    if(($meta->meta_key === "billing_first_name" || $meta->meta_key === "billing_last_name")) {
+                        $customer_name[] = $meta->meta_value;
+                    }
+
+                    if($meta->meta_key === "has_subscription" && $meta->meta_value == 1) {
+                        $has_subscription = true;
+                    }
+                }
+
+                $shipping_address = json_decode($row['shipping_address'],true);
+
+                $shipping_address = [
+                    @$shipping_address['shipping_first_name'].' '.@$shipping_address['shipping_last_name'],
+                    @$shipping_address['shipping_address_1'].' '.@$shipping_address['shipping_address_2'],
+                    @$shipping_address['shipping_city'].' '.@$shipping_address['shipping_postcode'],
+                    @$shipping_address['shipping_country']
+                ];
+
+                $shipping_address = implode(', ',$shipping_address);
+
+                $shipping_address = str_replace(', ,',',',$shipping_address);
+
+                $shipping_address = '<a target="_blank" href="https://maps.google.com/maps?&q='.$shipping_address.'">'.$shipping_address.'</a>';
+
+                $customer_name = implode(" ",$customer_name);
+
+                $status = !empty($row['status']) ? str_replace('_',' ',$row['status']) : '';
+
+
+                $price = _price($price);
+
+                $roles = $userModel->get_user_roles($row['customer_user']);
+
+                $roles = ucfirst(implode(', ',$roles));
+
+                $actions = '<div class="list-dropdown"> <a href="" class="btn btn-primary btn-sm bg-red"><i class="lni lni-menu"></i></a>';
+                $actions .= '<ul class="dropdown">';
+
+                if($row['order_type'] == 'shop_subscription') {
+                    $actions .= '<li><a href="'.site_url().ADMIN . '/subscription'.'/'.$row['order_id'].'">View Subscription</a></li>';
+                }else {
+                    $actions .= '<li><a href="'.site_url().ADMIN . '/orders/view'.'/'.$row['order_id'].'">View Order</a></li>';
+                    if(!($row['status']==="processing" || $row['status']==="completed")) {
+                        $actions .= '<li><a href="'.site_url().ADMIN . '/orders/edit'.'/'.$row['order_id'].'">Edit Order</a> </li>';
+                    }
+
+
+                    if($status !== "completed") {
+                        $actions .= '<li><a href="'.admin_url().'change-order-status/completed?orders='.$row['order_id'].'&ref=order_list&send_email=1" href="">Mark as completed</a></li>';
+                    }
+                }
+
+
+
+                $actions .= '<li><a href="'.admin_url().'generate-pdf-slip/'.$row['order_id'].'" target="_blank">View order slip</a></li>';
+
+                if($row['payment_method'] === 'invoice') {
+                    $actions .= '<li><a href="'.admin_url().'generate-invoice-slip/'.$row['order_id'].'" target="_blank">View invoice slip</a></li>';
+                }
+
+
+                $actions .= '</ul></div>';
+
+
+                $order_type_text = 'Shop order';
+                $sub_icon = '';
+                if($row['order_type'] == 'shop_subscription') {
+                    $order_type_text = 'Subscription';
+                    $sub_icon .= '<span class="sub_icon" title="Subscription"><i class="lni lni-spinner"></i></span> ';
+                }
+
+                $shipping_title = !empty($row['shipping_cost']) ? $row['order_shipping_title'] : 'Free Shipping';
+
+
+
+                $order_icon = '<div style="padding-right: 20px;"><div style="min-width: 130px; width: fit-content"> <a title="View order #'._order_number($row['order_id']).'" href="'.admin_url().'orders/view/'.$row['order_id'].'">'.'#'._order_number($row['order_id']).' - '.$customer_name.'</a></div> '.$sub_icon.'  <a href="#" title="Preview order #'.$row['order_id'].'" class="preview-open" data-id="'.$row['order_id'].'"><i class="lni lni-eye"></i></a></div>';
+
+                $output['data'][] = [
+                    '<div class="input_field inline-checkbox"><label><input type="checkbox" class="checkrow" name="product-row[]" value="'.$row['order_id'].'"></label></div>',
+                    $order_icon,
+                    '<div title="'._datetime_full($row['order_date']).'" style="width:80px"><div>'.date('d M Y',strtotime($row['order_date'])).'</div><small>'.date('h:i A',strtotime($row['order_date'])).'</small></div>',
+                    ucfirst(_order_status($status)),
+                    '<a title="View customer: '.$row['billing_first_name'].'" href="'.admin_url().'users/edit/'.$row['customer_user'].'" target="_blank">'.$customer_name.'</a>',
+                    $roles,
+                    $shipping_address,
+                    payment_method_map($row['payment_method']),
+                    $shipping_title,
+                    $order_type_text,
+                    $price,
+                    '<div class="text-right" style="width: max-content;">'.$actions.'</div>'
+                ];
+            }
+
+            echo json_encode($output);
+
+            exit;
+
+        }
+
+        $order_counts = [];
+
+        $get_count = $this->master->query('SELECT COUNT(order_id) AS total FROM tbl_orders',true,true);
+        $order_counts['all'] = $get_count['total'];
+
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='completed'",true,true);
+        $order_counts['completed'] = $get_count['total'];
+
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='processing'",true,true);
+        $order_counts['processing'] = $get_count['total'];
+
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='pending'",true,true);
+        $order_counts['pending'] = $get_count['total'];
+
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='ready_to_ship'",true,true);
+        $order_counts['ready_to_ship'] = $get_count['total'];
+
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='cancelled'",true,true);
+        $order_counts['cancelled'] = $get_count['total'];
+
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='refund'",true,true);
+        $order_counts['refund'] = $get_count['total'];
+
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='failed'",true,true);
+        $order_counts['failed'] = $get_count['total'];
+
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='trashed'",true,true);
+        $order_counts['trashed'] = $get_count['total'];
+
+        $this->data['status'] = $this->request->getGet('status');
+
+        $this->data['customers'] = $userModel->get_users('user.user_id,user.display_name,user.username','any','any',false);
+
+        $masterModel = model('masterModel');
+
+        $order_dates = $masterModel->query("SELECT DISTINCT order_date FROM tbl_orders");
+        $order_months_arr = [];
+        foreach($order_dates as $date) {
+            $order_months_arr[date('m-Y',strtotime($date->order_date))] = date('F Y',strtotime($date->order_date));
+        }
+        $order_months_arr = array_unique($order_months_arr);
+        $order_months_arr = array_reverse($order_months_arr);
+
+        $this->data['order_months'] = $order_months_arr;
+
+        $this->data['order_count'] = $order_counts;
+
+        $this->data['content'] = ADMIN . "/orders/subscriptions_orders";
+
+        _render_page('/' . ADMIN . '/index', $this->data);
+
+    }
     public function add_order($order_id=0) {
         $orderModel = model('OrderModel');
         $userModel = model('UserModel');

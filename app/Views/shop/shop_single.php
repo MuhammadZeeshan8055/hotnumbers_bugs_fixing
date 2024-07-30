@@ -144,8 +144,24 @@
                                 <article class="flex-block">
                                     <?php
                                     $price = $productModel->product_price($product->id);
-                                    $purchaseable = true;
+                                    $purchaseable = true; 
 
+                                    
+
+                                    $wholesaler_discount_value=0;
+                                    
+                                    if(is_wholesaler()){
+                                        // Call the function to get the discount value of wholesale
+                                        $discount_array = global_wholesale_discount_value();
+
+                                        if (is_array($discount_array) && isset($discount_array['role_discount'])) {
+                                            $wholesaler_discount_value = $discount_array['role_discount'];
+                                                            
+                                        } else {
+                                            $wholesaler_discount_value=0;
+                                        }
+                                    }
+                                                    
 
                                     if(is_array($price) && !empty(array_filter($price)) && $product->type == "variable") {
                                         $p = $price[0];
@@ -165,8 +181,20 @@
                                         $discount_price = $productModel->product_reduced_price($price);
                                         if($discount_price) {
                                             $price = $discount_price;
+
+                                            if(is_wholesaler()){
+                                                $wholesale_discount_price = ($price * $wholesaler_discount_value) / 100;
+                                                $final_price=$price-$wholesale_discount_price;
+                                                $discount_html = '<strike class="discount">'._price($price).'</strike>';
+
+                                                $price_text = '<span class="woocommerce-Price-currencySymbol">'.$discount_html.' '._price(number_format($final_price,2)).' per item</span>';
+                                            }else{
+                                                $final_price = $price;
+                                                $price_text = '<span class="woocommerce-Price-currencySymbol">'.$discount_html.' '._price(number_format($final_price,2)).' per item</span>';
+                                            }
+
                                         }
-                                        $price_text = '<span class="woocommerce-Price-currencySymbol">'.$discount_html.' '._price(number_format($price,2)).' per item</span>';
+                                        // $price_text = '<span class="woocommerce-Price-currencySymbol">'.$discount_html.' '._price(number_format($final_price,2)).' per item</span>';
                                     }
 
                                     if(!$price) {

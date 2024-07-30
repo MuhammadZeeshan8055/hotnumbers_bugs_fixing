@@ -71,12 +71,24 @@ if(is_logged_in()) {
                     <li><a class=" <?php echo ($page == 'orders') ? 'active' : '' ?>"
                            href="<?php echo base_url(ADMIN); ?>/orders?status=<?php echo get_setting('default_order_listing_status') ?>">
                             <i class="lni lni-cash-app"></i>  Orders <?php if(!empty($processing_order_count)) { ?><div class="number-count"><?php echo $processing_order_count ?></div> <?php } ?></a>
-                        <?php /*<ul class="sub-menu">
+                         <ul class="sub-menu">
                             <li>
-                               <a class="<?php echo ($page == 'product-add') ? 'active' : '' ?>"
-                                   href="<?php echo base_url(ADMIN); ?>/orders/add">Add Order</a>
+                               <a class="<?php echo ($page == 'retail_orders') ? 'active' : '' ?>"
+                                   href="<?php echo base_url(ADMIN); ?>/retail-orders?status=processing&sort-cols=10&sort-orders=desc&page=25">Retail</a>
                             </li>
-                        </ul>*/ ?>
+                            <li>
+                               <a class="<?php echo ($page == 'subscriptions_orders') ? 'active' : '' ?>"
+                                   href="<?php echo base_url(ADMIN); ?>/subscriptions-orders?status=processing&sort-cols=10&sort-orders=desc&page=25">Subscriptions</a>
+                            </li>
+                            <li>
+                               <a class="<?php echo ($page == 'whole_sale_orders') ? 'active' : '' ?>"
+                                   href="<?php echo base_url(ADMIN); ?>/whole-sale-orders?status=processing&sort-cols=10&sort-orders=desc&page=25">Wholesale</a>
+                            </li>
+                            <li>
+                               <a class="<?php echo ($page == 'internal_orders') ? 'active' : '' ?>"
+                                   href="<?php echo base_url(ADMIN); ?>/internal-orders?status=processing&sort-cols=10&sort-orders=desc&page=25">Internal</a>
+                            </li>
+                        </ul>
                     </li>
 
                     <?php if(get_setting('subscription_enabled')) { ?>

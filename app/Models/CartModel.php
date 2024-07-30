@@ -767,7 +767,15 @@ class CartModel extends BaseController {
             $cart['free_shipping'] = $free_shipping;
             $cart['discount_amount'] = $discount;
             $cart['product_total'] = $product_total;
-            $cart['shipping_cost'] = $ship_cost;
+
+            if($cart['has_shipping']=='0'){
+                $cart['shipping_cost'] = 0 ;
+            }else{
+                $cart['shipping_cost'] = $ship_cost;
+            }
+
+            // $cart['shipping_cost'] = $ship_cost;
+
             $cart['shipping_tax'] = $shipping_vat;
             $cart['shipping_name'] = $shipping_name;
             $cart['shipping_id'] = $shipping_id;
@@ -779,7 +787,12 @@ class CartModel extends BaseController {
 
             $cart = filter_shipping_rules($cart);
 
-            $cart_total = $cart_total + $cart['shipping_cost'];
+            if($cart['has_shipping']=='0'){
+                $cart_total = $cart_total ;
+            }else{
+                $cart_total = $cart_total + $cart['shipping_cost'];
+            }
+            // $cart_total = $cart_total + $cart['shipping_cost'];
 
             $cart['cart_total'] = $cart_total;
             

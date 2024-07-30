@@ -224,6 +224,16 @@ $routes->group('admin', ['filter' => 'AdminFilter'], static function ($routes) {
     $routes->post('blog/add_post', 'Admin/Blog::add_post');
     $routes->get('post-categories', 'Admin/Categories::post_categories');
 
+
+    //wholesale orders
+    $routes->match(['get', 'post'], 'whole-sale-orders', 'Admin/Orders::whole_sale_orders');
+    //internal orders
+    $routes->match(['get', 'post'], 'internal-orders', 'Admin/Orders::internal_orders');
+    //internal orders
+    $routes->match(['get', 'post'], 'retail-orders', 'Admin/Orders::retail_orders');
+    //Subscriptions orders
+    $routes->match(['get', 'post'], 'subscriptions-orders', 'Admin/Orders::subscriptions_orders');
+
     //Orders
     $routes->match(['get', 'post'], 'orders', 'Admin/Orders::index');
     $routes->match(['get', 'post'], 'orders/add', 'Admin/Orders::add_order');

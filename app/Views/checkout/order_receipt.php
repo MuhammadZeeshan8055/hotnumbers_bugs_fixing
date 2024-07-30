@@ -326,7 +326,8 @@ if(!empty($order)) {
                     ?>
 
                     <?php
-                    $shipping_total = 0;
+                    if($order_meta['has_shipping']!= 0 ){
+                        $shipping_total = 0;
                     ?>
                     <tr align="top" style="vertical-align: top;text-align: left">
                         <td>Shipping: </td>
@@ -352,6 +353,7 @@ if(!empty($order)) {
                     </tr>
 
                     <?php
+                    }
                     $tax_name = !empty($order_meta['tax_name']) ? $order_meta['tax_name'] : 'VAT';
                     if($vat && $display_tax_price === "excluding_tax") {
                         ?>
@@ -364,7 +366,13 @@ if(!empty($order)) {
 
                     <tr align="top" style="vertical-align: top; text-align: left; border-top: 1px solid #eee;">
                         <th style="text-align: left">Total: </th>
-                        <td style=" padding-top: 10px; text-align: right"><?php echo _price($order_subtotal); ?> <?php if($vat && $display_tax_price === "including_tax") {echo '<div><small>(includes '._price($vat).' '.$tax_name.')</small></div>';} ?></td>
+                        <td style=" padding-top: 10px; text-align: right">
+                            <?php 
+                                if($vat && $display_tax_price === "including_tax") {
+                                    echo '<div><small>(includes '._price($vat).' '.$tax_name.')</small></div>';
+                                } 
+                            ?>
+                        </td>
                     </tr>
                     <?php
                     if(!empty($payment_method)) {

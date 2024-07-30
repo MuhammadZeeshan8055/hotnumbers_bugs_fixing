@@ -264,7 +264,28 @@ class Shop extends BaseController
                 if($sale_price && $regular_price!=$sale_price) {
                     $original_price = '<span class="strike-through">'._price($regular_price).'</span> ';
                 }
-                $variation_json['calculated_price_html'] = $original_price._price($calculated_price);
+
+                if(is_wholesaler()){
+                    // Call the function to get the discount value of wholesale
+                    $discount_array = global_wholesale_discount_value();
+
+                    if (is_array($discount_array) && isset($discount_array['role_discount'])) {
+                        $wholesaler_discount_value = $discount_array['role_discount'];
+                        $wholesale_discount_price = ($calculated_price * $wholesaler_discount_value) / 100;
+                        $final_price=$calculated_price-$wholesale_discount_price;
+                                        
+                    } else {
+                        $wholesaler_discount_value=0;
+                    }
+                }
+                if(is_wholesaler()){
+                    $original_price = '<span class="strike-through">'._price($calculated_price).'</span> ';
+                    $variation_json['calculated_price_html'] = $original_price._price($final_price); 
+                }else{
+                    $variation_json['calculated_price_html'] = $original_price._price($calculated_price); 
+                }
+
+                // $variation_json['calculated_price_html'] = $original_price._price($calculated_price); 
 
                 if(!empty($error)) {
                     $variation_json['error'] = $error['error'];

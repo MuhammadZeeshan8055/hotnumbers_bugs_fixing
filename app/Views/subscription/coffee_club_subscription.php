@@ -310,7 +310,9 @@
                                                     if ($get_user) {
                                                         $user_id = $get_user->user_id;
                                                         $has_subscription = has_subscription($user_id);
+                                                        $already_has_subscription_in_cart=already_has_subscription_in_cart($user_id);
                                                     }
+                                                    
                                                 }
     
                                             if(!is_logged_in()) {
@@ -328,6 +330,11 @@
                                             <p><strong>You have already got the subscription</strong></p>
                                             <button style="margin-top: 1em;min-width: 190px;" type="submit" class="button" disabled>CONTINUE</button>
                                         <?php
+                                        }elseif(!empty($already_has_subscription_in_cart)) {
+                                            ?>
+                                                <p><strong>You have already got Subscription in the cart (only 1 subscription is allowed).</strong></p>
+                                                <button style="margin-top: 1em;min-width: 190px;" type="submit" class="button" disabled>CONTINUE</button>
+                                            <?php
                                         }else{
                                            ?>
                                            <button style="margin-top: 1em;min-width: 190px;" type="submit" class="button">CONTINUE</button>

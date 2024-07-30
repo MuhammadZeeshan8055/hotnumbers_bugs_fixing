@@ -263,12 +263,12 @@ if(!empty($cart_tax) && $cart['total_tax'] && get_setting('display_tax_price') =
                     <span style="margin-right: -4px"><?php echo currency_symbol ?></span>
                     <span id="total_shipping_amount">
                         <?php
-                        if(!empty($cart['has_shipping'])) {
-                            $grand_total= $cart['cart_total'];
-                        }else{
-                            $grand_total= $cart['cart_total']-$cart['shipping_cost'];
-                        }
-                            echo number_format($grand_total, 2); 
+                        // if(!empty($cart['has_shipping'])) {
+                        //     $grand_total= $cart['cart_total'];
+                        // }else{
+                        //     $grand_total= $cart['cart_total']-$cart['shipping_cost'];
+                        // }
+                            echo number_format($cart['cart_total'], 2); 
                         ?>
                     </span>
                 </bdi>
