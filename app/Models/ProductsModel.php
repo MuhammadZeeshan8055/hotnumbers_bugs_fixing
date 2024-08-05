@@ -692,6 +692,122 @@ class ProductsModel extends Model {
         }
     }
 
+    public function variation_reduce_stock($product_id, $stock_deduct=0,$orderID) {
+        
+        // working code 
+
+        // $master = model('MasterModel');
+
+        // $attribute = '250g'; // The attribute weight you want to filter by
+        // $new_stock_value = 100; // The new stock quantity you want to set
+
+        // $get_prod = $master->query("SELECT * FROM tbl_product_variations WHERE product_id='$product_id'", true, true);
+
+        // // Assuming $get_prod is already set
+        // $variation_json = $get_prod['variation'];
+
+        // // Decode the JSON string
+        // $variations = json_decode($variation_json, true); // true for associative array
+
+        // $updated = false;
+
+        // foreach ($variations as &$variation) {
+        //     // Accessing the keys and values
+        //     $keys = $variation['keys'];
+        //     $values = &$variation['values']; // Use reference to modify the array directly
+
+        //     // Check if the attribute_weight matches the desired value
+        //     if ($keys['attribute_weight'] === $attribute) {
+        //         // Update the stock value for the matching attribute
+                
+        //         $values['stock'] = $new_stock_value;
+        //         $updated = true;
+        //         break; // Assuming you only want to update one variation, break out of the loop
+        //     }
+        // }
+
+        // if ($updated) {
+        //     // Encode the updated array back to JSON
+        //     $updated_variation_json = json_encode($variations);
+
+        //     var_dump($updated_variation_json);
+
+        //     // Update the database with the new JSON string
+        //     $master->query("UPDATE tbl_product_variations SET variation='$updated_variation_json' WHERE product_id='$product_id'");
+            
+        //     echo "Stock updated successfully!";
+        // } else {
+        //     echo "Attribute not found!";
+        // }
+
+
+        $master = model('MasterModel');
+
+
+        $order_id=$orderID;
+
+        $item_id = $master->query("SELECT * FROM tbl_order_items WHERE order_id='$order_id'", true, true);
+
+        $attribute_value = $master->query("SELECT meta_value FROM tbl_order_item_meta WHERE item_id='$item_id[order_item_id]' and meta_key='variations'", true, true);
+       
+        $attribute_json=$attribute_value['meta_value'];
+
+        $attributes = json_decode($attribute_json, true);
+
+        // echo "Weight: " . $attributes['attribute_weight'] . "\n";
+        // echo "Grind: " . $attributes['attribute_grind'] . "\n";
+
+        $attribute =  $attributes['attribute_weight']; // The attribute weight you want to filter by
+
+
+        if(!empty($attribute)){
+
+            $get_prod = $master->query("SELECT * FROM tbl_product_variations WHERE product_id='$product_id'", true, true);
+
+            // Assuming $get_prod is already set
+            $variation_json = $get_prod['variation'];
+
+            // Decode the JSON string
+            $variations = json_decode($variation_json, true); // true for associative array
+
+            $updated = false;
+
+            foreach ($variations as &$variation) {
+                // Accessing the keys and values
+                $keys = $variation['keys'];
+                $values = &$variation['values']; // Use reference to modify the array directly
+
+                // Check if the attribute_weight matches the desired value
+                if ($keys['attribute_weight'] === $attribute) {
+                    // Update the stock value for the matching attribute
+                    
+                    $new_stock_value=$values['stock']-$stock_deduct;
+                    $values['stock'] = $new_stock_value;
+                    $updated = true;
+                    break; // Assuming you only want to update one variation, break out of the loop
+                }
+            }
+
+            if ($updated) {
+                // Encode the updated array back to JSON
+                $updated_variation_json = json_encode($variations);
+
+            
+                // Update the database with the new JSON string
+                $master->query("UPDATE tbl_product_variations SET variation='$updated_variation_json' WHERE product_id='$product_id'");
+                
+                // echo "Stock updated successfully!";
+            } 
+            
+            // else {
+            //     echo "Attribute not found!";
+            // }
+    
+        }
+       
+       
+    }
+
     public function gain_stock($product_id, $stock_gain=0) {
         $master = model('MasterModel');
         $master->query("UPDATE tbl_products SET stock = stock+$stock_gain WHERE id='$product_id'");

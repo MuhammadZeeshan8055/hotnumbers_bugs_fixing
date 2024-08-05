@@ -42,18 +42,57 @@ class Categories extends BaseController
 
 
 
-    public function product_category_sortorder() {
-        if(!empty($_POST)) {
-            foreach(json_decode($_POST['data'],true) as $post) {
-                $order = $post['order'];
-                $id = $post['id'];
-                $this->master->query("UPDATE tbl_categories SET sort_order='$order' WHERE group_name='product_cat' AND id='$id'");
-            }
-            echo json_encode(['success'=>1]);
-        }
-        _render_page('/' . ADMIN . '/index', $this->data);
+    // public function product_category_sortorder() {
+    //     if(!empty($_POST)) {
+    //         foreach(json_decode($_POST['data'],true) as $post) {
+    //             $order = $post['order'];
+    //             $id = $post['id'];
+    //             $this->master->query("UPDATE tbl_categories SET sort_order='$order' WHERE group_name='product_cat' AND id='$id'");
+    //         }
+    //         echo json_encode(['success'=>1]);
+    //     }
+    //     _render_page('/' . ADMIN . '/index', $this->data);
 
+    // }
+
+    public function product_category_sortorder() {
+        // Check if the request method is POST
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // Verify that 'data' is set in POST request
+            if (isset($_POST['data'])) {
+                // Decode JSON data from POST request
+                $orderData = json_decode($_POST['data'], true);
+                
+                // Initialize response array
+                $response = ['success' => 1];
+    
+                // Update database based on received data
+                foreach ($orderData as $post) {
+                    $order = intval($post['order']); // Ensure order is an integer
+                    $id = intval($post['id']);       // Ensure id is an integer
+                    $this->master->query("UPDATE tbl_categories SET sort_order='$order' WHERE group_name='product_cat' AND id='$id'");
+                }
+                
+                // Set content type to application/json
+                header('Content-Type: application/json');
+                
+                // Send JSON response
+                echo json_encode($response);
+                exit(); // Ensure no further output
+            } else {
+                // Handle the case where 'data' is not set
+                header('Content-Type: application/json');
+                echo json_encode(['success' => 0, 'message' => 'No data received']);
+                exit();
+            }
+        } else {
+            // Handle non-POST requests
+            header('Content-Type: application/json');
+            echo json_encode(['success' => 0, 'message' => 'Invalid request method']);
+            exit();
+        }
     }
+    
 
     public function page_categories()
     {

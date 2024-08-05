@@ -263,6 +263,7 @@ href="javascript:void(0)"></i> <i class="lni lni-trash-can"></i></a> &nbsp;';
                 'stock' => 0,
                 'stock_threshold' => 0,
                 'external_url' => !empty($data['external_url']) ? $data['external_url'] : '',
+                'sort_order'=>$data['sort_order'],
                 'button_text' => !empty($data['button_text']) ? $data['button_text'] : ''
             ];
 

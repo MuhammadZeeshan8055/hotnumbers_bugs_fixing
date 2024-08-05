@@ -83,7 +83,7 @@
                 'classes' => '',
                 'products' => [5340],
                 'button_label' => 'All barista training',
-                'button_link' => site_url().'barista-training/'
+                'button_link' => site_url().'shop/category/barista-training'
             ]);
             ?>
         </div>

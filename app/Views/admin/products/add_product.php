@@ -151,7 +151,7 @@
                                                 </div>
                                             </div>
 
-                                            <div class="col-md-6 mb-15">
+                                            <div class="col-md-4 mb-15">
                                                 <div class="input_field">
                                                     <label>Tax Status <i class="lni lni-question-circle" data-tooltip title="Define whether or not the entire product is taxable, or just the cost of shipping it."></i> </label>
                                                     <div>
@@ -167,7 +167,7 @@
                                             </div>
 
 
-                                            <div class="col-md-6 mb-15">
+                                            <div class="col-md-4 mb-15">
                                                 <div class="input_field">
                                                     <label>Tax Class <?php echo help_text('Choose a tax class for this product. Tax classes are used to apply different tax rates specific to certain types of product.') ?></label>
                                                     <div>
@@ -187,6 +187,13 @@
                                                             ?>
                                                         </select>
                                                     </div>
+                                                </div>
+                                            </div>
+
+                                            <div id="sort_order" class="col-md-4 mb-15 simple_product_field" <?php echo $data['sort_order'];?>>
+                                                <div class="input_field">
+                                                    <label>Menu Order</label>
+                                                    <input type="number" name="sort_order" value="<?php echo $data['sort_order'] ?>">
                                                 </div>
                                             </div>
 

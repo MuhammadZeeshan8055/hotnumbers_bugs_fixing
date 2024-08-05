@@ -18,28 +18,181 @@
 $productModel = model('ProductsModel');
 
 if(!is_logged_in()){
+// $categories = $masterModel->query("SELECT 
+//     tbl_categories.id, 
+//     tbl_categories.name, 
+//     tbl_categories.slug 
+// FROM 
+//     tbl_categories 
+// JOIN 
+//     tbl_user_role_meta 
+//     ON FIND_IN_SET(tbl_categories.id, tbl_user_role_meta.meta_value) > 0
+// WHERE 
+//    tbl_user_role_meta.role_id = '8' 
+// ORDER BY 
+//     sort_order"); 
+
+
      
-$categories = $masterModel->query("SELECT id, name, slug FROM tbl_categories WHERE show_in_menu=1 AND status=1 ORDER BY sort_order");
-$role = current_user_role();
-$user_role_id = $role['id'];
+$categories = $masterModel->query("
+    WITH ExcludedCategoryIDs AS (
+        SELECT 
+            SUBSTRING_INDEX(SUBSTRING_INDEX(meta_value, ',', numbers.n), ',', -1) AS category_id
+        FROM 
+            tbl_user_role_meta
+        JOIN
+            (SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10) numbers
+            ON LENGTH(meta_value) - LENGTH(REPLACE(meta_value, ',', '')) >= numbers.n - 1
+        WHERE
+            role_id = '8'
+            AND meta_key = 'user_role_categories'
+            AND meta_value <> ''
+    ),
+    ExcludedCategoryIDList AS (
+        SELECT DISTINCT category_id
+        FROM ExcludedCategoryIDs
+    ),
+    IncludedCategoryIDs AS (
+        SELECT 
+            SUBSTRING_INDEX(SUBSTRING_INDEX(meta_value, ',', numbers.n), ',', -1) AS category_id
+        FROM 
+            tbl_user_role_meta
+        JOIN
+            (SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10) numbers
+            ON LENGTH(meta_value) - LENGTH(REPLACE(meta_value, ',', '')) >= numbers.n - 1
+        WHERE
+            role_id = '8'
+            AND meta_key = 'user_role_categories'
+            AND meta_value <> ''
+            AND EXISTS (
+                SELECT 1 
+                FROM tbl_user_role_meta 
+                WHERE role_id = '8' 
+                AND meta_value <> 'hide'
+            )
+    ),
+    IncludedCategoryIDList AS (
+        SELECT DISTINCT category_id
+        FROM IncludedCategoryIDs
+    )
+
+    SELECT 
+        tbl_categories.id, 
+        tbl_categories.name, 
+        tbl_categories.slug 
+    FROM 
+        tbl_categories 
+    WHERE 
+        (
+        
+            EXISTS (
+                SELECT 1 
+                FROM tbl_user_role_meta 
+                WHERE role_id = '8' 
+                AND meta_value = 'hide'
+            )
+            AND tbl_categories.id NOT IN (SELECT category_id FROM ExcludedCategoryIDList)
+        )
+        OR
+        (
+        
+            NOT EXISTS (
+                SELECT 1 
+                FROM tbl_user_role_meta 
+                WHERE role_id = '8' 
+                AND meta_value = 'hide'
+            )
+            AND tbl_categories.id IN (SELECT category_id FROM IncludedCategoryIDList)
+        )
+        AND tbl_categories.status = 1
+
+    ORDER BY 
+        tbl_categories.id;
+");
 
  
 }else{
 $role = current_user_role();
 $user_role_id = $role['id'];
-$categories = $masterModel->query("SELECT 
-    tbl_categories.id, 
-    tbl_categories.name, 
-    tbl_categories.slug 
-FROM 
-    tbl_categories 
-JOIN 
-    tbl_user_role_meta 
-    ON FIND_IN_SET(tbl_categories.id, tbl_user_role_meta.meta_value) > 0
-WHERE 
-   tbl_user_role_meta.role_id = '$user_role_id' 
-ORDER BY 
-    sort_order"); 
+ 
+
+$categories = $masterModel->query("
+    WITH ExcludedCategoryIDs AS (
+        SELECT 
+            SUBSTRING_INDEX(SUBSTRING_INDEX(meta_value, ',', numbers.n), ',', -1) AS category_id
+        FROM 
+            tbl_user_role_meta
+        JOIN
+            (SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10) numbers
+            ON LENGTH(meta_value) - LENGTH(REPLACE(meta_value, ',', '')) >= numbers.n - 1
+        WHERE
+            role_id = '$user_role_id'
+            AND meta_key = 'user_role_categories'
+            AND meta_value <> ''
+    ),
+    ExcludedCategoryIDList AS (
+        SELECT DISTINCT category_id
+        FROM ExcludedCategoryIDs
+    ),
+    IncludedCategoryIDs AS (
+        SELECT 
+            SUBSTRING_INDEX(SUBSTRING_INDEX(meta_value, ',', numbers.n), ',', -1) AS category_id
+        FROM 
+            tbl_user_role_meta
+        JOIN
+            (SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10) numbers
+            ON LENGTH(meta_value) - LENGTH(REPLACE(meta_value, ',', '')) >= numbers.n - 1
+        WHERE
+            role_id = '$user_role_id'
+            AND meta_key = 'user_role_categories'
+            AND meta_value <> ''
+            AND EXISTS (
+                SELECT 1 
+                FROM tbl_user_role_meta 
+                WHERE role_id = '$user_role_id' 
+                AND meta_value <> 'hide'
+            )
+    ),
+    IncludedCategoryIDList AS (
+        SELECT DISTINCT category_id
+        FROM IncludedCategoryIDs
+    )
+
+    SELECT 
+        tbl_categories.id, 
+        tbl_categories.name, 
+        tbl_categories.slug 
+    FROM 
+        tbl_categories 
+    WHERE 
+        (
+        
+            EXISTS (
+                SELECT 1 
+                FROM tbl_user_role_meta 
+                WHERE role_id = '$user_role_id' 
+                AND meta_value = 'hide'
+            )
+            AND tbl_categories.id NOT IN (SELECT category_id FROM ExcludedCategoryIDList)
+        )
+        OR
+        (
+        
+            NOT EXISTS (
+                SELECT 1 
+                FROM tbl_user_role_meta 
+                WHERE role_id = '$user_role_id' 
+                AND meta_value = 'hide'
+            )
+            AND tbl_categories.id IN (SELECT category_id FROM IncludedCategoryIDList)
+        )
+        AND tbl_categories.status = 1
+
+    ORDER BY 
+        tbl_categories.id;
+");
+
+
 }
 
 
@@ -47,7 +200,7 @@ ORDER BY
 
 <!--menu nav ---------------->
 <nav id="nav">
-    <div class="nav_container">
+    <div class="nav_container" id="scrollable-div">
         <div class="menu-main-menu-container">
             <ul id="menu-main-menu" class="menu">
                 <li class="menu-item">

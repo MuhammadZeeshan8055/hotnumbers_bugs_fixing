@@ -219,6 +219,9 @@ class CheckoutModel extends BaseController {
                     $notification->create('Order#'._order_number($orderID).' '.$product->title.' x '.$item_meta['quantity'], 'orders/view/'.$orderID,'shop_order',$customerID);
 
                     $this->ProductsModel->reduce_stock($item_meta['product_id'],$item_meta['quantity']);
+
+                    $this->ProductsModel->variation_reduce_stock($item_meta['product_id'],$item_meta['quantity'],$orderID);
+
                     $this->ProductsModel->add_sale($item_meta['product_id'],$item_meta['quantity']);
 
                     if(!empty($item_meta['subscription'])) {

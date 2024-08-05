@@ -5061,6 +5061,26 @@ form.woocommerce-cart-form .product-thumbnail img {
   min-width: 350px;
   transition: all ease-in 700ms;
   border-right: 5px ridge #C91F31;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+#nav #scrollable-div {
+  overflow: auto; /* Enable scrolling */
+}
+
+/* Webkit browsers */
+#nav #scrollable-div::-webkit-scrollbar {
+  display: none; /* Hide scrollbar */
+}
+
+/* Firefox */
+#nav #scrollable-div {
+  scrollbar-width: none; /* Hide scrollbar */
+}
+
+/* Edge and IE */
+#nav #scrollable-div {
+  -ms-overflow-style: none; /* Hide scrollbar */
 }
 #nav .nav_container .menu-main-menu-container {
   top: 20px;
@@ -5183,6 +5203,8 @@ form.woocommerce-cart-form .product-thumbnail img {
 #nav .nav_container .menu-main-menu-container ul.menu > li > .sub-menu li {
   margin-top: 4px;
   margin-bottom: 3px;
+  width: 100%;
+  max-width: 250px;
 }
 #nav .nav_container .menu-main-menu-container ul.menu ul .gap_above[class] {
   padding-top: 1em;

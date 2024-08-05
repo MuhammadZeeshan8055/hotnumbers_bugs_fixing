@@ -77,7 +77,7 @@
                                     <div class="text-right w-100">
                                         <img style="width: 14px;margin-right: 5px;margin-top: -4px;" src="<?php echo base_url('./assets/images/') ?>/location.png">
 
-                                        <a href="https://maps.google.com/maps?q=?>"><span id="region"><?php echo !empty($address) ? $address : '' ?> &nbsp;</span></a>
+                                        <a href="https://maps.google.com/maps?q=<?=$address?>"><span id="region"><?php echo !empty($address) ? $address : '' ?> &nbsp;</span></a>
                                     </div>
                             </div>
                             <?php } ?>

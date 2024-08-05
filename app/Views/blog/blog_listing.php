@@ -69,53 +69,61 @@ function showArtical(){
 
 
 
-        <script>
-            // vanilla JS
-            showMoreArtical = function() {
+    <script>
+    // vanilla JS
+    function showMoreArtical() {
 
-                const curr_count = document.querySelector('.blog_articles').childElementCount;
-                const limit = curr_count;
-                const curr_scroll = $(window).scrollTop();
+        const curr_count = document.querySelector('.blog_articles').childElementCount;
+        const limit = curr_count;
+        const curr_scroll = $(window).scrollTop();
 
-                $.post('<?php echo site_url() ?>blog/loadmore',{start:curr_count, limit: limit},(data)=>{
-                    data = JSON.parse(data);
-                    if(typeof data == "object") {
-                        const total_posts = data.total;
-                        $('.blog_articles').find('.new_articles').removeClass('new_articles');
-                        let new_html = '';
-                        data.posts.forEach((item)=>{
-                            const html = `<article class="loadsblog new_articles" style="display: none;">
-                            <a href="<?php echo base_url('blog/details') ?>/${item.slug}" title="${item.title}">
-                                <div class="featured">
-                                    <img src="${item.img_path}">
-                                    <div class="layer"></div>
-                                </div>
-                            </a>
-                            <div class="details">
-                                <h3>
-                                    <a href="<?php echo base_url('blog/details') ?>/${item.slug}" title="${item.title}">${item.title}</a>
-                                </h3>
-                                <p><?php echo base_url('blog/details') ?>/${item.content}</p>
-                                <a class="button" href="<?php echo base_url('blog/details') ?>/${item.slug}" title="${item.title}">Read More</a>
-                            </div>
-                        </article>`;
-                            document.querySelector('.blog_articles').innerHTML += html;
-                            new_html += html;
-                        });
+        $.post('<?php echo site_url() ?>blog/loadmore', { start: curr_count, limit: limit }, (data) => {
+            data = JSON.parse(data);
+            if (typeof data == "object") {
+                const total_posts = data.total;
+                $('.blog_articles').find('.new_articles').removeClass('new_articles');
+                let new_html = '';
+                let postsLoaded = 0;
 
-                        $('.blog_articles').find('.new_articles').show();
-
-                        $(document).scrollTop(curr_scroll);
-                        setTimeout(()=>{
-                            if(document.querySelector('.blog_articles').childElementCount >= total_posts) {
-                                $('#showMoreArtical');
-                            }
-                        },50);
-                    }
-
+                data.posts.forEach((item) => {
+                    const html = `<article class="loadsblog new_articles" style="display: none;">
+                    <a href="<?php echo base_url('blog/details') ?>/${item.slug}" title="${item.title}">
+                        <div class="featured">
+                            <img src="${item.img_path}">
+                            <div class="layer"></div>
+                        </div>
+                    </a>
+                    <div class="details">
+                        <h3>
+                            <a href="<?php echo base_url('blog/details') ?>/${item.slug}" title="${item.title}">${item.title}</a>
+                        </h3>
+                        <p><?php echo base_url('blog/details') ?>/${item.content}</p>
+                        <a class="button" href="<?php echo base_url('blog/details') ?>/${item.slug}" title="${item.title}">Read More</a>
+                    </div>
+                </article>`;
+                    new_html += html;
+                    postsLoaded++;
                 });
+
+                if (postsLoaded > 0) {
+                    document.querySelector('.blog_articles').innerHTML += new_html;
+                    $('.blog_articles').find('.new_articles').show();
+                }
+
+                $(document).scrollTop(curr_scroll);
+
+                // Disable the button if no more posts are available
+                setTimeout(() => {
+                    const current_count = document.querySelector('.blog_articles').childElementCount;
+                    if (current_count >= total_posts) {
+                        $('#showMoreArtical').prop('disabled', true); // Disable the button
+                    }
+                }, 50);
             }
-        </script>
+        });
+    }
+</script>
+
 
         
 <!------------footer ---------------------------------------->
