@@ -415,6 +415,10 @@
                             <button type="submit" class="btn btn-primary btn-sm" onclick="preventNavigation = false">&nbsp; <?php echo $btnlabel ?></button>
                         </div>
 
+                        <br>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="cloneProduct()">Clone Product</button>
+
+
 
                     </div>
                 </div>
@@ -422,6 +426,13 @@
 
         </form>
 
+        <script>
+            function cloneProduct() {
+                let form = document.querySelector('form');
+                form.action += '?clone=true'; // Add a query parameter to indicate cloning
+                form.submit(); // Submit the form
+            }
+        </script>
 
 
         <script>

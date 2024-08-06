@@ -222,6 +222,15 @@ href="javascript:void(0)"></i> <i class="lni lni-trash-can"></i></a> &nbsp;';
 
             $data = $this->request->getPost();
 
+            // Check if clone is requested
+            if ($this->request->getGet('clone')) {
+                // Remove ID to force insertion as new record
+                unset($data['id']);
+                $data['title'] .= ' - Cafe Use Only-copy';
+                $data['product_url'] .= ' ---cafe-use-only-copy'; // Optionally modify the title or slug to indicate a clone
+            
+            }
+
             $data['stock_managed'] = $this->request->getPost('stock_managed') === 'yes'?'yes':'no';
 
             $data['img'] = !empty($this->request->getPost('product_images')) ? implode(',',$this->request->getPost('product_images')) : '';
@@ -313,7 +322,7 @@ href="javascript:void(0)"></i> <i class="lni lni-trash-can"></i></a> &nbsp;';
                 $this->master->insertData('tbl_product_variations', $var_data);
             }
 
-            $msg = 'Successfully Updated';
+            $msg = !isset($data['id']) ? 'Successfully Cloned' : 'Successfully Updated';
 
             return redirect()->to(base_url(ADMIN . '/products/add/' . $id))->with('msg', $msg);
         }
