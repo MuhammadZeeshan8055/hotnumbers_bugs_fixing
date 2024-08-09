@@ -109,6 +109,7 @@
                     <th width="260">Categories</th>
                     <th width="100">Product type</th>
                     <th width="40">Stock</th>
+                    <th width="40">Stock Status</th>
                     <th width="60">Sales</th>
                     <th width="60">Status</th>
                     <th data-sortable="false" width="180">Actions</th>

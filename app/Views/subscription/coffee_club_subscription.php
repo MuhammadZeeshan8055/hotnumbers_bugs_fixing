@@ -302,43 +302,26 @@
                                         <p id="price_html" class="color-red f42"><span class="woocommerce-Price-amount amount"><bdi><?php echo currency_symbol ?><span id="subscription-price-text">0</span> </bdi></span></p>
                                         <p>*Terms &amp; Conditions Apply</p>
 
-                                        <?php 
-                                               if (is_logged_in()) {
-                                                    $user = model('UserModel');
-                                                    $get_user = $user->get_user();
-                                                    
-                                                    if ($get_user) {
-                                                        $user_id = $get_user->user_id;
-                                                        $has_subscription = has_subscription($user_id);
-                                                        $already_has_subscription_in_cart=already_has_subscription_in_cart($user_id);
-                                                    }
-                                                    
-                                                }
-    
+                                        <?php
                                             if(!is_logged_in()) {
                                         ?>
-                                           <p><strong>You must be logged in to purchase this product!</strong></p>
-                                           <a class="button" href="<?php echo site_url('account') ?>">SIGN IN</a>
-                                            <?php
+                                                <p><strong>You must be logged in to purchase this product!</strong></p>
+                                                <a class="button" href="<?php echo site_url('account') ?>">SIGN IN</a>
+                                        <?php
                                         }elseif(is_wholesaler()) {
                                         ?>
-                                            <p><strong>This product is not available for wholesale customers</strong></p>
-                                            <button style="margin-top: 1em;min-width: 190px;" type="submit" class="button" disabled>CONTINUE</button>
-                                        <?php
-                                        }elseif(!empty($has_subscription)) {
-                                        ?>
-                                            <p><strong>You have already got the subscription</strong></p>
-                                            <button style="margin-top: 1em;min-width: 190px;" type="submit" class="button" disabled>CONTINUE</button>
+                                                <p><strong>This product is not available for wholesale customers</strong></p>
+                                                <button style="margin-top: 1em;min-width: 190px;" type="submit" class="button" disabled>CONTINUE</button>
                                         <?php
                                         }elseif(!empty($already_has_subscription_in_cart)) {
-                                            ?>
+                                        ?>
                                                 <p><strong>You have already got Subscription in the cart (only 1 subscription is allowed).</strong></p>
                                                 <button style="margin-top: 1em;min-width: 190px;" type="submit" class="button" disabled>CONTINUE</button>
-                                            <?php
+                                        <?php
                                         }else{
-                                           ?>
-                                           <button style="margin-top: 1em;min-width: 190px;" type="submit" class="button">CONTINUE</button>
-                                            <?php
+                                        ?>
+                                                <button style="margin-top: 1em;min-width: 190px;" type="submit" class="button">CONTINUE</button>
+                                        <?php
                                         } 
                                         ?>
 

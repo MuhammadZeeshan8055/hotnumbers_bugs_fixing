@@ -114,18 +114,58 @@ class Products extends BaseController
 
                 $price = $productModel->product_price($row['id']);
 
-                $stock = intval($row['stock']);
+                // $stock = intval($row['stock']);
+
+
+
+                $zero_stock_value_mark='';
+
+                 // count variation stock 
+                 if($row['type'] == 'variable'){
+                    
+                    $values = get_variable_product_stock($row['id']);
+                    
+                    $variation_stock= $values['total_stock'];
+    
+                    $zero_stock_value=get_variable_product_stock_zero($row['id']);
+                   
+                    if(!empty($zero_stock_value['has_zero_stock'] && $row['type'] == 'variable')){
+                        $zero_stock_value_mark="<span style='font-weight:bold;color:red'>!</span>";
+                    }
+                }
+                // count variation stock 
+
+                if($row['type'] == 'simple' && $row['stock_managed'] == 'no' && $row['stock'] == 0){
+                    $stock = '-';
+                }else{
+                    if(!empty($variation_stock && $row['type'] == 'variable')){
+                        $stock = intval($row['stock'])+$variation_stock;
+                    }else{
+                        $stock = intval($row['stock']);
+                    }
+                    
+                }
+
+               
+
+
                 $sales = $row['total_sales'];
                 $low_stock = $row['stock_threshold'];
 
-                $stock_status = 'stock stock_available';
+                $stock_status_class = 'stock stock_available';
+                $stock_status = 'In Stock';
+                
                 if($row['stock_managed'] || $row['stock_managed'] == 'yes') {
                     if($low_stock >= $stock && $stock > 0) {
-                        $stock_status = 'stock stock_low';
+                        $stock_status_class = 'stock stock_low';
+                        $stock_status = 'Low Stock';
+
                         $stock = '<div title="Low stock"><i class="icon-exclamation"></i> '.$stock.'</div>';
                     }else {
                         if(!$stock || $row['stock_status'] == "outofstock") {
-                            $stock_status = 'stock stock_outofstock';
+                            $stock_status_class = 'stock stock_outofstock';
+                            $stock_status = 'Out Of Stock';
+
                             $stock = '<div title="Empty stock">'.$stock.'</div>';
                         }
                     }
@@ -169,7 +209,8 @@ href="javascript:void(0)"></i> <i class="lni lni-trash-can"></i></a> &nbsp;';
                     $price,
                     implode(', ',$cat_names),
                     $type,
-                    '<div class="'.$stock_status.'">'.$stock.'</div>',
+                    '<div class="'.$stock_status_class.'">'.$stock.'&nbsp'.$zero_stock_value_mark.'</div>',
+                    '<div class="'.$stock_status_class.'">'.$stock_status.'</div>',
                     $sales,
                     '<span class="status-'.$row['status'].'">'.ucfirst($row['status']).'</span>',
                     '<div class="text-center" style="width: 150px;">'.implode('',$action_btns).'</div>'

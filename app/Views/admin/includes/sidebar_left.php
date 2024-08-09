@@ -236,7 +236,7 @@ if(is_logged_in()) {
     <div class="admin_nav_bar flex_end">
         <button class="openbtn" onclick="openNav()">☰</button>
 
-        <a href="<?php echo base_url()?>" target="_blank">Logged in as <?=$get_user->email?></a>
+        <a href="<?php echo base_url(ADMIN."/profile")?>" target="_blank">Logged in as <?=$get_user->email?></a>
 
         <a href="<?php echo base_url()?>" target="_blank">Open Website</a>
 

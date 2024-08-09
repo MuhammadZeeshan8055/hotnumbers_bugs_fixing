@@ -10,7 +10,7 @@ if(get_setting('currency')) {
 function has_subscription($uid) {
 
     // $sql="SELECT tbl_orders.customer_user,tbl_order_items.order_id,tbl_order_item_meta.item_id,tbl_order_item_meta.meta_key,tbl_order_item_meta.meta_value FROM `tbl_orders` join tbl_order_items ON tbl_orders.order_id=tbl_order_items.order_id join tbl_order_item_meta on tbl_order_items.order_item_id=tbl_order_item_meta.item_id where tbl_order_item_meta.meta_key='type' and tbl_order_item_meta.meta_value='club_subscription' and tbl_orders.customer_user='$uid'";
-    $sql="SELECT tbl_orders.customer_user,tbl_order_items.order_id FROM `tbl_orders` join tbl_order_items ON tbl_orders.order_id=tbl_order_items.order_id where tbl_orders.order_type='shop_subscription' and tbl_orders.customer_user='$uid';";
+    $sql="SELECT tbl_orders.customer_user,tbl_order_items.order_id FROM `tbl_orders` join tbl_order_items ON tbl_orders.order_id=tbl_order_items.order_id where tbl_orders.order_type='shop_subscription' and tbl_orders.customer_user='$uid'";
     $master = model('MasterModel');
     $q = $master->query($sql, true, true);
     return $q;
@@ -24,11 +24,78 @@ function already_has_subscription_in_cart($uid){
 }
 
 function global_wholesale_discount_value(){
-    $sql = "SELECT JSON_UNQUOTE(JSON_EXTRACT(value, '$.4.role_discount')) AS role_discount FROM tbl_settings WHERE title = 'user_discount'";
+    $sql = "SELECT JSON_UNQUOTE(JSON_EXTRACT(value, '\$.\"4\".role_discount')) AS role_discount 
+        FROM tbl_settings 
+        WHERE title = 'user_discount'";
+
     $master = model('MasterModel');
     $q = $master->query($sql, true, true);
     return $q;
 }
+
+
+function get_variable_product_stock($pid) {
+        $sql = "SELECT SUM(stock) AS total_stock
+        FROM (
+        SELECT JSON_UNQUOTE(JSON_EXTRACT(variation, CONCAT('$[', idx, '].values.stock'))) AS stock
+        FROM tbl_product_variations
+        JOIN (
+            SELECT 0 AS idx UNION ALL
+            SELECT 1 UNION ALL
+            SELECT 2 UNION ALL
+            SELECT 3 UNION ALL
+            SELECT 4 UNION ALL
+            SELECT 5 UNION ALL
+            SELECT 6 UNION ALL
+            SELECT 7 UNION ALL
+            SELECT 8 UNION ALL
+            SELECT 9
+        ) AS indices
+            WHERE product_id = '$pid'
+            AND idx < JSON_LENGTH(variation)
+        ) AS stock_values
+        ";
+        
+        $master = model('MasterModel');
+        $q = $master->query($sql, true, true);
+        return $q;
+}
+function get_variable_product_stock_zero($pid) {
+
+    // $sql = "
+    //     SELECT 
+    //     SUM(stock) AS total_stock, 
+    //     MAX(CASE 
+    //         WHEN stock REGEXP '^[0-9]+$' THEN CASE 
+    //             WHEN stock = 0 THEN 1 
+    //             ELSE 0 
+    //         END 
+    //         ELSE NULL 
+    //     END) AS has_zero_stock 
+    //     FROM (
+    //         SELECT 
+    //             JSON_UNQUOTE(JSON_EXTRACT(variation, CONCAT('$[', idx, '].values.stock'))) AS stock 
+    //         FROM 
+    //             tbl_product_variations 
+    //         JOIN (
+    //             SELECT 0 AS idx UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 
+    //             UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 
+    //             UNION ALL SELECT 8 UNION ALL SELECT 9 
+    //         ) AS indices 
+    //         WHERE 
+    //             product_id = '$pid' 
+    //             AND idx < JSON_LENGTH(variation)
+    //     ) AS stock_values;
+    // ";
+
+    $sql = "
+      SELECT SUM(stock) AS total_stock, MAX(CASE WHEN stock = 0 THEN 1 ELSE 0 END) AS has_zero_stock FROM ( SELECT JSON_UNQUOTE(JSON_EXTRACT(variation, CONCAT('$[', idx, '].values.stock'))) AS stock FROM tbl_product_variations JOIN ( SELECT 0 AS idx UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 ) AS indices WHERE product_id = '$pid' AND idx < JSON_LENGTH(variation) ) AS stock_values
+    ";
+    $master = model('MasterModel');
+    $q = $master->query($sql, true, true);
+    return $q;
+}
+
 
 function php_errors() {
     ini_set('display_errors', 1);
@@ -653,30 +720,30 @@ function get_message($k='sessionmessage', $once = false)
 
         if($message['msg_type'] == 'toast') {
             ?>
-            <script>
-                document.addEventListener('DOMContentLoaded', ()=>{
-                    Swal.fire({
-                        html: '<div style="color: #fff"><?php echo is_array($message['message']) ? implode(', ',$message['message']) : $message['message'] ?></div>',
-                        toast: true,
-                        timer: <?php echo $message['timeout'] ?>,
-                        position: 'top',
-                        background: '#d8262f',
-                        showConfirmButton:false,
-                        showClass: {
-                            popup: 'animated windowIn'
-                        },
-                        hideClass: {
-                            popup: 'animated windowOut'
-                        },
-                    });
-                })
-            </script>
-            <style>
-                body.swal2-toast-shown .swal2-container.swal2-top .swal2-validation-message {
-                    display: none
-                }
-            </style>
-            <?php
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    Swal.fire({
+        html: '<div style="color: #fff"><?php echo is_array($message['message']) ? implode(', ',$message['message']) : $message['message'] ?></div>',
+        toast: true,
+        timer: <?php echo $message['timeout'] ?>,
+        position: 'top',
+        background: '#d8262f',
+        showConfirmButton: false,
+        showClass: {
+            popup: 'animated windowIn'
+        },
+        hideClass: {
+            popup: 'animated windowOut'
+        },
+    });
+})
+</script>
+<style>
+body.swal2-toast-shown .swal2-container.swal2-top .swal2-validation-message {
+    display: none
+}
+</style>
+<?php
             $session->remove($k);
         }
         else {
@@ -1169,34 +1236,36 @@ function upload_media_box($config=[],$include_scripts=true) {
     }
     $media = model('Media');
     ?>
-    <div class="input_file upload_media_images <?php echo !empty($config['multiple']) ? 'multiple':'' ?>">
-        <?php if(empty($config['textarea'])) { ?>
-            <div class="gallery-images" data-inputname="<?php echo $config['input_name'] ?>">
-                <?php if(!empty($config['images'])) {
+<div class="input_file upload_media_images <?php echo !empty($config['multiple']) ? 'multiple':'' ?>">
+    <?php if(empty($config['textarea'])) { ?>
+    <div class="gallery-images" data-inputname="<?php echo $config['input_name'] ?>">
+        <?php if(!empty($config['images'])) {
                     $config['images'] = array_filter($config['images']);
                     foreach($config['images'] as $img) {
                         $src = $media->get_media_src($img);
                         ?>
-                        <div class="media-slide">
-                            <div onclick="remove_product_media(this)" class="lni lni-cross-circle del-image" data-id="<?php echo $img ?>"></div>
-                            <div><img class="media_image" src="<?php echo $src ?>"></div>
-                            <?php
+        <div class="media-slide">
+            <div onclick="remove_product_media(this)" class="lni lni-cross-circle del-image"
+                data-id="<?php echo $img ?>"></div>
+            <div><img class="media_image" src="<?php echo $src ?>"></div>
+            <?php
                             if(!empty($config['input_name'])) {
                                 ?>
-                                <input type="hidden" name="<?php echo $config['input_name'] ?>[]" class="media_input" value="<?php echo $img ?>">
-                                <?php
+            <input type="hidden" name="<?php echo $config['input_name'] ?>[]" class="media_input"
+                value="<?php echo $img ?>">
+            <?php
                             }?>
-                        </div>
-                        <?php
+        </div>
+        <?php
                     }
                 } ?>
-            </div>
-        <?php }?>
+    </div>
+    <?php }?>
 
-        <div>
+    <div>
 
 
-            <?php
+        <?php
             $atts = '';
             if(!empty($config['textarea'])) {
                 $atts .= 'data-textarea="'.$config['textarea'].'"';
@@ -1212,11 +1281,12 @@ function upload_media_box($config=[],$include_scripts=true) {
             }
             ?>
 
-            <a href="#" <?php echo $atts ?> class="btn btn-sm btn-secondary back browse_media"><?php echo empty($config['buttonText']) ? '<i class="icon-up-circled2"></i> Upload image':$config['buttonText'] ?></a>
+        <a href="#" <?php echo $atts ?>
+            class="btn btn-sm btn-secondary back browse_media"><?php echo empty($config['buttonText']) ? '<i class="icon-up-circled2"></i> Upload image':$config['buttonText'] ?></a>
 
-        </div>
     </div>
-    <?php
+</div>
+<?php
 
     if(!empty($config['return'])) {
         return ob_get_clean();
@@ -1225,11 +1295,12 @@ function upload_media_box($config=[],$include_scripts=true) {
 
 function message_notice($message,$extraClass='') {
     ?>
-    <div class="alert woocommerce-message mb-50 <?php echo $extraClass ?>">
-        <span class=" closebtn" onclick="this.parentElement.style.display='none';"><i class="lni lni-cross-circle"></i></span>
-        <?php echo $message ?>
-    </div>
-    <?php
+<div class="alert woocommerce-message mb-50 <?php echo $extraClass ?>">
+    <span class=" closebtn" onclick="this.parentElement.style.display='none';"><i
+            class="lni lni-cross-circle"></i></span>
+    <?php echo $message ?>
+</div>
+<?php
 }
 
 function get_html_tag($html='',$tagname='',$wrap='') {
@@ -1304,15 +1375,17 @@ function shortcodes_decode($html='') {
 
 function admin_page_title($label='') {
     ?>
-    <div class="back_btn">
-        <a class="btn back" href="#" onclick="history.back()" title="Go Back" data-tooltip><i class="lni lni-arrow-left-circle"></i></a>
-        <a class="btn back" href="#" onclick="location.reload()" title="Reload Page" data-tooltip><i class="lni lni-reload"></i></a>
+<div class="back_btn">
+    <a class="btn back" href="#" onclick="history.back()" title="Go Back" data-tooltip><i
+            class="lni lni-arrow-left-circle"></i></a>
+    <a class="btn back" href="#" onclick="location.reload()" title="Reload Page" data-tooltip><i
+            class="lni lni-reload"></i></a>
 
-        <?php if($label) { ?>
-            <h3 class="label"><?php echo $label; ?></h3>
-        <?php } ?>
-    </div>
-    <?php
+    <?php if($label) { ?>
+    <h3 class="label"><?php echo $label; ?></h3>
+    <?php } ?>
+</div>
+<?php
 }
 
 function postgrids_html($atts=[]) {
@@ -1376,6 +1449,7 @@ function payment_method_map($text='') {
         'braintree'=>'Braintree',
         'squareup' => 'Squareup',
         'direct'=>'Direct Checkout',
+        'Credit/Debit Card'=>'Credit/Debit Card',
         'invoice' => 'Invoice Checkout'
     ];
     return !empty($maps[$text]) ? $maps[$text] : '';
@@ -1951,69 +2025,69 @@ function number_position($number='') {
 
 function init_subscription_form_script() {
     ?>
-    <script type="text/javascript">
-        function plan_expire_options(element) {
-            const parent = element.closest('.shop_subscription_form');
-            const interval = $(parent).find('.subscription-interval').val();
-            const period = $(parent).find('.subscription-period').val();
+<script type="text/javascript">
+function plan_expire_options(element) {
+    const parent = element.closest('.shop_subscription_form');
+    const interval = $(parent).find('.subscription-interval').val();
+    const period = $(parent).find('.subscription-period').val();
 
-            const plan_expire = $(parent).find('.subscription-plan-expire');
-            const plan_price = $(parent).find('.subscription_plan_price');
+    const plan_expire = $(parent).find('.subscription-plan-expire');
+    const plan_price = $(parent).find('.subscription_plan_price');
 
-            const url = `<?php echo site_url() ?>ajax/sub_plan_expire_options?period=${period}&interval=${interval}`;
-            plan_expire.find('select').html('');
+    const url = `<?php echo site_url() ?>ajax/sub_plan_expire_options?period=${period}&interval=${interval}`;
+    plan_expire.find('select').html('');
 
-            if (interval && period) {
-                $('.add_to_cart_form').addClass('loading');
-                plan_price.text('');
+    if (interval && period) {
+        $('.add_to_cart_form').addClass('loading');
+        plan_price.text('');
 
-                fetch(url).then(res => res.json()).then((res) => {
-                    if (Object.keys(res).length) {
-                        for (let k in res) {
-                            let option = document.createElement('option');
-                            option.value = k;
-                            option.text = res[k];
-                            //document.querySelector('#subscription-plan-expire > select').appendChild(option);
-                            plan_expire.find('select').append(`<option value="${res[k]}">${res[k]}</option>`);
-                        }
-                        if(plan_expire.find('select').attr('value')) {
-                            plan_expire.find('select').val(plan_expire.find('select').attr('value'));
-                        }
-                    }
-                    plan_expire.find('select').trigger('change');
-                    $('.add_to_cart_form').removeClass('loading');
-                });
+        fetch(url).then(res => res.json()).then((res) => {
+            if (Object.keys(res).length) {
+                for (let k in res) {
+                    let option = document.createElement('option');
+                    option.value = k;
+                    option.text = res[k];
+                    //document.querySelector('#subscription-plan-expire > select').appendChild(option);
+                    plan_expire.find('select').append(`<option value="${res[k]}">${res[k]}</option>`);
+                }
+                if (plan_expire.find('select').attr('value')) {
+                    plan_expire.find('select').val(plan_expire.find('select').attr('value'));
+                }
             }
-        }
+            plan_expire.find('select').trigger('change');
+            $('.add_to_cart_form').removeClass('loading');
+        });
+    }
+}
 
-        function set_price_display (expire) {
-            const parent = expire.closest('.subscription_box_fields');
-            const interval_input = parent.querySelector('.subscription-interval');
-            const interval_text = $(interval_input).find('option:selected').text().toLowerCase();
+function set_price_display(expire) {
+    const parent = expire.closest('.subscription_box_fields');
+    const interval_input = parent.querySelector('.subscription-interval');
+    const interval_text = $(interval_input).find('option:selected').text().toLowerCase();
 
-            const period_input = parent.querySelector('.subscription-period');
-            const period_text = $(period_input).find('option:selected').text().toLowerCase();
-            const expire_text = $(expire).find('option:selected').text().toLowerCase();
+    const period_input = parent.querySelector('.subscription-period');
+    const period_text = $(period_input).find('option:selected').text().toLowerCase();
+    const expire_text = $(expire).find('option:selected').text().toLowerCase();
 
-            const prod_price = $(parent).data('price');
+    const prod_price = $(parent).data('price');
 
-            $(parent).find('.subscription_plan_price').text(`${prod_price} ${interval_text} ${period_text} for ${expire_text}`);
+    $(parent).find('.subscription_plan_price').text(`${prod_price} ${interval_text} ${period_text} for ${expire_text}`);
 
-            $(parent).find('.plan_price_value').val(prod_price);
-        }
+    $(parent).find('.plan_price_value').val(prod_price);
+}
 
-        function subscription_switch (check) {
-            const parent = $(check).closest('.shop_subscription_form');
-            if(check.checked) {
-                parent.find('.subscription_box_fields').show();
-                parent.find('.subscription_box_fields').find('input,select').prop('disabled',false);
-            }else {
-                parent.find('.subscription_box_fields').hide();
-                parent.find('.subscription_box_fields').find('input,select').prop('disabled',true);
-            }
-        }
-    </script>
-    <?php
+function subscription_switch(check) {
+    const parent = $(check).closest('.shop_subscription_form');
+    if (check.checked) {
+        parent.find('.subscription_box_fields').show();
+        parent.find('.subscription_box_fields').find('input,select').prop('disabled', false);
+    } else {
+        parent.find('.subscription_box_fields').hide();
+        parent.find('.subscription_box_fields').find('input,select').prop('disabled', true);
+    }
+}
+</script>
+<?php
 }
 
 function squareup_script_tag() {
@@ -2021,12 +2095,12 @@ function squareup_script_tag() {
         $payment_methods = get_setting('payment_method',true);
         if(!empty($payment_methods['squareup']['mode']) && $payment_methods['squareup']['mode'] === "sandbox") {
             ?>
-            <script type="text/javascript" src="https://sandbox.web.squarecdn.com/v1/square.js"></script>
-            <?php
+<script type="text/javascript" src="https://sandbox.web.squarecdn.com/v1/square.js"></script>
+<?php
         }else {
             ?>
-            <script type="text/javascript" src="https://js.squareup.com"></script>
-            <?php
+<script type="text/javascript" src="https://js.squareup.com"></script>
+<?php
         }
     }
 }

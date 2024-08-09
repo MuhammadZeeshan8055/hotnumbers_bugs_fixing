@@ -1049,7 +1049,8 @@ class CartModel extends BaseController {
         $shipping_state = $getPost['shipping_state'];
         $shipping_postcode = $getPost['shipping_postcode'];
 
-        $payment_method = !empty($getPost['payment_method']) ? $getPost['payment_method'] : '';
+        // $payment_method = !empty($getPost['payment_method']) ? $getPost['payment_method'] : '';
+        $payment_method = 'Credit/Debit Card';
 
         $order_comments = $getPost['order_comments'];
         // $subscribe = $getPost['fue_subscribe'];

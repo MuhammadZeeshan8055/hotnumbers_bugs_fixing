@@ -249,7 +249,7 @@
             $standard_tax_rates['tax_class_name'] = 'standard';
 
             ?>
-            <div class="table-box">
+            <!-- <div class="table-box">
                 <label>Standard Tax Rates</label>
                 <?php tax_table($standard_tax_rates) ?>
             </div>
@@ -274,7 +274,7 @@
                     }
                 }
             }
-            ?>
+            ?> -->
         </div>
 
         <div class="mt-22"></div>

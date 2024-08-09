@@ -275,8 +275,16 @@ if(!empty($cart_tax) && $cart['total_tax'] && get_setting('display_tax_price') =
             </span>
         </strong>
 
-        <span id="shipping-vat" style="font-size: 15px;margin-left: 5px;"><?php if($cart['total_tax'] && get_setting('display_tax_price') == 'including_tax') {echo '(includes '._price($cart['total_tax']).' '.$cart['tax_name'].')';} ?></span>
-
+        <?php
+            if(!empty($cart['has_shipping'])) {
+        ?>
+        
+            <span id="shipping-vat" style="font-size: 15px;margin-left: 5px;"><?php if($cart['total_tax'] && get_setting('display_tax_price') == 'including_tax') {echo '(includes '._price($cart['total_tax']).' '.$cart['tax_name'].')';} ?></span>
+        
+        <?php
+            }
+        ?>
+        
         <script>
             jQuery(function() {
                 $(document).on('click','#apply_coupon', function(e) {
