@@ -216,7 +216,15 @@
                                     ?>
                                     <div class="add_to_cart_form">
                                         <div class="header">
-                                            <h3 class="pull-left"><?php echo $head_text; ?></h3>
+                                            <h3 class="pull-left">
+                                                <?php 
+                                                    if($product->type=='external'){
+                                                        echo $product->override_text; 
+                                                    }else{
+                                                        echo $head_text; 
+                                                    }
+                                                ?>
+                                            </h3>
 
                                             <div class="pull-right">
                                                 <?php echo $in_stock ? $price_text : _price(0); ?>

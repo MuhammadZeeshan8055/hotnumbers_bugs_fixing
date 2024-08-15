@@ -270,9 +270,7 @@ class Users extends BaseController
 
             $db_data['role'] = !empty($data['role']) ? $data['role'] : '';
 
-            // $db_data['display_name'] = $data['fname'].' '.$data['lname'];
-            $db_data['display_name'] = $data['fname'];
-
+            $db_data['display_name'] = $data['fname'].' '.$data['lname'];
             if(!empty($data['new_password']) && is_password_strong($data['new_password'])) {
                 $hash = new Pass_hash_lib();
                 $new_password = $data['new_password'];

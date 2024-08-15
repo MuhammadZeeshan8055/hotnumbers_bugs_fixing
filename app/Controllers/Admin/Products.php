@@ -171,6 +171,12 @@ class Products extends BaseController
                     }
                 }
 
+
+                 if($row['type'] == 'external'){
+                    $stock = '-';
+                    $stock_status = '-';
+                }
+
                 if(is_array($price)) {
                     $price = 'From '._price(number_format((float)$price[0],2));
                 }else {
@@ -314,7 +320,8 @@ href="javascript:void(0)"></i> <i class="lni lni-trash-can"></i></a> &nbsp;';
                 'stock_threshold' => 0,
                 'external_url' => !empty($data['external_url']) ? $data['external_url'] : '',
                 'sort_order'=>$data['sort_order'],
-                'button_text' => !empty($data['button_text']) ? $data['button_text'] : ''
+                'button_text' => !empty($data['button_text']) ? $data['button_text'] : '',
+                'override_text' => !empty($data['override_text']) ? $data['override_text'] : ''
             ];
 
             if(isset($data['stock'])) {

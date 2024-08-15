@@ -35,6 +35,17 @@
                 <!-- form -->
                 <form id="form" class="woocommerce-EditAccountForm edit-account validate" action="<?php echo base_url('account/edit-account') ?>" method="post">
 
+                    <?php
+
+                        if(is_logged_in()) {
+                            $user = model('UserModel');
+
+                            $get_user = $user->get_user();
+
+                            $display_name=$get_user->fname;
+                        }
+
+                    ?>
 
                     <div class="woocommerce-form-row">
                         <label for="account_display_name">Display Name&nbsp;<span class="required">*</span></label>

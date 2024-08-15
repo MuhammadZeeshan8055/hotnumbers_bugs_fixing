@@ -186,13 +186,13 @@
                         <td>
                             <input type="text" name="<?php echo $class_name ?>_tax_rate[tax_name][]" value="<?php echo $tax_name ?>">
                         </td>
-                        <td class="text-center">
+                        <!-- <td class="text-center">
                             <div class="input_field inline-checkbox">
                                 <label>
                                     <input type="checkbox" name="<?php echo $class_name ?>_tax_rate[tax_shipping][]" value="1" <?php echo $tax_shipping ? 'checked':'' ?>>
                                 </label>
                             </div>
-                        </td>
+                        </td> -->
                         <td>
                             <a href="#" onclick="remove_tax_rate(this);return false" class="color-base"><i class="lni lni-cross-circle"></i> </a>
                         </td>
@@ -218,7 +218,7 @@
                                 <th width="100">Amount</th>
                                 <th>Type</th>
                                 <th>Tax Name</th>
-                                <th>Shipping <i title="Choose whether or not this tax rate also gets applied to shipping." class="lni lni-question-circle"></i></th>
+                                <!-- <th>Shipping <i title="Choose whether or not this tax rate also gets applied to shipping." class="lni lni-question-circle"></i></th> -->
                                 <th></th>
                             </tr>
                             </thead>
@@ -249,7 +249,7 @@
             $standard_tax_rates['tax_class_name'] = 'standard';
 
             ?>
-            <!-- <div class="table-box">
+            <div class="table-box">
                 <label>Standard Tax Rates</label>
                 <?php tax_table($standard_tax_rates) ?>
             </div>
@@ -274,7 +274,7 @@
                     }
                 }
             }
-            ?> -->
+            ?>
         </div>
 
         <div class="mt-22"></div>
@@ -324,13 +324,13 @@
         <td>
             <input type="text" name="xxx_tax_rate[tax_name][]">
         </td>
-        <td class="text-center">
+        <!-- <td class="text-center">
             <div class="input_field inline-checkbox">
                 <label>
                     <input type="checkbox" name="xxx_tax_rate[tax_shipping][]" value="1">
                 </label>
             </div>
-        </td>
+        </td> -->
         <td>
             <a href="#" onclick="remove_tax_rate(this);return false" class="color-base"><i class="lni lni-cross-circle"></i> </a>
         </td>

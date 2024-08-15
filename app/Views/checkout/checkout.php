@@ -217,11 +217,11 @@ echo view('includes/header', ['header_scripts'=>$header_scripts]); ?>
 
                         <?php
                         if(!is_logged_in()) {
-                            // $required = ($cart['has_subscription'] || $cart['has_club_subscription']) ? 'required':'';
+                            $required = ($cart['has_subscription'] || $cart['has_club_subscription']) ? 'required':'';
                             ?>
                         <div id="create_account_input" class="form-row validate-required">
                             <label class="woocommerce-form__label woocommerce-form__label-for-checkbox input_button checkbox" style="padding-top: 0">
-                                <input style="display: inline-block;width: auto;margin-right: 5px;" <?php echo 'required' ?> data-error="Please login or sign up to purchase subscription" type="checkbox" class="woocommerce-form__input woocommerce-form__input-checkbox input-checkbox" value="1" name="create_account">
+                                <input style="display: inline-block;width: auto;margin-right: 5px;" <?php echo $required ?> data-error="Please login or sign up to purchase subscription" type="checkbox" class="woocommerce-form__input woocommerce-form__input-checkbox input-checkbox" value="1" name="create_account">
                                 <span>Create Hot Numbers account</span>
                             </label>
                         </div>

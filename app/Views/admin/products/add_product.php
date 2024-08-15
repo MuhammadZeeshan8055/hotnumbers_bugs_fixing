@@ -150,8 +150,13 @@
                                                     <input type="text" name="button_text" placeholder="View Product" value="<?php echo @$data['button_text'] ?>" maxlength="100">
                                                 </div>
                                             </div>
-
-                                            <div class="col-md-4 mb-15">
+                                            <div class="col-md-6 mb-15 external_product" <?php echo $data['type'] == "external" ? '':'hidden' ?>>
+                                                <div class="input_field">
+                                                    <label>Override Text</label>
+                                                    <input type="text" name="override_text" placeholder="Override Text" value="<?php echo @$data['override_text'] ?>" maxlength="100">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 mb-15" id="tax_status" <?php echo $data['type'] == "external" ? 'hidden' : ''; ?>>
                                                 <div class="input_field">
                                                     <label>Tax Status <i class="lni lni-question-circle" data-tooltip title="Define whether or not the entire product is taxable, or just the cost of shipping it."></i> </label>
                                                     <div>
@@ -167,7 +172,7 @@
                                             </div>
 
 
-                                            <div class="col-md-4 mb-15">
+                                            <div class="col-md-4 mb-15" id="tax_class" <?php echo $data['type'] == "external" ? 'hidden' : ''; ?>>
                                                 <div class="input_field">
                                                     <label>Tax Class <?php echo help_text('Choose a tax class for this product. Tax classes are used to apply different tax rates specific to certain types of product.') ?></label>
                                                     <div>
@@ -190,7 +195,7 @@
                                                 </div>
                                             </div>
 
-                                            <div id="sort_order" class="col-md-4 mb-15 simple_product_field" <?php echo $data['sort_order'];?>>
+                                            <div id="sort_order" class="col-md-4 mb-15 simple_product_field" <?php echo $data['sort_order'];?> <?php echo $data['type'] == "external" ? 'hidden' : ''; ?>>
                                                 <div class="input_field">
                                                     <label>Menu Order</label>
                                                     <input type="number" name="sort_order" value="<?php echo $data['sort_order'] ?>">
@@ -284,7 +289,7 @@
                                 </div>
 
                             </div>
-                            <div class="col-md-12">
+                            <div class="col-md-12" <?php echo $data['type'] == "external" ? 'hidden' : ''; ?>>
                                 <?php if(get_setting('subscription_enabled')) { ?>
                                     <div title="Enable subscription on this product" class="input_field mb-15 mr-15 inline-checkbox">
                                         <label><input type="checkbox" class="checkbox" name="subscribe" value="1" <?php echo !empty($data['subscription']) && $data['subscription'] ? 'checked':'' ?>>
@@ -292,17 +297,17 @@
                                     </div>
                                 <?php } ?>
 
-                                <div class="input_field mb-15 mr-15 inline-checkbox">
+                                <div class="input_field mb-15 mr-15 inline-checkbox" <?php echo $data['type'] == "external" ? 'hidden' : ''; ?>>
                                     <label><input type="checkbox" class="checkbox" name="sold_individually" value="1" <?php echo !empty($data['sold_individually']) && $data['sold_individually'] ? 'checked':'' ?>>
                                         Sold Individually <?php echo help_text('Enable this to only allow one of this item to be bought in a single order') ?></label>
                                 </div>
 
-                                <div class="input_field mb-15 mr-15 inline-checkbox">
+                                <div class="input_field mb-15 mr-15 inline-checkbox" <?php echo $data['type'] == "external" ? 'hidden' : ''; ?>>
                                     <label><input type="checkbox" class="checkbox" name="free_shipping" value="1" <?php echo !empty($data['free_shipping']) && $data['free_shipping'] ? 'checked':'' ?>>
                                         Free Shipping <?php echo help_text('Disable shipping charges for this product') ?></label>
                                 </div>
 
-                                <div class="input_field mb-15 mr-15 inline-checkbox">
+                                <div class="input_field mb-15 mr-15 inline-checkbox" <?php echo $data['type'] == "external" ? 'hidden' : ''; ?>>
                                     <label><input type="checkbox" class="checkbox" name="no_shipping" value="1" <?php echo !empty($data['no_shipping']) && $data['no_shipping'] ? 'checked':'' ?>>
                                         No Shipping <?php echo help_text('Disable shipment requirement for this product') ?></label>
                                 </div>
@@ -442,14 +447,26 @@
 
                 if(ele.value === "simple") {
                     $('.simple_product_field').show();
+                    $('.input_field.mb-15.mr-15.inline-checkbox').show();
+                    $('#tax_status').show();
+                    $('#tax_class').show();
+                    $('#sort_order').show();
                 }
                 if(ele.value === "variable") {
                     $('.simple_product_field').hide();
+                    $('.input_field.mb-15.mr-15.inline-checkbox').show();
+                    $('#tax_status').show();
+                    $('#tax_class').show();
                 }
                 if(ele.value === "external") {
                     $('.external_product').show();
                     $('.simple_product_field').show();
                     $('#stock_management_check, #stock_control').hide();
+                    $('#stock_management_check, #stock_control').hide();
+                    $('.input_field.mb-15.mr-15.inline-checkbox').hide();
+                    $('#tax_status').hide();
+                    $('#tax_class').hide();
+                    $('#sort_order').hide();
                 }
             }
 

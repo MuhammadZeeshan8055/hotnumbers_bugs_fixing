@@ -3,7 +3,7 @@
         <div class="col-md-6" style="padding-left: 0">
             <div class="form-row">
                 <form class="form pt-5 pb-5 media_gallery_upload" method="post" action="<?php echo base_url('admin/media-library/upload-media') ?>" enctype="multipart/form-data">
-                    <input type="file" name="upload_files[]" required multiple accept="image/*">
+                    <input type="file" name="upload_files[]" required multiple accept="image/*,.pdf, application/pdf">
                     <button name="file_upload" class="btn btn-sm btn-primary bg-red" type="submit">Upload</button>
                 </form>
             </div>

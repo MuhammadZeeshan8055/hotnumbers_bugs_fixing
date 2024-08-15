@@ -9,7 +9,7 @@ class Media extends Model {
         $db      = \Config\Database::connect();
         $builder = $db->table('tbl_files');
         helper(['form', 'url']);
-        $image_mimes = ['image/jpg','image/jpeg','image/gif','image/png','image/webp'];
+        $image_mimes = ['image/jpg','image/jpeg','image/gif','image/png','image/webp','application/pdf'];
 
         $validated = false;
 
