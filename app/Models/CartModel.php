@@ -1515,8 +1515,16 @@ class CartModel extends BaseController {
     
         // Create order for other products if present
         if (!empty($other_items)) {
+
+            $is_internal=is_internal();
+            $is_wholesaler=is_wholesaler();
+
+            // Set post status to 'processing' for internal users or wholesalers, otherwise 'pending' by default
+            $getPost['post_status'] = ($is_internal || $is_wholesaler) ? 'processing' : ($getPost['post_status'] ?? 'pending');
+
+
             $order_data = [
-                'status'=>!empty($getPost['post_status']) ? $getPost['post_status'] : 'pending',
+                'status' => $getPost['post_status'],
                 'order_title' => 'Product Order &ndash; '.date('F d, Y').' @ '.date('h:i A'),
                 'customer_user'=>$customer_id,
                 'payment_method'=> $payment_method,
