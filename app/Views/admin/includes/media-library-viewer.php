@@ -392,8 +392,17 @@
                             </ul>
                         </div>
                         <div class="media-image">
-                            <a id="media-image-<?php echo $media_id ?>" data-fancybox="gallery" data-title="<?php echo $media_file->name ?>" data-path="<?php echo $media_file->name ?>" href="<?php echo $src ?>">
-                                <img ondrag="return false;" alt="<?php echo $media_file->name ?>" src="<?php echo urldecode($src_thumb)?>"></a>
+                            <div class="media-image">
+                                <?php if (pathinfo($media_file->name, PATHINFO_EXTENSION) === 'pdf'): ?>
+                                    <a id="media-image-<?php echo $media_id ?>" data-fancybox="gallery" data-title="<?php echo $media_file->name ?>" data-path="<?php echo $media_file->name ?>" href="<?php echo $src ?>" target="_blank">
+                                        <img ondrag="return false;" alt="<?php echo $media_file->name ?>" src="https://dev.zeeteck.com/projects/hotnumbers/assets/images/site-images/products/download.png">
+                                    </a>
+                                <?php else: ?>
+                                    <a id="media-image-<?php echo $media_id ?>" data-fancybox="gallery" data-title="<?php echo $media_file->name ?>" data-path="<?php echo $media_file->name ?>" href="<?php echo $src ?>">
+                                        <img ondrag="return false;" alt="<?php echo $media_file->name ?>" src="<?php echo urldecode($src_thumb) ?>">
+                                    </a>
+                                <?php endif; ?>
+                            </div>
                         </div>
                         <div class="media-caption">
                             <div class="left">

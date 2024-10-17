@@ -344,6 +344,8 @@ class UserModel extends Model {
 
     public function register_wholesaler($data) {
 
+        $notification = model('NotificationModel');
+
         $name = str_replace(' ','_',$data['full_name']);
         $username = strtolower($name).rand();
 
@@ -378,7 +380,15 @@ class UserModel extends Model {
             'status' => 1
         ];
 
+        $login_uid = is_logged_in();
+
         $user_id = $this->master->insertData('tbl_users',$user_data);
+
+        $check=record_exists_in_notifications('New Wholesale Registration#'.$user_id);
+
+        if(empty($check)){
+            $notification->create('New Wholesale Registration#'.$user_id, 'users/edit/'.$user_id,'New Wholesale Registration',$login_uid,$customerID);
+        }
 
         $this->master->insertData('tbl_request_acc',['user_id'=>$user_id],'req_id',$req_id);
 

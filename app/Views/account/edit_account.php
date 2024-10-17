@@ -42,7 +42,7 @@
 
                             $get_user = $user->get_user();
 
-                            $display_name=$get_user->fname;
+                            $display_name=$get_user->display_name;
                         }
 
                     ?>

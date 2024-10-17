@@ -232,30 +232,52 @@ class cart extends BaseController
         return 0;
     }
 
+    // public function order_complete() {
+
+    //     $get_order_id = $this->request->getVar('id');
+
+    //     if($get_order_id) {
+
+    //         $data['order'] = $this->order->get_order_by_transaction($get_order_id);
+
+    //         if(!empty($data['order'])) {
+    //             $data['order_id'] = $data['order']['order_id'];
+
+    //             if(!empty($data['order'])) {
+    //                 return view('checkout/checkout_complete',$data);
+    //             }else {
+    //                 return redirect()->to(base_url());
+    //             }
+    //         }else {
+    //             return redirect()->to(base_url());
+    //         }
+
+    //     }else {
+    //         return redirect()->to(base_url());
+    //     }
+    // }
+
+
     public function order_complete() {
 
-        $get_order_id = $this->request->getVar('id');
-
-        if($get_order_id) {
-
-            $data['order'] = $this->order->get_order_by_transaction($get_order_id);
-
-            if(!empty($data['order'])) {
-                $data['order_id'] = $data['order']['order_id'];
-
-                if(!empty($data['order'])) {
-                    return view('checkout/checkout_complete',$data);
-                }else {
-                    return redirect()->to(base_url());
-                }
-            }else {
+        $get_transaction_id = $this->request->getVar('id');
+    
+        if($get_transaction_id) {
+    
+            // Fetch all orders with the same transaction ID
+            $data['orders'] = $this->order->get_orders_by_transaction($get_transaction_id);
+    
+            if(!empty($data['orders'])) {
+                return view('checkout/checkout_complete', $data);
+            } else {
                 return redirect()->to(base_url());
             }
-
-        }else {
+    
+        } else {
             return redirect()->to(base_url());
         }
     }
+    
 
     public function cart_process() {
 

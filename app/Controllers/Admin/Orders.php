@@ -1673,12 +1673,12 @@ class Orders extends MyController
         $userModel = model('UserModel');
         $cartModel = model('CartModel');
 
-//        $subscriptionModel->init([
-//             'order_id'=>155,
-//             'item_id' => 403
-//        ]);
-//
-//        exit;
+        //        $subscriptionModel->init([
+        //             'order_id'=>155,
+        //             'item_id' => 403
+        //        ]);
+        //
+        //        exit;
 
         $this->data['order_type'] = 'order';
 
@@ -1687,7 +1687,7 @@ class Orders extends MyController
         $this->data['coupons'] = $this->master->getRows('tbl_coupons');
 
         $this->data['order'] = $order = $orderModel->get_order_by_id($order_id);
-        
+
         if($order_id) {
 
             $this->data['order_notes'] = $orderModel->get_order_notes($order_id);

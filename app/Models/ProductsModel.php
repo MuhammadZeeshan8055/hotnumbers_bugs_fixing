@@ -197,7 +197,8 @@ class ProductsModel extends Model {
         $_status = $status != 'any' ? "AND category.status=$status" : '';
 
         if($status !== "any") {
-            $query = " AND (prod.stock_managed=1 AND stock_status='instock') ".$query;
+            // $query = " AND (prod.stock_managed=1 AND stock_status='instock') ".$query;
+            $query = " AND (stock_status='instock') ".$query;
         }
 
         $sql = "SELECT category.*,prod.* FROM tbl_categories AS category JOIN tbl_product_categories AS pc ON pc.category_id=category.id JOIN tbl_products AS prod ON prod.id=pc.product_id where pc.category_id=$cid $_status $query";
@@ -309,7 +310,7 @@ class ProductsModel extends Model {
 
         $fields = trim($fields,',');
 
-        $q = "SELECT $fields FROM tbl_categories AS category JOIN tbl_product_categories AS pc ON pc.category_id=category.id JOIN tbl_products AS p ON p.id=pc.product_id WHERE category.id='$cid' $query  GROUP BY p.id";
+        $q = "SELECT $fields FROM tbl_categories AS category JOIN tbl_product_categories AS pc ON pc.category_id=category.id JOIN tbl_products AS p ON p.id=pc.product_id WHERE category.id='$cid' $query  GROUP BY p.id ORDER BY pc.sort_order";
 
         $fetch_query= $this->db->query($q)->getResultArray();
 
@@ -683,11 +684,25 @@ class ProductsModel extends Model {
 
     public function reduce_stock($product_id, $stock_deduct=0) {
         $master = model('MasterModel');
+
+        
+        //for sending notification
+        $notification = model('NotificationModel');
+        
+
+        
         $master->query("UPDATE tbl_products SET stock = stock-$stock_deduct WHERE id='$product_id' AND (stock_managed=1 OR stock_managed='yes')");
         $get_prod = $master->query("SELECT stock, stock_status FROM tbl_products WHERE id='$product_id'",true,true);
         if(!empty($get_prod)) {
             if($get_prod['stock'] == 0) {
                 $master->query("UPDATE tbl_products SET stock_status = 'outofstock' WHERE id='$product_id' AND (stock_managed=1 OR stock_managed='yes')");
+
+                //for sending notification
+                $login_uid = is_logged_in();
+                
+                $customerID='1';
+                $notification->create('Product Low Stock/Out of Stock#'.$product_id, 'products/add/'.$product_id,'Product Low Stock/Out of Stock',$login_uid,$customerID);
+               
             }
         }
     }

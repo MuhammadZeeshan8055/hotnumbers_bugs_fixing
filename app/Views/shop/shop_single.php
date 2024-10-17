@@ -218,7 +218,7 @@
                                         <div class="header">
                                             <h3 class="pull-left">
                                                 <?php 
-                                                    if($product->type=='external'){
+                                                    if(($product->type=='external') && !empty($product->override_text)){
                                                         echo $product->override_text; 
                                                     }else{
                                                         echo $head_text; 
@@ -377,15 +377,79 @@
 
                                                             ?>
                                                         <div class="col-md-6 justify-content-end d-flex">
-                                                            <div class="woocommerce-variation-add-to-cart">
-                                                                <?php if(!$button_link) { ?>
-                                                                <button type="submit" class="single_add_to_cart_button button alt"><?php echo $button_text ?></button>
-                                                                <?php }else {
-                                                                    ?>
-                                                                 <a href="<?php echo $button_link ?>" class="single_add_to_cart_button button alt" style="border-color: #fff;" target="_blank"><?php echo $button_text ?></a>
+
+                                                            
+                                                            <!-- <div class="woocommerce-variation-add-to-cart">
+                                                                <?php 
+                                                                  
+                                                                if(!$button_link) { ?>
+                                                                    <button type="submit" class="single_add_to_cart_button button alt"><?php echo $button_text ?></button>
+                                                                <?php 
+                                                                }else {
+                                                                ?>
+                                                                    <a href="<?php echo $button_link ?>" class="single_add_to_cart_button button alt" style="border-color: #fff;" target="_blank"><?php echo $button_text ?></a>
                                                                 <?php
-                                                                }?>
-                                                            </div>
+                                                                }
+                                                                    
+                                                                ?>
+                                                            </div> -->
+
+
+                                                            <?php 
+                                                                   
+                                                                if(!$button_link) { 
+
+
+                                                                     if($product->type ==  "variable"){
+                                                                    
+                                                                        $product_id=$product->id;
+                                                                        $check = check_manage_stock_for_variations($product_id);
+                
+                                                                        // Decode the JSON string
+                                                                        $checkvariations = json_decode($check['variation'], true);
+                                                                        
+                                                                        if (is_array($checkvariations)) {
+                                                                            $manage_stock = 'no'; // Initialize default value
+                                                                            $stock_status = 'Out of Stock'; // Default stock status
+                                                                    
+                                                                            foreach ($checkvariations as $variation) {
+                                                                                if ($variation['values']['manage_stock'] == 'yes') {
+                                                                                    $manage_stock = 'yes';
+                                                                                }
+                                                                                
+                                                                                if ($variation['values']['stock_status'] == 'instock') {
+                                                                                    $stock_status_class = 'stock stock_available';
+                                                                                    $stock_status = 'In Stock';
+                                                                                    break; // Exit the loop if 'In Stock' is found
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+
+                                                                    if($product->type ==  "variable" && $product->stock_managed=='no' && $manage_stock=='no' && $product->stock_status=='outofstock'){
+                                                                        
+                                                                    
+                                                                ?>
+                                                                
+                                                                            <p>Out of Stock</p>
+                                                                
+                                                                <?php 
+                                                                    }else{
+                                                                ?>
+                                                                            <button type="submit" class="single_add_to_cart_button button alt"><?php echo $button_text ?></button>
+                                                                
+                                                                <?php
+                                                                    }
+                                                                }else {
+                                                                ?>
+                                                                    <a href="<?php echo $button_link ?>" class="single_add_to_cart_button button alt" style="border-color: #fff;" target="_blank"><?php echo $button_text ?></a>
+                                                                <?php
+                                                                }
+                                                                    
+                                                                ?>
+
+                                                            
+
                                                         </div>
                                                         <?php } ?>
                                                     </div>
@@ -562,8 +626,31 @@
                                                     <div class="content">
                                                         <h2 class="woocommerce-loop-product__title"><?php echo $product['title'] ?></h2>
                                                         <span class="price">
-                                                    <span class="amount">From <span><?php echo currency_symbol ?></span><?php echo (int)$product['price'] ?></span>
-                                                </span>
+                                                            <?php
+                                                                if($product['type']=='variable'){
+                                                                    $variation_price=get_variation_starting_price($product['id']);
+
+                                                                    
+                                                                    $variations = json_decode($variation_price['variation'], true);
+
+                                                                    $regular_prices = [];
+
+                                                                    foreach ($variations as $variation) {
+                                                                        $regular_prices[] = (float) $variation['values']['regular_price'];
+                                                                    }
+
+                                                                    $smallest_price = min($regular_prices);
+                                                                                                                                    
+                                                            ?>
+                                                                <span class="amount">From <span><?php echo currency_symbol ?></span><?php echo  $smallest_price ?></span>
+                                                            <?php
+                                                                }else{
+                                                            ?>
+                                                                <span class="amount">From <span><?php echo currency_symbol ?></span><?php echo (int)$product['price'] ?></span>
+                                                            <?php
+                                                                }
+                                                            ?>
+                                                        </span>
                                                     </div>
                                                 </div>
                                             </a>

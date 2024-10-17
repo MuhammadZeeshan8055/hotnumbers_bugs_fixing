@@ -1,3 +1,8 @@
+<style>
+    .variable-product-active{
+        display:block !important;
+    }
+</style>
 <div class="container ">
     <div class="admin_title_row">
         <?php
@@ -195,10 +200,31 @@
                                                 </div>
                                             </div>
 
-                                            <div id="sort_order" class="col-md-4 mb-15 simple_product_field" <?php echo $data['sort_order'];?> <?php echo $data['type'] == "external" ? 'hidden' : ''; ?>>
+                                            <!-- <div id="sort_order" class="col-md-4 mb-15 simple_product_field" <?php echo $data['sort_order'];?> <?php echo $data['type'] == "external" ? 'hidden' : ''; ?>>
                                                 <div class="input_field">
                                                     <label>Menu Order</label>
                                                     <input type="number" name="sort_order" value="<?php echo $data['sort_order'] ?>">
+                                                </div>
+                                            </div> -->
+
+                                            <div class="col-md-4 mb-15">
+                                                <div class="input_field">
+                                                    <label>Xero Code</label>
+                                                    <input type="text" name="" value="" placeholder="Xero Code">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-4 mb-15" id="">
+                                                <div class="input_field">
+                                                    <label>Xero Category <i class="lni lni-question-circle" data-tooltip title="Define whether or not the entire product is taxable, or just the cost of shipping it."></i> </label>
+                                                    <div>
+                                                        <select class="select2"  name="" value="">
+                                                            
+                                                                <option value=""></option>
+                                                               
+                                                            
+                                                        </select>
+                                                    </div>
                                                 </div>
                                             </div>
 
@@ -440,6 +466,21 @@
         </script>
 
 
+        <!-- showing variation options when Product Type is variable -->
+        <!-- <script>
+            function product_type_switch(selectElement) {
+                var selectedValue = selectElement.value;
+                var variableProductField = document.querySelector('.variable_product_field');
+
+                if (selectedValue === 'variable') {
+                    variableProductField.style.display = 'block';
+                } else {
+                    variableProductField.style.display = 'none';
+                }
+            }
+        </script> -->
+
+
         <script>
             const product_type_switch = (ele)=> {
                 $('.simple_product_field,.variable_product_field,.external_product').hide();
@@ -451,12 +492,16 @@
                     $('#tax_status').show();
                     $('#tax_class').show();
                     $('#sort_order').show();
+                    // Remove 'variable-product-active' class if it exists
+                    $('.variable_product_field').removeClass('variable-product-active');
                 }
                 if(ele.value === "variable") {
                     $('.simple_product_field').hide();
                     $('.input_field.mb-15.mr-15.inline-checkbox').show();
                     $('#tax_status').show();
                     $('#tax_class').show();
+                    // Add a class 'variable-product-active' for variable products
+                    $('.variable_product_field').addClass('variable-product-active');
                 }
                 if(ele.value === "external") {
                     $('.external_product').show();
@@ -467,6 +512,8 @@
                     $('#tax_status').hide();
                     $('#tax_class').hide();
                     $('#sort_order').hide();
+                    // Remove 'variable-product-active' class if it exists
+                    $('.variable_product_field').removeClass('variable-product-active');
                 }
             }
 

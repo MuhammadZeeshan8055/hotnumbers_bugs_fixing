@@ -87,6 +87,7 @@ class LoginController extends BaseController
 
             $mailModel = model('MailModel');
             $userModel = model('UserModel');
+            $notification = model('NotificationModel');
 
             $registered_data = $userModel->getCustomerByEmail($data['email']);
 
@@ -111,6 +112,7 @@ class LoginController extends BaseController
 
                 if(empty($registered_data)) {
                     $user_id = $this->master->insertData($this->table, $user_data);
+                    $notification->create('New User#'.$user_id, 'users/edit/'.$user_id,'New User Registered','1','1',$customerID);
                 }else {
                     $user_id = $this->master->insertData($this->table, $user_data,'user_id',$registered_data['user_id']);
                 }

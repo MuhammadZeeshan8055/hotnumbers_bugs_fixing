@@ -37,109 +37,216 @@ class SquareupModel extends Model {
         ]);
     }
 
+    // public function process_squareup($customer_id='') {
+
+    //     $square = $this->squareClient;
+
+    //     $request = $this->request;
+    //     $checkout = model('CheckoutModel');
+
+    //     $idempotencyKey = uniqid();
+
+    //     try {
+    //         //$squareupCustomerID = $this->UserModel->get_user_meta($customer_id,'squareup_customer_id',true);
+    //         $isSqCustomer = false;
+    //         if(!empty($request->getPost('customer_user_card'))) {
+    //             $cid = (int)$request->getPost('customer_user_card');
+    //             $uid = is_logged_in();
+    //             $getCard = $this->masterModel->query("SELECT card_id, value FROM tbl_card_meta WHERE user_id='$uid' AND id='$cid'",true,true);
+    //             if(!empty($getCard['card_id'])) {
+    //                 $cardID = $getCard['card_id'];
+    //                 $cardvalue = !empty($getCard['value']) ? json_decode($getCard['value'],true) : '';
+
+    //                 if(!empty($cardvalue['card']['customer_id'])) {
+    //                     $sqCustomer = $square->getCustomersApi()->retrieveCustomer($cardvalue['card']['customer_id']);
+    //                     if($sqCustomer->isSuccess()) {
+    //                         $isSqCustomer = true;
+    //                     }
+    //                 }
+    //             }else {
+    //                 echo json_encode(['Invalid card']);
+    //                 exit;
+    //             }
+    //         }else {
+    //             $sqCustomer = $this->createSquareupCustomer($idempotencyKey);
+    //             if($sqCustomer->isSuccess()) {
+    //                 $isSqCustomer = true;
+    //             }
+    //         }
+
+    //         if(!empty($sqCustomer->getErrors())) {
+    //             return ['success'=>0,'message'=>$sqCustomer->getErrors(),'orderID'=>0];
+    //         }else if ($isSqCustomer) {
+    //             $result = $sqCustomer->getBody();
+    //             $res = json_decode($result,true);
+    //             $squareupCustomerID = $res['customer']['id'];
+    //             $this->UserModel->update_meta(['squareup_customer_id'=>$squareupCustomerID], $customer_id);
+
+    //             if(empty($request->getPost('customer_user_card'))) {
+    //                 $Card = $this->SquareupCard($squareupCustomerID, $idempotencyKey, $customer_id);
+    //                 if($Card->isSuccess()) {
+    //                     $cardData = $Card->getBody();
+    //                     $res = json_decode($cardData,true);
+    //                     $cardID = $res['card']['id'];
+    //                 }else {
+    //                     $errors = $this->sq_errors($Card->getErrors());
+    //                     echo json_encode($errors);
+    //                     exit;
+    //                 }
+    //             }
+
+    //             $idempotencyKey = uniqid();
+
+    //             $getCart = $this->CartModel->get_cart();
+    //             $subtotal = $getCart['cart_total'];
+
+    //             $payment = $this->chargeCard($idempotencyKey, $squareupCustomerID, $cardID, $subtotal);
+
+    //             if ($payment->isSuccess()) {
+    //                 $result = json_decode($payment->getBody(),true);
+    //                 $paymentData = $result['payment'];
+    //                 $transaction_id = $paymentData['id'];
+
+    //                 $orderPost = $request->getPost();
+    //                 $orderPost['post_status'] = 'completed';
+
+    //                 $postData = $request->getPost();
+    //                 $postData['customer_id'] = $customer_id;
+    //                 $postData['order_paid'] = 1;
+
+    //                 $orderID = $this->CartModel->create_order($postData);
+
+    //                 $this->OrderModel->add_order_meta($orderID,'transaction_id',$transaction_id);
+
+    //                 $this->OrderModel->set_transaction_id($orderID, $transaction_id);
+
+    //                 $this->OrderModel->add_order_meta($orderID,'squareup_body',$payment->getBody());
+    //                 $this->OrderModel->add_order_meta($orderID,'squareup_card_id',$cardID);
+    //                 $this->OrderModel->update_order_meta($orderID,['paid_date'=>date('Y-m-d h:i:s')]);
+
+    //                 $checkout->orderCompleteActions($orderID, $customer_id);
+
+    //                 return ['success'=>1,'message'=>$this->successMessage,'orderID'=>$transaction_id];
+
+    //             } else {
+    //                 $errors = $this->sq_errors($payment->getErrors());
+    //                 echo json_encode($errors);
+    //                 exit;
+    //             }
+    //         }
+
+    //     }catch (Exception $e) {
+    //         return ['success'=>0,'message'=>$e->errorMessage(),'orderID'=>0];
+    //     }
+
+    // }
+
+
     public function process_squareup($customer_id='') {
-
         $square = $this->squareClient;
-
         $request = $this->request;
         $checkout = model('CheckoutModel');
-
         $idempotencyKey = uniqid();
-
+    
         try {
-            //$squareupCustomerID = $this->UserModel->get_user_meta($customer_id,'squareup_customer_id',true);
+            // Check or create Square customer
             $isSqCustomer = false;
-            if(!empty($request->getPost('customer_user_card'))) {
+            if (!empty($request->getPost('customer_user_card'))) {
                 $cid = (int)$request->getPost('customer_user_card');
                 $uid = is_logged_in();
-                $getCard = $this->masterModel->query("SELECT card_id, value FROM tbl_card_meta WHERE user_id='$uid' AND id='$cid'",true,true);
-                if(!empty($getCard['card_id'])) {
+                $getCard = $this->masterModel->query("SELECT card_id, value FROM tbl_card_meta WHERE user_id='$uid' AND id='$cid'", true, true);
+                if (!empty($getCard['card_id'])) {
                     $cardID = $getCard['card_id'];
-                    $cardvalue = !empty($getCard['value']) ? json_decode($getCard['value'],true) : '';
-
-                    if(!empty($cardvalue['card']['customer_id'])) {
+                    $cardvalue = !empty($getCard['value']) ? json_decode($getCard['value'], true) : '';
+    
+                    if (!empty($cardvalue['card']['customer_id'])) {
                         $sqCustomer = $square->getCustomersApi()->retrieveCustomer($cardvalue['card']['customer_id']);
-                        if($sqCustomer->isSuccess()) {
+                        if ($sqCustomer->isSuccess()) {
                             $isSqCustomer = true;
                         }
                     }
-                }else {
+                } else {
                     echo json_encode(['Invalid card']);
                     exit;
                 }
-            }else {
+            } else {
                 $sqCustomer = $this->createSquareupCustomer($idempotencyKey);
-                if($sqCustomer->isSuccess()) {
+                if ($sqCustomer->isSuccess()) {
                     $isSqCustomer = true;
                 }
             }
-
-            if(!empty($sqCustomer->getErrors())) {
-                return ['success'=>0,'message'=>$sqCustomer->getErrors(),'orderID'=>0];
-            }else if ($isSqCustomer) {
+    
+            if (!empty($sqCustomer->getErrors())) {
+                return ['success' => 0, 'message' => $sqCustomer->getErrors(), 'orderID' => 0];
+            } else if ($isSqCustomer) {
                 $result = $sqCustomer->getBody();
-                $res = json_decode($result,true);
+                $res = json_decode($result, true);
                 $squareupCustomerID = $res['customer']['id'];
-                $this->UserModel->update_meta(['squareup_customer_id'=>$squareupCustomerID], $customer_id);
-
-                if(empty($request->getPost('customer_user_card'))) {
+                $this->UserModel->update_meta(['squareup_customer_id' => $squareupCustomerID], $customer_id);
+    
+                if (empty($request->getPost('customer_user_card'))) {
                     $Card = $this->SquareupCard($squareupCustomerID, $idempotencyKey, $customer_id);
-                    if($Card->isSuccess()) {
+                    if ($Card->isSuccess()) {
                         $cardData = $Card->getBody();
-                        $res = json_decode($cardData,true);
+                        $res = json_decode($cardData, true);
                         $cardID = $res['card']['id'];
-                    }else {
+                    } else {
                         $errors = $this->sq_errors($Card->getErrors());
                         echo json_encode($errors);
                         exit;
                     }
                 }
-
+    
                 $idempotencyKey = uniqid();
-
                 $getCart = $this->CartModel->get_cart();
                 $subtotal = $getCart['cart_total'];
-
+    
                 $payment = $this->chargeCard($idempotencyKey, $squareupCustomerID, $cardID, $subtotal);
-
+    
                 if ($payment->isSuccess()) {
-                    $result = json_decode($payment->getBody(),true);
+                    $result = json_decode($payment->getBody(), true);
                     $paymentData = $result['payment'];
                     $transaction_id = $paymentData['id'];
-
+    
                     $orderPost = $request->getPost();
                     $orderPost['post_status'] = 'completed';
-
-                    $postData = $request->getPost();
-                    $postData['customer_id'] = $customer_id;
-                    $postData['order_paid'] = 1;
-
-                    $orderID = $this->CartModel->create_order($postData);
-
-                    $this->OrderModel->add_order_meta($orderID,'transaction_id',$transaction_id);
-
-                    $this->OrderModel->set_transaction_id($orderID, $transaction_id);
-
-                    $this->OrderModel->add_order_meta($orderID,'squareup_body',$payment->getBody());
-                    $this->OrderModel->add_order_meta($orderID,'squareup_card_id',$cardID);
-                    $this->OrderModel->update_order_meta($orderID,['paid_date'=>date('Y-m-d h:i:s')]);
-
-                    $checkout->orderCompleteActions($orderID, $customer_id);
-
-                    return ['success'=>1,'message'=>$this->successMessage,'orderID'=>$transaction_id];
-
+                    $orderPost['order_paid'] = 1;
+    
+                    // Create orders
+                    $orderIDs = $this->CartModel->create_order($orderPost);
+    
+                    if (isset($orderIDs['subscription'])) {
+                        $this->OrderModel->add_order_meta($orderIDs['subscription'], 'transaction_id', $transaction_id);
+                        $this->OrderModel->set_transaction_id($orderIDs['subscription'], $transaction_id);
+                        $this->OrderModel->add_order_meta($orderIDs['subscription'], 'squareup_body', $payment->getBody());
+                        $this->OrderModel->add_order_meta($orderIDs['subscription'], 'squareup_card_id', $cardID);
+                        $this->OrderModel->update_order_meta($orderIDs['subscription'], ['paid_date' => date('Y-m-d h:i:s')]);
+                        $checkout->orderCompleteActions($orderIDs['subscription'], $customer_id);
+                    }
+    
+                    if (isset($orderIDs['product'])) {
+                        $this->OrderModel->add_order_meta($orderIDs['product'], 'transaction_id', $transaction_id);
+                        $this->OrderModel->set_transaction_id($orderIDs['product'], $transaction_id);
+                        $this->OrderModel->add_order_meta($orderIDs['product'], 'squareup_body', $payment->getBody());
+                        $this->OrderModel->add_order_meta($orderIDs['product'], 'squareup_card_id', $cardID);
+                        $this->OrderModel->update_order_meta($orderIDs['product'], ['paid_date' => date('Y-m-d h:i:s')]);
+                        $checkout->orderCompleteActions($orderIDs['product'], $customer_id);
+                    }
+    
+                    return ['success' => 1, 'message' => $this->successMessage, 'orderID' => $transaction_id];
+    
                 } else {
                     $errors = $this->sq_errors($payment->getErrors());
                     echo json_encode($errors);
                     exit;
                 }
             }
-
-        }catch (Exception $e) {
-            return ['success'=>0,'message'=>$e->errorMessage(),'orderID'=>0];
+    
+        } catch (Exception $e) {
+            return ['success' => 0, 'message' => $e->getMessage(), 'orderID' => 0];
         }
-
     }
+    
 
     public function createSquareupCustomer($idempotencyKey, $customerID='') {
 

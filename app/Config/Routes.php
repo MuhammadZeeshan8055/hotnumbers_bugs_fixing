@@ -175,6 +175,9 @@ $routes->group('admin', ['filter' => 'AdminFilter'], static function ($routes) {
 
     $routes->get('products', 'Admin/Products::index');
     $routes->get('trash-products/(:any)', 'Admin\Products::trash_products/$1');
+    $routes->get('publish-products/(:any)', 'Admin\Products::publish_products/$1');
+    $routes->get('draft-products/(:any)', 'Admin\Products::draft_products/$1');
+    $routes->get('private-products/(:any)', 'Admin\Products::private_products/$1');
     $routes->get('products/trash/(:any)', 'Admin\Products::trash_product/$1');
     $routes->match(['get', 'post'], 'products/add(:any)', 'Admin\Products::add/$1');
     $routes->get('products/delete/(:any)', 'Admin\Products::delete/$1');
@@ -223,6 +226,11 @@ $routes->group('admin', ['filter' => 'AdminFilter'], static function ($routes) {
     $routes->get('blog/add(:any)', 'Admin/Blog::add');
     $routes->post('blog/add_post', 'Admin/Blog::add_post');
     $routes->get('post-categories', 'Admin/Categories::post_categories');
+
+    // for product sorting
+    $routes->get('product-sorting', 'Admin/Products::product_sorting');
+    $routes->post('product-sortorder-testing', 'Admin/Products::product_sortorder_testing');
+
 
 
     //wholesale orders

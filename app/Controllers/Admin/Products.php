@@ -27,6 +27,133 @@ class Products extends BaseController
 
     }
 
+    // public function product_sorting(){
+        
+    //     $filter_by_category=$_GET['filter_by_category'];
+       
+    //     $parent = 1;
+    //     $this->data['productModel'] = model('ProductsModel');
+        
+    //     if(!empty($filter_by_category)){
+    //         $this->data['categories'] = $this->master->getRows('tbl_product_categories',['category_id'=>$filter_by_category]);
+    //     }else{
+    //         $this->data['categories'] = $this->master->getRows('tbl_product_categories',['category_id'=>'82']);
+    //     }
+
+    //     $this->data['all_categories'] = $this->master->getRows(
+    //         'tbl_categories',
+    //         [
+    //             'status' => '1',
+    //             'sort_order !=' => ''
+    //         ]
+    //     );
+
+    //     $this->data['content'] = ADMIN . "/products/product_sorting";
+    //     $this->data['media'] = model('Media');
+    //     $this->data['parent'] = $parent;
+    //     $this->data['page'] ="product-sorting";
+    //     $this->data['group'] = "post";
+    //     // echo '<pre>';
+    //     // print_r($this->data['all_categories']);
+    //     // echo '</pre>';
+
+    //     _render_page('/' . ADMIN . '/index', $this->data);
+    // }
+
+    
+    public function product_sorting(){
+        $filter_by_category = $_GET['filter_by_category'];
+        $parent = 1;
+        $this->data['productModel'] = model('ProductsModel');
+        
+        // Fetch categories based on filter
+        if (!empty($filter_by_category)) {
+            $this->data['categories'] = $this->master->getRows(
+                'tbl_product_categories', 
+                ['category_id' => $filter_by_category],
+                '*',
+                '',
+                '',
+                'ASC', // Order direction
+                'sort_order' // Order by column
+            );
+        } else {
+            $this->data['categories'] = $this->master->getRows(
+                'tbl_product_categories', 
+                ['category_id' => '82'],
+                '*',
+                '',
+                '',
+                'ASC', // Order direction
+                'sort_order' // Order by column
+            );
+        }
+    
+        // Fetch all categories, sorted by sort_order ascending
+        $this->data['all_categories'] = $this->master->getRows(
+            'tbl_categories',
+            [
+                'status' => '1',
+                'sort_order !=' => ''
+            ],
+            '*',
+            '',
+            '',
+            'ASC', // Order direction
+            'sort_order' // Order by column
+        );
+    
+        $this->data['content'] = ADMIN . "/products/product_sorting";
+        $this->data['media'] = model('Media');
+        $this->data['parent'] = $parent;
+        $this->data['page'] = "product-sorting";
+        $this->data['group'] = "post";
+    
+        _render_page('/' . ADMIN . '/index', $this->data);
+    }
+    
+
+    public function product_sortorder_testing() {
+
+        // Check if the request method is POST
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // Verify that 'data' is set in POST request
+            if (isset($_POST['data'])) {
+                // Decode JSON data from POST request
+                $orderData = json_decode($_POST['data'], true);
+                
+                // Initialize response array
+                $response = ['success' => 1];
+
+                // Update database based on received data
+                foreach ($orderData as $post) {
+                    $order = intval($post['order']); // Ensure order is an integer
+                    $id = intval($post['id']);       // Ensure id is an integer
+                    $cid = intval($post['cid']);       // Ensure id is an integer
+                    $this->master->query("UPDATE tbl_product_categories SET sort_order='$order' WHERE category_id='$cid' AND product_id='$id'");
+                }
+                
+                // Set content type to application/json
+                header('Content-Type: application/json');
+                
+                // Send JSON response
+                echo json_encode($response);
+                exit(); // Ensure no further output
+            } else {
+                // Handle the case where 'data' is not set
+                header('Content-Type: application/json');
+                echo json_encode(['success' => 0, 'message' => 'No data received']);
+                exit();
+            }
+        } else {
+            // Handle non-POST requests
+            header('Content-Type: application/json');
+            echo json_encode(['success' => 0, 'message' => 'Invalid request method']);
+            exit();
+        }
+    }
+
+
     public function index()
     {
         $productModel = model('ProductsModel', true, $db);
@@ -172,10 +299,45 @@ class Products extends BaseController
                 }
 
 
-                 if($row['type'] == 'external'){
+                if($row['type'] == 'external'){
                     $stock = '-';
                     $stock_status = '-';
                 }
+
+               
+
+                if ($row['type'] == 'variable') {
+                    $check = check_manage_stock_for_variations($row['id']);
+                
+                    // Decode the JSON string
+                    $variations = json_decode($check['variation'], true);
+                
+                    if (is_array($variations)) {
+                        $manage_stock = 'no'; // Initialize default value
+                        $stock_status = 'Out of Stock'; // Default stock status
+                
+                        foreach ($variations as $variation) {
+                            if ($variation['values']['manage_stock'] == 'yes') {
+                                $manage_stock = 'yes';
+                            }
+                            
+                            if ($variation['values']['stock_status'] == 'instock') {
+                                $stock_status_class = 'stock stock_available';
+                                $stock_status = 'In Stock';
+                                break; // Exit the loop if 'In Stock' is found
+                            }
+                        }
+                    }
+                
+                }
+
+                if ($row['type'] == 'variable' && $manage_stock == 'no') {
+                    $stock = '-';
+                    $stock_status_class = 'stock stock_outofstock';
+                    $stock_status = '-';
+                    $zero_stock_value_mark = '';
+                }
+                
 
                 if(is_array($price)) {
                     $price = 'From '._price(number_format((float)$price[0],2));
@@ -246,6 +408,69 @@ href="javascript:void(0)"></i> <i class="lni lni-trash-can"></i></a> &nbsp;';
         $productModel = model('ProductsModel');
         foreach(explode(',',$ids) as $prodID) {
             $productModel->change_status($prodID,'trash');
+        }
+        notice_success('Products trashed successfully');
+        if(empty($_GET['ref'])) {
+            ?>
+            <script>
+                window.close();
+            </script>
+            <?php
+        }else {
+            ?>
+            <script>
+                history.back();
+            </script>
+            <?php
+        }
+    }
+
+    public function publish_products($ids='') {
+        $productModel = model('ProductsModel');
+        foreach(explode(',',$ids) as $prodID) {
+            $productModel->change_status($prodID,'publish');
+        }
+        notice_success('Products trashed successfully');
+        if(empty($_GET['ref'])) {
+            ?>
+            <script>
+                window.close();
+            </script>
+            <?php
+        }else {
+            ?>
+            <script>
+                history.back();
+            </script>
+            <?php
+        }
+    }
+
+    public function draft_products($ids='') {
+        $productModel = model('ProductsModel');
+        foreach(explode(',',$ids) as $prodID) {
+            $productModel->change_status($prodID,'draft');
+        }
+        notice_success('Products trashed successfully');
+        if(empty($_GET['ref'])) {
+            ?>
+            <script>
+                window.close();
+            </script>
+            <?php
+        }else {
+            ?>
+            <script>
+                history.back();
+            </script>
+            <?php
+        }
+    }
+
+    public function private_products($ids='') {
+        $productModel = model('ProductsModel');
+        foreach(explode(',',$ids) as $prodID) {
+            $productModel->change_status($prodID,'private');
         }
         notice_success('Products trashed successfully');
         if(empty($_GET['ref'])) {
@@ -352,16 +577,48 @@ href="javascript:void(0)"></i> <i class="lni lni-trash-can"></i></a> &nbsp;';
                     $this->master->insertData('tbl_product_categories',['product_id'=>$id,'category_id'=>$cat]);
                 }
             }
+            // $variation_data = [];
+            // if (!empty($data['variations'])) {
+            //     foreach ($data['variations'] as &$variation) {
+            //         // Check if 'regular_price' is empty and set it to '0' if it is
+            //         if (isset($variation['values']['regular_price']) && $variation['values']['regular_price'] === '') {
+            //             $variation['values']['regular_price'] = '0';
+            //         }
+            //         // Add the processed variation to the array
+            //         $variation_data[] = $variation;
+            //     }
+            //     unset($variation); // Break the reference with the last element
+            // }
+            
+            // $var_data = [
+            //     'product_id' => $id,
+            //     'variation' => json_encode($variation_data)
+            // ];
+
             $variation_data = [];
-            if(!empty($data['variations'])) {
-                foreach($data['variations'] as $variation) {
-                    $variation_data[] = ($variation);
+            if (!empty($data['variations'])) {
+                foreach ($data['variations'] as &$variation) {
+                    // Check if 'regular_price' is empty and set it to '0' if it is
+                    if (isset($variation['values']['regular_price']) && $variation['values']['regular_price'] === '') {
+                        $variation['values']['regular_price'] = '0';
+                    }
+
+                    // Remove any leading or trailing whitespace around 'attribute_date'
+                    if (isset($variation['keys']['attribute_date'])) {
+                        $variation['keys']['attribute_date'] = trim($variation['keys']['attribute_date']);
+                    }
+
+                    // Add the processed variation to the array
+                    $variation_data[] = $variation;
                 }
+                unset($variation); // Break the reference with the last element
             }
+
             $var_data = [
-                'product_id'=>$id,
-                'variation'=>json_encode($variation_data)
+                'product_id' => $id,
+                'variation' => json_encode($variation_data)
             ];
+            
             $getvar = $this->master->getRow('tbl_product_variations',['product_id'=>$id]);
 
             if(!empty($variation_data) && $getvar) {

@@ -21,63 +21,133 @@ class OrderModel extends Model {
     }
 
 
-    public function get_orders($extra_query='',$include_order_meta=true,$include_items = true, $select='o.*') {
+    // public function get_orders($extra_query='',$include_order_meta=true,$include_items = true, $select='o.*') {
 
+    //     $output = [];
+
+    //     $query = "SELECT $select FROM `tbl_orders` AS o LEFT JOIN tbl_users AS user ON user.user_id=o.customer_user LEFT JOIN tbl_order_meta AS meta ON meta.order_id=o.order_id WHERE 1=1 $extra_query ";
+
+    //     if(!strstr($extra_query,"GROUP BY")) {
+    //         $query .= " GROUP BY o.order_id DESC";
+    //     }
+
+    //     $db_orders = $this->db->query($query)->getResultArray();
+
+    //     if($db_orders) {
+
+    //         foreach($db_orders as $i=>$order) {
+
+    //             $order_id = $order['order_id'];
+
+    //             if(!empty($order['billing_address'])) {
+    //                 $order['billing_address'] = json_decode($order['billing_address'],true);
+    //             }
+    //             if(!empty($order['shipping_address'])) {
+    //                 $order['shipping_address'] = json_decode($order['shipping_address'], true);
+    //             }
+    //             if($include_items) {
+    //                 $order['order_items'] = [];
+    //                 $items = $this->db->query("SELECT * FROM tbl_order_items WHERE order_id='$order_id'")->getResultArray();
+
+    //                 foreach($items as $item) {
+    //                     $itemid = $item['order_item_id'];
+    //                     $metas = $this->db->query("SELECT * FROM tbl_order_item_meta WHERE item_id='$itemid'")->getResultArray();
+    //                     $item['item_meta'] = [];
+    //                     foreach($metas as $meta) {
+
+    //                         $meta['meta_value'] = !empty($meta['meta_value']) ? stripslashes($meta['meta_value']) : '';
+
+    //                         if($meta['meta_key'] === "line_tax_data" && !empty($meta['meta_value'])) {
+
+    //                             $meta['meta_value'] = unserialize($meta['meta_value']);
+    //                         }
+    //                         if($meta['meta_key'] === "variation" &&  !empty($meta['meta_value'])) {
+    //                             $meta['meta_value'] = json_decode($meta['meta_value'],true);
+    //                         }
+    //                         $item['item_meta'][$meta['meta_key']] = $meta['meta_value'];
+    //                     }
+    //                     $order['order_items'][] = $item;
+
+    //                     $children = [];
+
+
+    //                 }
+    //             }
+
+    //             if($include_order_meta) {
+    //                 $order_metas = $this->db->query("SELECT * FROM tbl_order_meta WHERE order_id='$order_id'")->getResultArray();
+    //                 if(!empty($order_metas)) {
+    //                     foreach($order_metas as $meta) {
+    //                         $order['order_meta'][$meta['meta_key']] = $meta['meta_value'];
+    //                     }
+    //                 }
+    //             }
+
+    //             $output[] = $order;
+    //         }
+
+
+    //     }
+
+    //     return $output;
+    // }
+    
+    public function get_orders($extra_query='', $include_order_meta=true, $include_items=true, $select='o.*') {
         $output = [];
-
-        $query = "SELECT $select FROM `tbl_orders` AS o LEFT JOIN tbl_users AS user ON user.user_id=o.customer_user LEFT JOIN tbl_order_meta AS meta ON meta.order_id=o.order_id WHERE 1=1 $extra_query ";
-
-        if(!strstr($extra_query,"GROUP BY")) {
-            $query .= " GROUP BY o.order_id DESC";
+        
+        // Construct the query
+        $query = "SELECT $select FROM `tbl_orders` AS o 
+                LEFT JOIN tbl_users AS user ON user.user_id=o.customer_user 
+                LEFT JOIN tbl_order_meta AS meta ON meta.order_id=o.order_id 
+                WHERE 1=1 $extra_query";
+        
+        // If no GROUP BY is specified, add it to avoid potential issues
+        if (strpos($extra_query, "GROUP BY") === false) {
+            $query .= " GROUP BY o.order_id";
         }
 
         $db_orders = $this->db->query($query)->getResultArray();
-
-        if($db_orders) {
-
-            foreach($db_orders as $i=>$order) {
-
+        
+        if ($db_orders) {
+            foreach ($db_orders as $i => $order) {
                 $order_id = $order['order_id'];
 
-                if(!empty($order['billing_address'])) {
-                    $order['billing_address'] = json_decode($order['billing_address'],true);
+                if (!empty($order['billing_address'])) {
+                    $order['billing_address'] = json_decode($order['billing_address'], true);
                 }
-                if(!empty($order['shipping_address'])) {
+                if (!empty($order['shipping_address'])) {
                     $order['shipping_address'] = json_decode($order['shipping_address'], true);
                 }
-                if($include_items) {
+                if ($include_items) {
                     $order['order_items'] = [];
-                    $items = $this->db->query("SELECT * FROM tbl_order_items WHERE order_id='$order_id'")->getResultArray();
+                    $items_query = "SELECT * FROM tbl_order_items WHERE order_id='$order_id'";
+                    $items = $this->db->query($items_query)->getResultArray();
 
-                    foreach($items as $item) {
+                    foreach ($items as $item) {
                         $itemid = $item['order_item_id'];
-                        $metas = $this->db->query("SELECT * FROM tbl_order_item_meta WHERE item_id='$itemid'")->getResultArray();
+                        $metas_query = "SELECT * FROM tbl_order_item_meta WHERE item_id='$itemid'";
+                        $metas = $this->db->query($metas_query)->getResultArray();
                         $item['item_meta'] = [];
-                        foreach($metas as $meta) {
-
+                        foreach ($metas as $meta) {
                             $meta['meta_value'] = !empty($meta['meta_value']) ? stripslashes($meta['meta_value']) : '';
 
-                            if($meta['meta_key'] === "line_tax_data" && !empty($meta['meta_value'])) {
-
+                            if ($meta['meta_key'] === "line_tax_data" && !empty($meta['meta_value'])) {
                                 $meta['meta_value'] = unserialize($meta['meta_value']);
                             }
-                            if($meta['meta_key'] === "variation" &&  !empty($meta['meta_value'])) {
-                                $meta['meta_value'] = json_decode($meta['meta_value'],true);
+                            if ($meta['meta_key'] === "variation" && !empty($meta['meta_value'])) {
+                                $meta['meta_value'] = json_decode($meta['meta_value'], true);
                             }
                             $item['item_meta'][$meta['meta_key']] = $meta['meta_value'];
                         }
                         $order['order_items'][] = $item;
-
-                        $children = [];
-
-
                     }
                 }
 
-                if($include_order_meta) {
-                    $order_metas = $this->db->query("SELECT * FROM tbl_order_meta WHERE order_id='$order_id'")->getResultArray();
-                    if(!empty($order_metas)) {
-                        foreach($order_metas as $meta) {
+                if ($include_order_meta) {
+                    $order_metas_query = "SELECT * FROM tbl_order_meta WHERE order_id='$order_id'";
+                    $order_metas = $this->db->query($order_metas_query)->getResultArray();
+                    if (!empty($order_metas)) {
+                        foreach ($order_metas as $meta) {
                             $order['order_meta'][$meta['meta_key']] = $meta['meta_value'];
                         }
                     }
@@ -85,36 +155,61 @@ class OrderModel extends Model {
 
                 $output[] = $order;
             }
-
-
         }
 
         return $output;
     }
+    
+    // public function get_order_by_id($order_id = 0,$extra_query='', $include_order_meta=true, $include_items = true, $select='o.*') {
 
-    public function get_order_by_id($order_id = 0,$extra_query='', $include_order_meta=true, $include_items = true, $select='o.*') {
+    //     $output = [];
+    //     if($order_id) {
+    //         $output = $this->get_orders("AND o.order_id='$order_id' $extra_query", $include_order_meta, $include_items, $select);
+    //         if($output) {
+    //             $output = $output[0];
+    //         }
+    //     }
 
+    //     return $output;
+    // }
+    
+    public function get_order_by_id($order_id = 0, $extra_query='', $include_order_meta=true, $include_items=true, $select='o.*') {
         $output = [];
-        if($order_id) {
+        
+        if ($order_id) {
+            // Call get_orders with specific query to get the desired order
             $output = $this->get_orders("AND o.order_id='$order_id' $extra_query", $include_order_meta, $include_items, $select);
-            if($output) {
+            
+            if ($output) {
                 $output = $output[0];
             }
         }
 
         return $output;
     }
+    
 
-    public function get_order_by_transaction($transaction_id = 0,$extra_query='', $include_order_meta=true, $include_items = true) {
+    // public function get_order_by_transaction($transaction_id = 0,$extra_query='', $include_order_meta=true, $include_items = true) {
+    //     $output = [];
+    //     if($transaction_id) {
+    //         $output = $this->get_orders("AND o.transaction_id='$transaction_id' $extra_query", $include_order_meta, $include_items);
+    //         if($output) {
+    //             $output = $output[0];
+    //         }
+    //     }
+    //     return $output;
+    // }
+    
+
+    public function get_orders_by_transaction($transaction_id = 0, $extra_query='', $include_order_meta=true, $include_items = true) {
         $output = [];
         if($transaction_id) {
+            // Fetch all orders with the given transaction ID
             $output = $this->get_orders("AND o.transaction_id='$transaction_id' $extra_query", $include_order_meta, $include_items);
-            if($output) {
-                $output = $output[0];
-            }
         }
         return $output;
     }
+    
 
     public function get_order_by_customer($customer_id=0,$extra_query='', $include_order_meta=true, $include_items = true) {
         $output = [];
@@ -449,6 +544,13 @@ class OrderModel extends Model {
     }
 
     public function processing_order_email($order_id) {
+
+         // Check if $order_id is an array and not empty
+        if (is_array($order_id) && !empty($order_id)) {
+            $order_id = reset($order_id);  // Get the first value from the array
+        }
+    
+    
         $order = $this->get_order_by_id($order_id);
 
         $mail = new MailModel();

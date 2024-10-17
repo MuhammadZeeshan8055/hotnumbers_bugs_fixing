@@ -354,7 +354,7 @@
             </div>
         </div>
 
-        <script>
+        <!-- <script>
             $(function() {
 
                 $('#bagsize_check').find('input').on('change', function() {
@@ -383,6 +383,51 @@
                     }
                 });
             })
+        </script> -->
+
+        <script>
+            $(function() {
+                // Function to calculate and update the subscription price
+                function updateSubscriptionPrice() {
+                    let sub_price = 0;
+                    $('#bagsize_check').find('input:checkbox:checked').each(function() {
+                        const price = parseFloat($(this).data('price'));
+                        const quantity = parseInt($(this).closest('.fields-wrapper').find('.quantity-input').val()) || 1;
+                        sub_price += price * quantity;
+                    });
+                    $('#subscription-price-text').text(sub_price.toFixed(2));
+                }
+
+                // Check if any checkbox is checked to make required attribute conditional
+                $('#bagsize_check').find('input:checkbox').on('change', function() {
+                    if($('#bagsize_check').find('input:checked').length) {
+                        $('#bagsize_check').find('input').each(function() {
+                            $(this).prop('required', false);
+                        });
+                    } else {
+                        $('#bagsize_check').find('input').each(function() {
+                            $(this).prop('required', true);
+                        });
+                    }
+                    updateSubscriptionPrice();
+                });
+
+                // Update price when any input changes
+                $('#payment_form').find('input').on('change', function() {
+                    const form = this.closest('form');
+                    if (form.checkValidity()) {
+                        updateSubscriptionPrice();
+                        $('#subscription-price').slideDown();
+                    } else {
+                        $('#subscription-price').slideUp();
+                    }
+                });
+
+                // Update price when quantity changes
+                $('#bagsize_check').on('input', '.quantity-input', function() {
+                    updateSubscriptionPrice();
+                });
+            });
         </script>
 
         <style>

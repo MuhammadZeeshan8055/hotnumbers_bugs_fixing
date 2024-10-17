@@ -16,6 +16,44 @@ function has_subscription($uid) {
     return $q;
 }
 
+// function get_subscription_item_total($uid,$transaction_id){
+//     $sql="SELECT tbl_orders.order_id,tbl_orders.transaction_id,tbl_order_items.order_item_id,tbl_order_items.product_name,tbl_order_item_meta.meta_key,tbl_order_item_meta.meta_value FROM `tbl_orders` JOIN tbl_order_items on tbl_orders.order_id=tbl_order_items.order_id join tbl_order_item_meta on tbl_order_items.order_item_id=tbl_order_item_meta.item_id where tbl_orders.transaction_id='$transaction_id' and tbl_order_item_meta.meta_key='price' and tbl_order_items.product_name='The Coffee Club'";
+//     $master = model('MasterModel');
+//     $q = $master->query($sql, true, true);
+//     return $q;
+// }
+
+function get_product_status_by_id($pid){
+    $sql = "SELECT title,status,img FROM `tbl_products` WHERE status='publish' and id='$pid'";
+    $master = model('MasterModel');
+    $q = $master->query($sql, true, true);
+    return $q;
+}
+function get_product_images_by_id($pid){
+    $sql = "SELECT path FROM `tbl_files` WHERE id='$pid'";
+    $master = model('MasterModel');
+    $q = $master->query($sql, true, true);
+    return $q;
+}
+function record_exists_in_notifications($content){
+    $sql = "SELECT * FROM `tbl_notifications` WHERE content='$content'";
+    $master = model('MasterModel');
+    $q = $master->query($sql, true, true);
+    return !empty($q); // Return true if the query result is not empty, false otherwise
+}
+function get_variation_starting_price($pid){
+    $sql = "SELECT variation FROM `tbl_product_variations` WHERE product_id='$pid';";
+    $master = model('MasterModel');
+    $q = $master->query($sql, true, true);
+    return $q; // Return true if the query result is not empty, false otherwise
+}
+function get_variation_product_price($pid){
+    $sql = "SELECT variation FROM `tbl_product_variations` WHERE product_id='$pid';";
+    $master = model('MasterModel');
+    $q = $master->query($sql, true, true);
+    return $q; // Return true if the query result is not empty, false otherwise
+}
+
 function already_has_subscription_in_cart($uid){
     $sql = "SELECT * FROM tbl_carts WHERE user_id = '$uid' AND JSON_CONTAINS(cart_data, '{\"type\": \"club_subscription\"}', '$.products') order by id desc LIMIT 1";
     $master = model('MasterModel');
@@ -33,6 +71,14 @@ function global_wholesale_discount_value(){
     return $q;
 }
 
+
+//manage stock for variations
+function check_manage_stock_for_variations($pid){
+    $sql = "SELECT variation FROM `tbl_product_variations` WHERE product_id='$pid'";
+    $master = model('MasterModel');
+    $q = $master->query($sql, true, true);
+    return $q;
+}
 
 function get_variable_product_stock($pid) {
         $sql = "SELECT SUM(stock) AS total_stock
@@ -150,25 +196,64 @@ function post_statuses() {
     ];
 }
 
+// function _order_number($number, $prefix='') {
+//     $sql = "SELECT role.role FROM tbl_orders AS ord LEFT JOIN tbl_users AS user ON user.user_id=ord.customer_user LEFT JOIN tbl_user_roles AS role ON role.id=user.role WHERE ord.order_id='$number' LIMIT 1";
+//     $master = model('MasterModel');
+//     $q = $master->query($sql, true, true);
+
+//     if(!empty($q['role']) && $q['role'] == "wholesale_customer") {
+//         $prefix = 'HNW';
+//     }elseif(!empty($q['role']) && $q['role'] == "internal") {
+//         $prefix = 'HNI';
+//     }
+//     else {
+//         $prefix = 'HNR';
+//     }
+//     $number = strlen($number) < 4 ? sprintf("%04d", $number) : $number;
+//     if($prefix) {
+//         $number = $prefix.$number;
+//     }
+//     return $number;
+// }
+
 function _order_number($number, $prefix='') {
-    $sql = "SELECT role.role FROM tbl_orders AS ord LEFT JOIN tbl_users AS user ON user.user_id=ord.customer_user LEFT JOIN tbl_user_roles AS role ON role.id=user.role WHERE ord.order_id='$number' LIMIT 1";
+    // Check if $number is an array, and if so, extract the first element (assuming it's the order ID)
+    if (is_array($number)) {
+        $number = $number['order_id'] ?? reset($number); // Fallback to first element if 'order_id' key is missing
+    }
+
+    // Ensure $number is now a string or an integer
+    if (!is_string($number) && !is_int($number)) {
+        return null; // Return null or handle error if $number is neither string nor integer
+    }
+
+    $sql = "SELECT role.role FROM tbl_orders AS ord 
+            LEFT JOIN tbl_users AS user ON user.user_id=ord.customer_user 
+            LEFT JOIN tbl_user_roles AS role ON role.id=user.role 
+            WHERE ord.order_id='$number' LIMIT 1";
+
     $master = model('MasterModel');
     $q = $master->query($sql, true, true);
 
-    if(!empty($q['role']) && $q['role'] == "wholesale_customer") {
+    // Determine the prefix based on user role
+    if (!empty($q['role']) && $q['role'] == "wholesale_customer") {
         $prefix = 'HNW';
-    }elseif(!empty($q['role']) && $q['role'] == "internal") {
+    } elseif (!empty($q['role']) && $q['role'] == "internal") {
         $prefix = 'HNI';
-    }
-    else {
+    } else {
         $prefix = 'HNR';
     }
+
+    // Ensure $number is formatted correctly
     $number = strlen($number) < 4 ? sprintf("%04d", $number) : $number;
-    if($prefix) {
-        $number = $prefix.$number;
+
+    if ($prefix) {
+        $number = $prefix . $number;
     }
+
     return $number;
 }
+
 
 function _order_status($status='') {
     $status = str_replace("_"," ",$status);
@@ -547,6 +632,20 @@ function is_guest() {
         $userModel = model('UserModel');
         $user_roles = $userModel->get_user_roles($uid);
         if((empty($user_roles) || in_array('guest',array_keys($user_roles)))) {
+            $is_user = $uid;
+        }
+    }
+    return $is_user;
+}
+function is_internal() {
+    $session = session();
+    $user = $session->get('user');
+    $is_user = false;
+    if(!empty($user['id'])) {
+        $uid = $user['id'];
+        $userModel = model('UserModel');
+        $user_roles = $userModel->get_user_roles($uid);
+        if((empty($user_roles) || in_array('internal',array_keys($user_roles)))) {
             $is_user = $uid;
         }
     }
@@ -1450,7 +1549,8 @@ function payment_method_map($text='') {
         'squareup' => 'Squareup',
         'direct'=>'Direct Checkout',
         'Credit/Debit Card'=>'Credit/Debit Card',
-        'invoice' => 'Invoice Checkout'
+        'invoice' => 'Invoice Checkout',
+        'Zero Charge' => 'Zero Charge'
     ];
     return !empty($maps[$text]) ? $maps[$text] : '';
 }

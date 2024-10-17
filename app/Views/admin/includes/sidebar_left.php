@@ -67,7 +67,11 @@ if(is_logged_in()) {
                             </li>
                         </ul>
                     </li>
-
+                    
+                    <li><a class="<?php echo ($page == 'product-sorting') ? 'active' : '' ?>"
+                           href="<?php echo base_url(ADMIN); ?>/product-sorting"> <i class="lni lni-list"></i> Product Sorting</a>
+                    </li>
+                    
                     <li><a class=" <?php echo ($page == 'orders') ? 'active' : '' ?>"
                            href="<?php echo base_url(ADMIN); ?>/orders?status=<?php echo get_setting('default_order_listing_status') ?>">
                             <i class="lni lni-cash-app"></i>  Orders <?php if(!empty($processing_order_count)) { ?><div class="number-count"><?php echo $processing_order_count ?></div> <?php } ?></a>

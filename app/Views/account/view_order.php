@@ -165,7 +165,15 @@
                                                     <div class="mt-2 f-16">
                                                         <?php foreach($attributes as $key=>$value) {
                                                             ?>
-                                                            <div class="mb-1"><span style="font-weight: 600"><?php echo $key ?></span>: <?php echo $value ?></div>
+                                                            <div class="mb-1"><span style="font-weight: 600"><?php echo $key ?></span>: 
+                                                                <?php 
+                                                                    if($key=="Sizes"){
+                                                                        echo $value[0]; 
+                                                                    }else{
+                                                                        echo $value; 
+                                                                    }
+                                                                ?>
+                                                            </div>
                                                             <?php
                                                         }?>
                                                     </div>

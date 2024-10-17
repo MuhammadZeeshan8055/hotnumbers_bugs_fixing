@@ -19,17 +19,112 @@ class Shop extends BaseController
         $this->media = model('Media');
     }
 
+    public function get_price() {
+        $productId = $this->request->getPost('product_id');
+        $targetVariation = $this->request->getPost('variation');
+    
+        // Get the variation product price
+        $values = get_variation_product_price($productId);
+    
+        // Decode the JSON string in the 'variation' key
+        $variations = json_decode($values['variation'], true);
+    
+        // Search through variations to find the one that matches weight, size, or quantity
+        foreach ($variations as $variation) {
+            // Check if targetVariation matches 'attribute_weight', 'attribute_size', or 'attribute_quantity'
+            if (
+                (isset($variation['keys']['attribute_weight']) && $variation['keys']['attribute_weight'] == $targetVariation) ||
+                (isset($variation['keys']['attribute_size']) && $variation['keys']['attribute_size'] == $targetVariation) ||
+                (isset($variation['keys']['attribute_quantity']) && $variation['keys']['attribute_quantity'] == $targetVariation)
+            ) {
+                // If matching variation is found, print the price
+                echo $variation['values']['regular_price'];
+                return; // Stop after finding the match
+            }
+        }
+    
+        // If no matching variation is found, display a message
+        echo "No matching variation found.";
+    }
+
+
+
+
+
+    // public function get_price() {
+    //     $productId = '3488';
+    //     $targetVariation = '250g'; // The variation you want to find
+    
+    //     // Get the variation product price
+    //     $values = get_variation_product_price($productId);
+    
+    //     // Decode the JSON string in the 'variation' key
+    //     $variations = json_decode($values['variation'], true);
+    
+    //     // Search through variations to find the one that matches the target variation
+    //     foreach ($variations as $variation) {
+    //         if ($variation['keys']['attribute_weight'] == $targetVariation) {
+    //             // If matching variation is found, print the price
+    //             echo $variation['values']['regular_price'];
+    //             return; // Stop after finding the match
+    //         }
+    //     }
+    
+    //     // If no matching variation is found, display a message
+    //     echo "No matching variation found.";
+    // }
+    
 
     //// fetch shop categories data
+    // public function index()
+    // {
+    //     $get_categories = $this->productModel->get_shop_categories('c.*',1,'',1);
+
+    //     foreach($get_categories as $cat) {
+    //         if(!empty($cat)) {
+    //             if($this->productModel->role_category_permission($cat->id)) {
+    //                 $active_cat_products = $this->productModel->products_by_category($cat->id,'AND p.status="publish"','p.title',1);
+    //                 if (!empty($active_cat_products)) {
+    //                     $img = json_decode($cat->img, true);
+    //                     if (is_array($img)) {
+    //                         $img = $img[0];
+    //                     } else {
+    //                         $img = $cat->img;
+    //                     }
+    //                     $image_src = $this->media->get_media_src($img, '', 'large');
+    //                     if (!$image_src) {
+    //                         $image_src = base_url('assets/images/placeholder.jpg');
+    //                     }
+    //                     $data['loop_data'][] = [
+    //                         'title' => $cat->name,
+    //                         'image' => $image_src,
+    //                         'url' => 'shop/category/' . $cat->slug
+    //                     ];
+    //                 }
+
+    //             }
+
+    //         }
+    //     }
+    //     $data['title'] = 'Shop';
+    //     $data['list_type'] = 'category';
+
+    //     return view('shop/shop',$data);
+    // }
+
     public function index()
     {
-        $get_categories = $this->productModel->get_shop_categories('c.*',1,'',1);
+        $get_categories = $this->productModel->get_shop_categories('c.*', 1, '', 1);
+        $data = [];
+        
+        foreach ($get_categories as $cat) {
+            if (!empty($cat)) {
+                if ($this->productModel->role_category_permission($cat->id)) {
+                    // Fetch category products
+                    $active_cat_products = $this->productModel->products_by_category($cat->id, 'AND p.status="publish"', 'p.title, p.ID, p.type, p.attributes, p.stock_managed, p.stock, p.sold_individually, p.slug, p.img, p.title, p.price', 0, 1);
 
-        foreach($get_categories as $cat) {
-            if(!empty($cat)) {
-                if($this->productModel->role_category_permission($cat->id)) {
-                    $active_cat_products = $this->productModel->products_by_category($cat->id,'AND p.status="publish"','p.title',1);
                     if (!empty($active_cat_products)) {
+                        // Category Image
                         $img = json_decode($cat->img, true);
                         if (is_array($img)) {
                             $img = $img[0];
@@ -40,22 +135,63 @@ class Shop extends BaseController
                         if (!$image_src) {
                             $image_src = base_url('assets/images/placeholder.jpg');
                         }
-                        $data['loop_data'][] = [
+
+                        // Add category data
+                        $category_data = [
+                            'cid' => $cat->id,
                             'title' => $cat->name,
                             'image' => $image_src,
-                            'url' => 'shop/category/' . $cat->slug
+                            'url' => 'shop/category/' . $cat->slug,
+                            'products' => []
                         ];
+
+                        // Add product data for each category
+                        foreach ($active_cat_products as $product) {
+                            if ($this->productModel->role_product_permission($product['ID'])) {
+
+                                $product_data = $this->productModel->product_by_id($product['ID'], '*', 'any');
+       
+
+                                $prod_img = json_decode($product['img'], true);
+                                if (is_array($prod_img)) {
+                                    $prod_img = $prod_img[0];
+                                } else {
+                                    $prod_img = $product['img'];
+                                }
+                                $product_image_src = $this->media->get_media_src($prod_img);
+                                if (!$product_image_src) {
+                                    $product_image_src = base_url('assets/images/placeholder.jpg');
+                                }
+
+                                // Append product data to category
+                                $category_data['products'][] = [
+                                    'id' => $product['ID'],
+                                    'type' => $product['type'],
+                                    'attributes' => $product['attributes'],
+                                    'stock_managed' => $product['stock_managed'],
+                                    'sold_individually' => $product['sold_individually'],
+                                    'stock' => $product['stock'],
+                                    'title' => $product['title'],
+                                    'image' => $product_image_src,
+                                    'url' => 'shop/product/' . $product['slug'],
+                                    'price' => $product['price']
+                                ];
+                            }
+                        }
+
+                        // Store category data including its products
+                        $data['loop_data'][] = $category_data;
                     }
-
                 }
-
             }
         }
+
         $data['title'] = 'Shop';
         $data['list_type'] = 'category';
 
-        return view('shop/shop',$data);
+        return view('shop/shop', $data);
     }
+
 
     public function shop_by_category($category='') {
         $master = model('MasterModel');

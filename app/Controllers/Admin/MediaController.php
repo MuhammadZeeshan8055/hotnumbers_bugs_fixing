@@ -111,17 +111,62 @@ class MediaController extends BaseController
             exit;
         }
     }
+    // public function media_upload() {
+    //     $files = $this->request->getFiles();
+    //     if(!empty($files['upload_files'])) {
+    //         $files = $files['upload_files'];
+    //         $media = model('Media');
+    //         $success = true; // Assume success initially
+    
+    //         foreach($files as $file) {
+    //             $uploads = $media->store_image($file, 'products');
+    //             if(empty($uploads['success'])) {
+    //                 $success = false;
+    //                 break; // If any upload fails, break out and set success to false
+    //             }
+    //         }
+    
+    //         if($success) {
+    //             echo json_encode(['success' => 1, 'message' => 'Files uploaded successfully']);
+    //         } else {
+    //             echo json_encode(['success' => 0, 'message' => 'Failed to upload some file(s)']);
+    //         }
+    
+    //         exit; // Exit to prevent further output
+    //     }
+    // }
+
     public function media_upload() {
         $files = $this->request->getFiles();
         if(!empty($files['upload_files'])) {
             $files = $files['upload_files'];
             $media = model('Media');
+            $maxFileSize = 4 * 1024 * 1024; // 4MB in bytes
             $success = true; // Assume success initially
+            $errorMessages = [];
     
             foreach($files as $file) {
+                // Check if file size exceeds 4MB
+                if ($file->getSize() > $maxFileSize) {
+                    $success = false;
+                    $errorMessages[] = 'Recommended 4mb max image upload size
+                    ';
+                    break; // Break if any file exceeds size limit
+                }
+    
+                // Check if image is 72 DPI
+                $imageInfo = getimagesize($file->getTempName());
+                if ($imageInfo && isset($imageInfo['resolution']) && ($imageInfo['resolution'][0] != 72 || $imageInfo['resolution'][1] != 72)) {
+                    $success = false;
+                    $errorMessages[] = 'Image resolution should be 72 DPI.';
+                    break; // Break if image resolution is not 72 DPI
+                }
+    
+                // Proceed with file upload
                 $uploads = $media->store_image($file, 'products');
                 if(empty($uploads['success'])) {
                     $success = false;
+                    $errorMessages[] = 'Failed to upload some file(s).';
                     break; // If any upload fails, break out and set success to false
                 }
             }
@@ -129,12 +174,13 @@ class MediaController extends BaseController
             if($success) {
                 echo json_encode(['success' => 1, 'message' => 'Files uploaded successfully']);
             } else {
-                echo json_encode(['success' => 0, 'message' => 'Failed to upload some file(s)']);
+                echo json_encode(['success' => 0, 'message' => implode(', ', $errorMessages)]);
             }
     
             exit; // Exit to prevent further output
         }
     }
+    
     
 
     public function delete_media($del_id=0) {

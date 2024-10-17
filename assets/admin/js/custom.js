@@ -667,85 +667,172 @@ function media_browser_select_file(fileID,_this) {
     Swal.close();
 }
 
+// function media_library_click_handle() {
+//     let is_multiple = $(browse_media_target).data('multiple') || false;
+//     $(document).on('click',function(e) {
+//         if(!$(e.target).hasClass('media-row') && !$(e.target).closest('.media-row').length) {
+//             // $('.media-library-viewer .library-view > .media-row').removeClass('selected');
+//         }
+//     });
+
+//     $('.swal2-container .media-library-viewer .library-view .media-row').on('click', function(e) {
+//         if(e.target.nodeName === "IMG" || e.target.nodeName === "INPUT" || $(this).hasClass('copyText')) {
+//             return;
+//         }
+//         if(!is_multiple) {
+//             $('.media-library-viewer .library-view > .media-row').removeClass('selected');
+//         }
+
+//         const _this_id = $(this).data('id');
+//         const _this_id_str = _this_id.toString();
+
+//         $(this).toggleClass('selected');
+
+//         let selectedvals;
+
+//         if(is_multiple) {
+//             selectedvals = $(this).closest('.media-library-viewer').find('#media-library-selected-ids').val();
+//             selectedvals = selectedvals.split(',');
+
+//             if($(this).hasClass('selected')) {
+//                 if(selectedvals.indexOf(_this_id_str) === -1) {
+//                     selectedvals.push(_this_id_str);
+//                 }
+//             }else {
+//                 if(selectedvals.indexOf(_this_id_str) !== -1) {
+//                     selectedvals = selectedvals.filter((val)=>{
+//                         return val !== _this_id_str;
+//                     });
+//                 }
+//             }
+//             selectedvals = selectedvals.filter((val)=>{
+//                 return val !== "";
+//             });
+//         }else {
+//             selectedvals = [_this_id_str];
+//         }
+
+//         if(selectedvals.length) {
+//             $('.upload_media_images_gallery .gallery_footer').addClass('open');
+//         }else {
+//             $('.upload_media_images_gallery .gallery_footer').removeClass('open');
+//         }
+
+//         let item_text = 'items';
+//         if(selectedvals.length == 1) {
+//             item_text = 'item';
+//         }
+
+
+
+//         $('.upload_media_images_gallery').find('#item_selected_count').text(selectedvals.length+' '+item_text+' selected');
+
+//         $('.media-library-viewer').find('#media-library-selected-ids').val(selectedvals.join(','));
+//     });
+
+
+//     $('.upload_media_images_gallery .gallery_footer > .back').off('click').on('click', function() {
+//         let selectedvals = $('.upload_media_images_gallery').find('#media-library-selected-ids').val();
+//         // let old_vals = $(browse_media_target).closest('.upload_media_images').find('.media_input').val();
+//         // selectedvals = old_vals + ',' + selectedvals;
+//         //  selectedvals = selectedvals.split(',').filter((value, index, array)=>{return array.indexOf(value) === index;});
+
+//         selectedvals = selectedvals.split(',');
+
+//         if(selectedvals) {
+//             selectedvals.forEach((selectedID) => {
+//                 media_browser_select_file(selectedID, browse_media_target);
+//             });
+//         }
+//     });
+// }
+
 function media_library_click_handle() {
     let is_multiple = $(browse_media_target).data('multiple') || false;
-    $(document).on('click',function(e) {
-        if(!$(e.target).hasClass('media-row') && !$(e.target).closest('.media-row').length) {
-            // $('.media-library-viewer .library-view > .media-row').removeClass('selected');
-        }
-    });
 
-    $('.swal2-container .media-library-viewer .library-view .media-row').on('click', function(e) {
-        if(e.target.nodeName === "IMG" || e.target.nodeName === "INPUT" || $(this).hasClass('copyText')) {
+    // Handle click events for media rows
+    $(document).on('click', '.swal2-container .media-library-viewer .library-view .media-row', function(e) {
+        console.log('Media row clicked:', $(this).data('id'));
+
+        // Skip selection for image or input clicks, or if clicking on 'copyText'
+        if (e.target.nodeName === "IMG" || e.target.nodeName === "INPUT" || $(this).hasClass('copyText')) {
+            console.log('Ignored click on image/input or copyText');
             return;
         }
-        if(!is_multiple) {
+
+        // Deselect all if not in multiple selection mode
+        if (!is_multiple) {
             $('.media-library-viewer .library-view > .media-row').removeClass('selected');
+            console.log('Deselected all media rows');
         }
 
         const _this_id = $(this).data('id');
         const _this_id_str = _this_id.toString();
+        console.log('Current row ID:', _this_id_str);
 
         $(this).toggleClass('selected');
+        console.log('Row selected state:', $(this).hasClass('selected'));
 
         let selectedvals;
 
-        if(is_multiple) {
+        if (is_multiple) {
+            // Retrieve currently selected values
             selectedvals = $(this).closest('.media-library-viewer').find('#media-library-selected-ids').val();
+            console.log('Selected IDs before update:', selectedvals);
             selectedvals = selectedvals.split(',');
 
-            if($(this).hasClass('selected')) {
-                if(selectedvals.indexOf(_this_id_str) === -1) {
+            // Update selected values based on current selection
+            if ($(this).hasClass('selected')) {
+                if (selectedvals.indexOf(_this_id_str) === -1) {
                     selectedvals.push(_this_id_str);
+                    console.log('Added ID to selected:', _this_id_str);
                 }
-            }else {
-                if(selectedvals.indexOf(_this_id_str) !== -1) {
-                    selectedvals = selectedvals.filter((val)=>{
-                        return val !== _this_id_str;
-                    });
+            } else {
+                if (selectedvals.indexOf(_this_id_str) !== -1) {
+                    selectedvals = selectedvals.filter((val) => val !== _this_id_str);
+                    console.log('Removed ID from selected:', _this_id_str);
                 }
             }
-            selectedvals = selectedvals.filter((val)=>{
-                return val !== "";
-            });
-        }else {
-            selectedvals = [_this_id_str];
+            selectedvals = selectedvals.filter((val) => val !== ""); // Remove any empty values
+        } else {
+            selectedvals = [_this_id_str]; // Single selection
+            console.log('Single selection:', selectedvals);
         }
 
-        if(selectedvals.length) {
+        // Update footer visibility based on selected items
+        if (selectedvals.length) {
             $('.upload_media_images_gallery .gallery_footer').addClass('open');
-        }else {
+            console.log('Footer opened, selected items:', selectedvals);
+        } else {
             $('.upload_media_images_gallery .gallery_footer').removeClass('open');
+            console.log('Footer closed, no items selected');
         }
 
-        let item_text = 'items';
-        if(selectedvals.length == 1) {
-            item_text = 'item';
-        }
+        // Update selected count text
+        let item_text = selectedvals.length === 1 ? 'item' : 'items';
+        $('.upload_media_images_gallery').find('#item_selected_count').text(selectedvals.length + ' ' + item_text + ' selected');
+        console.log('Selected count updated:', selectedvals.length + ' ' + item_text + ' selected');
 
-
-
-        $('.upload_media_images_gallery').find('#item_selected_count').text(selectedvals.length+' '+item_text+' selected');
-
+        // Store selected IDs
         $('.media-library-viewer').find('#media-library-selected-ids').val(selectedvals.join(','));
+        console.log('Media library selected IDs updated:', selectedvals.join(','));
     });
 
-
+    // Handle the back button click
     $('.upload_media_images_gallery .gallery_footer > .back').off('click').on('click', function() {
         let selectedvals = $('.upload_media_images_gallery').find('#media-library-selected-ids').val();
-        // let old_vals = $(browse_media_target).closest('.upload_media_images').find('.media_input').val();
-        // selectedvals = old_vals + ',' + selectedvals;
-        //  selectedvals = selectedvals.split(',').filter((value, index, array)=>{return array.indexOf(value) === index;});
-
+        console.log('Back button clicked, selected IDs:', selectedvals);
         selectedvals = selectedvals.split(',');
 
-        if(selectedvals) {
+        if (selectedvals) {
             selectedvals.forEach((selectedID) => {
+                console.log('Processing selected ID for media browser select:', selectedID);
                 media_browser_select_file(selectedID, browse_media_target);
             });
         }
     });
 }
+
 
 window.browse_media_target = null;
 

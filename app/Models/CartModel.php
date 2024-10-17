@@ -1022,6 +1022,273 @@ class CartModel extends BaseController {
         return $output;
     }
 
+    // public function create_order($getPost=[]) {
+
+    //     $ProductsModel = model('ProductsModel');
+    //     $orderModel = model('OrderModel');
+    //     $master = model('MasterModel');
+    //     $session = session();
+    //     helper('text_helper');
+
+    //     $first_name = $getPost['billing_first_name'];
+    //     $last_name = $getPost['billing_last_name'];
+    //     $billing_country = $getPost['billing_country'];
+    //     $billing_address1 = $getPost['billing_address_1'];
+    //     $billing_address2 = $getPost['billing_address_2'];
+    //     $billing_city = $getPost['billing_city'];
+    //     $billing_state = $getPost['billing_state'];
+    //     $billing_postcode = $getPost['billing_postcode'];
+    //     $billing_phone = $getPost['billing_phone'];
+    //     $billing_email = $getPost['billing_email'];
+
+    //     $ship_to_different_address = !empty($getPost['ship_to_different_address']) ? $getPost['ship_to_different_address'] : 0;
+    //     $shipping_country = $getPost['shipping_country'];
+    //     $shipping_address1 = $getPost['shipping_address_1'];
+    //     $shipping_address2 = $getPost['shipping_address_2'];
+    //     $shipping_city = $getPost['shipping_city'];
+    //     $shipping_state = $getPost['shipping_state'];
+    //     $shipping_postcode = $getPost['shipping_postcode'];
+
+    //     // $payment_method = !empty($getPost['payment_method']) ? $getPost['payment_method'] : '';
+    //     $payment_method = !empty($getPost['payment_method']) ? $getPost['payment_method'] : '';
+
+    //     if ($payment_method === 'squareup') {
+    //         $payment_method = 'Credit/Debit Card';
+    //     }
+
+    //     $order_comments = $getPost['order_comments'];
+    //     // $subscribe = $getPost['fue_subscribe'];
+
+    //     $include_tax = 'No';
+    //     $price_with_tax = get_setting('price_with_tax');
+    //     $display_tax_price = get_setting('display_tax_price');
+
+    //     $cart_products = $this->get_cart();
+
+    //     if(empty($cart_products['cart_id'])) {
+    //         $cart_id = random_string();
+    //         $cart_products['cart_id'] = random_string();
+    //         $session->set('cart_id',$cart_id);
+    //     }
+
+    //     if($cart_products['vat_price']) {
+    //         $include_tax = 'Yes';
+    //     }
+
+    //     $customer_id = empty($getPost['customer_id']) ? (int)is_logged_in() : $getPost['customer_id'];
+
+    //     if (empty($cart_products)) {
+    //         return redirect()->to(base_url('cart'));
+    //     }
+
+    //     $discount_amount = !empty($cart_products['discount_amount']) ? $cart_products['discount_amount'] : 0;
+
+    //     $billing_info = [
+    //         'billing_first_name'=>$first_name,
+    //         'billing_last_name'=>$last_name,
+    //         'billing_country'=>$billing_country,
+    //         'billing_address_1'=>$billing_address1,
+    //         'billing_address_2'=>$billing_address2,
+    //         'billing_city'=>$billing_city,
+    //         'billing_county'=>$billing_state,
+    //         'billing_postcode'=>$billing_postcode,
+    //         'billing_phone'=>$billing_phone,
+    //         'billing_email'=>$billing_email
+    //     ];
+
+    //     $shipping_info = [
+    //         'shipping_first_name'=>$first_name,
+    //         'shipping_last_name'=>$last_name,
+    //         'shipping_country'=>$shipping_country,
+    //         'shipping_address_1'=>$shipping_address1,
+    //         'shipping_address_2'=>$shipping_address2,
+    //         'shipping_city'=>$shipping_city,
+    //         'shipping_county'=>$shipping_state,
+    //         'shipping_postcode'=>$shipping_postcode,
+    //         'shipping_phone'=>$billing_phone,
+    //         'shipping_email'=>$billing_email
+    //     ];
+
+    //     $cart_exists = $master->query("SELECT order_id FROM `tbl_orders` WHERE cart_id='".$cart_products['cart_id']."'",true,true);
+
+    //     $order_data = [
+    //         'status'=>!empty($getPost['post_status']) ? $getPost['post_status'] : 'pending',
+    //         'order_title' => 'Order &ndash; '.date('F d, Y').' @ '.date('h:i A'),
+    //         'customer_user'=>$customer_id,
+    //         'payment_method'=> $payment_method,
+    //         'customer_ip_address'=>get_client_ip(),
+    //         'customer_user_agent'=>$_SERVER['HTTP_USER_AGENT'],
+    //         'order_currency'=>env('default_currency_code'),
+    //         'billing_address' => json_encode($billing_info),
+    //         'shipping_address' => json_encode($shipping_info),
+    //         'cart_id' => $cart_products['cart_id']
+    //     ];
+
+    //     $purchase_order_number = '';
+
+    //     if(is_wholesaler() && $getPost['purchase_order_number']) {
+    //         $purchase_order_number = $getPost['purchase_order_number'];
+    //     }
+
+    //     if(empty($cart_exists)) {
+    //         $master->insertData('tbl_orders',$order_data);
+    //         $new_order_id = $master->last_insert_id();
+    //     }else {
+    //         $new_order_id = $cart_exists['order_id'];
+    //     }
+
+    //     //Clear order in db if exists.
+    //     $master->delete_data('tbl_order_meta','order_id',$new_order_id);
+
+    //     $existing_items = $master->getRows('tbl_order_items',['order_id'=>$new_order_id]);
+
+    //     if($existing_items) {
+    //         foreach ($existing_items as $item) {
+    //             $master->delete_data('tbl_order_item_meta', 'item_id', $item->order_item_id);
+    //         }
+    //     }
+
+    //     $master->delete_data('tbl_order_items','order_id',$new_order_id);
+
+    //     $product_meta = [];
+
+    //     if(!empty($cart_products)) {
+    //         $order_total = 0;
+
+    //         foreach($cart_products['products'] as $item) {
+
+    //             $product = $ProductsModel->product_by_id($item['product_id']);
+
+    //             $item_meta = $item;
+
+    //             $order_items = [
+    //                 'order_id'=>$new_order_id,
+    //                 'product_name'=>$product->title,
+    //                 'item_type'=>'line_item'
+    //             ];
+
+    //             $master->insertData('tbl_order_items', $order_items);
+
+    //             $item_id = $master->last_insert_id();
+
+    //             foreach($item_meta as $key=>$value) {
+    //                 if(is_array($value)) {
+    //                     $value = json_encode($value);
+    //                 }
+    //                 $master->insertData('tbl_order_item_meta', ['meta_key'=>$key,'meta_value'=>$value,'item_id'=>$item_id]);
+    //             }
+
+    //             if(!empty($item['replace_order'])) {
+    //                 $old_order_id = $item['replace_order'];
+    //                 $o_order_items = $orderModel->order_items($old_order_id);
+    //                 foreach($o_order_items as $item) {
+    //                     $o_item_id = $item['order_item_id'];
+    //                     $master->delete_data('tbl_order_item_meta','item_id',$o_item_id);
+    //                 }
+    //                 $master->delete_data('tbl_orders','order_id',$old_order_id);
+    //                 $master->delete_data('tbl_orders','parent_id',$old_order_id);
+    //                 $master->delete_data('tbl_order_meta','order_id',$old_order_id);
+    //             }
+
+    //         }
+
+
+
+    //         $order_total = $cart_products['cart_total'];
+    //         $shipping_cost = $cart_products['shipping_cost'];
+    //         $shipping_method = $cart_products['shipping_name'];
+    //         $shipping_vat_amt = $cart_products['shipping_tax'];
+    //         $product_total = $cart_products['product_total'];
+    //         $has_shipping = $cart_products['has_shipping'];
+    //         $free_shipping = $cart_products['free_shipping'];
+
+    //         $order_tax = $cart_products['total_tax'];
+    //         $discount_tax = 0;
+
+    //         unset($cart_products['products']);
+
+    //         $shipping_discount = 0;
+    //         $shipping_add = 0;
+    //         $shipping_options = '';
+
+    //         $paid_date = !empty($getPost['order_paid']) ? date('Y-m-d h:i:s') : '';
+
+    //         $order_meta = array_merge($cart_products, [
+    //             'customer_user' => $customer_id,
+    //             'payment_method'=>$payment_method,
+    //             'payment_method_title'=>payment_method_map($payment_method),
+    //             'customer_ip_address'=>get_client_ip(),
+    //             'customer_user_agent'=>$_SERVER['HTTP_USER_AGENT'],
+    //             'created_via'=>'checkout',
+    //             'order_currency'=>env('default_currency_code'),
+    //             'cart_discount'=>$discount_amount,
+    //             'order_comments'=>$order_comments,
+    //             'order_shipping'=>$shipping_cost,
+    //             'has_shipping'=>$has_shipping,
+    //             'free_shipping'=>$free_shipping,
+    //             'order_shipping_title'=>$shipping_method,
+    //             'order_shipping_tax'=>$shipping_vat_amt,
+    //             'order_total'=>$order_total,
+    //             'order_tax' => $order_tax,
+    //             'price_with_tax' => $price_with_tax,
+    //             'display_tax_price' => $display_tax_price,
+    //             'cart_discount_tax' => $discount_tax,
+    //             'prices_include_tax' => $include_tax,
+    //             'product_total' => $product_total,
+    //             'paid_date'=>$paid_date,
+    //             'order_date'=>date('Y-m-d h:i:s'),
+    //             'purchase_order_number' => $purchase_order_number,
+
+    //             'billing_first_name'=>$first_name,
+    //             'billing_last_name'=>$last_name,
+    //             'billing_address_1'=>$billing_address1,
+    //             'billing_address_2'=>$billing_address2,
+    //             'billing_country'=>$billing_country,
+    //             'billing_phone'=>$billing_phone,
+    //             'billing_postcode'=>$billing_postcode,
+    //             'billing_city'=>$billing_city,
+    //             'billing_email'=>$billing_email,
+    //             'billing_address_index'=>$first_name.' '.$last_name.' '.$billing_address1.' '.$billing_address2.' '.$billing_email.' '.$billing_phone,
+
+    //             'shipping_first_name'=>$first_name,
+    //             'shipping_last_name'=>$last_name,
+    //             'shipping_address_1'=>$shipping_address1,
+    //             'shipping_address_2'=>$shipping_address2,
+    //             'shipping_country'=>$shipping_country,
+    //             'shipping_phone'=>$billing_phone,
+    //             'shipping_postcode'=>$shipping_postcode,
+    //             'shipping_city'=>$shipping_city,
+    //             'shipping_email'=>$billing_email,
+    //             'shipping_address_index'=>$first_name.' '.$last_name.' '.$shipping_address1.' '.$shipping_address2.' '.$billing_email.' '.$billing_phone,
+    //             'shipping_discount' => $shipping_discount,
+    //             'shipping_add' => $shipping_add,
+    //             'shipping_options' => $shipping_options
+    //         ]);
+
+    //         foreach($order_meta as $key=>$value) {
+    //             if(is_array($value)) {
+    //                 $value = json_encode($value);
+    //             }
+    //             $master->insertData('tbl_order_meta', ['meta_key'=>$key,'meta_value'=>$value, 'order_id'=>$new_order_id]);
+    //         }
+
+    //         $master->insertData('tbl_order_items', [
+    //             'item_type' => 'shipping',
+    //             'order_id' => $new_order_id,
+    //             'product_name' => $shipping_method
+    //         ]);
+
+    //         $master->insertData('tbl_order_items', [
+    //             'item_type' => 'tax',
+    //             'order_id' => $new_order_id,
+    //             'product_name' => $shipping_vat_amt
+    //         ]);
+    //     }
+
+    //     return $new_order_id;
+    // }
+
+
     public function create_order($getPost=[]) {
 
         $ProductsModel = model('ProductsModel');
@@ -1029,7 +1296,7 @@ class CartModel extends BaseController {
         $master = model('MasterModel');
         $session = session();
         helper('text_helper');
-
+    
         $first_name = $getPost['billing_first_name'];
         $last_name = $getPost['billing_last_name'];
         $billing_country = $getPost['billing_country'];
@@ -1040,7 +1307,7 @@ class CartModel extends BaseController {
         $billing_postcode = $getPost['billing_postcode'];
         $billing_phone = $getPost['billing_phone'];
         $billing_email = $getPost['billing_email'];
-
+    
         $ship_to_different_address = !empty($getPost['ship_to_different_address']) ? $getPost['ship_to_different_address'] : 0;
         $shipping_country = $getPost['shipping_country'];
         $shipping_address1 = $getPost['shipping_address_1'];
@@ -1048,41 +1315,41 @@ class CartModel extends BaseController {
         $shipping_city = $getPost['shipping_city'];
         $shipping_state = $getPost['shipping_state'];
         $shipping_postcode = $getPost['shipping_postcode'];
-
-        // $payment_method = !empty($getPost['payment_method']) ? $getPost['payment_method'] : '';
+    
         $payment_method = !empty($getPost['payment_method']) ? $getPost['payment_method'] : '';
-
+    
         if ($payment_method === 'squareup') {
             $payment_method = 'Credit/Debit Card';
         }
-
+        if ($payment_method === 'direct') {
+            $payment_method = 'Zero Charge';
+        }
+    
         $order_comments = $getPost['order_comments'];
-        // $subscribe = $getPost['fue_subscribe'];
-
         $include_tax = 'No';
         $price_with_tax = get_setting('price_with_tax');
         $display_tax_price = get_setting('display_tax_price');
-
+    
         $cart_products = $this->get_cart();
-
+    
         if(empty($cart_products['cart_id'])) {
             $cart_id = random_string();
-            $cart_products['cart_id'] = random_string();
+            $cart_products['cart_id'] = $cart_id;
             $session->set('cart_id',$cart_id);
         }
-
+    
         if($cart_products['vat_price']) {
             $include_tax = 'Yes';
         }
-
+    
         $customer_id = empty($getPost['customer_id']) ? (int)is_logged_in() : $getPost['customer_id'];
-
+    
         if (empty($cart_products)) {
             return redirect()->to(base_url('cart'));
         }
-
+    
         $discount_amount = !empty($cart_products['discount_amount']) ? $cart_products['discount_amount'] : 0;
-
+    
         $billing_info = [
             'billing_first_name'=>$first_name,
             'billing_last_name'=>$last_name,
@@ -1095,7 +1362,7 @@ class CartModel extends BaseController {
             'billing_phone'=>$billing_phone,
             'billing_email'=>$billing_email
         ];
-
+    
         $shipping_info = [
             'shipping_first_name'=>$first_name,
             'shipping_last_name'=>$last_name,
@@ -1108,137 +1375,98 @@ class CartModel extends BaseController {
             'shipping_phone'=>$billing_phone,
             'shipping_email'=>$billing_email
         ];
-
-        $cart_exists = $master->query("SELECT order_id FROM `tbl_orders` WHERE cart_id='".$cart_products['cart_id']."'",true,true);
-
-        $order_data = [
-            'status'=>!empty($getPost['post_status']) ? $getPost['post_status'] : 'pending',
-            'order_title' => 'Order &ndash; '.date('F d, Y').' @ '.date('h:i A'),
-            'customer_user'=>$customer_id,
-            'payment_method'=> $payment_method,
-            'customer_ip_address'=>get_client_ip(),
-            'customer_user_agent'=>$_SERVER['HTTP_USER_AGENT'],
-            'order_currency'=>env('default_currency_code'),
-            'billing_address' => json_encode($billing_info),
-            'shipping_address' => json_encode($shipping_info),
-            'cart_id' => $cart_products['cart_id']
-        ];
-
-        $purchase_order_number = '';
-
-        if(is_wholesaler() && $getPost['purchase_order_number']) {
-            $purchase_order_number = $getPost['purchase_order_number'];
-        }
-
-        if(empty($cart_exists)) {
-            $master->insertData('tbl_orders',$order_data);
-            $new_order_id = $master->last_insert_id();
-        }else {
-            $new_order_id = $cart_exists['order_id'];
-        }
-
-        //Clear order in db if exists.
-        $master->delete_data('tbl_order_meta','order_id',$new_order_id);
-
-        $existing_items = $master->getRows('tbl_order_items',['order_id'=>$new_order_id]);
-
-        if($existing_items) {
-            foreach ($existing_items as $item) {
-                $master->delete_data('tbl_order_item_meta', 'item_id', $item->order_item_id);
-            }
-        }
-
-        $master->delete_data('tbl_order_items','order_id',$new_order_id);
-
-        $product_meta = [];
-
-        if(!empty($cart_products)) {
+    
+        // Separate subscription items and other products
+        $subscription_items = array_filter($cart_products['products'], function($item) {
+            return $item['type'] === 'club_subscription';
+        });
+    
+        $other_items = array_filter($cart_products['products'], function($item) {
+            return $item['type'] !== 'club_subscription';
+        });
+    
+        $order_ids = [];
+    
+        // Create order for subscription items if present
+        if (!empty($subscription_items)) {
+            $order_data = [
+                'status'=>!empty($getPost['post_status']) ? $getPost['post_status'] : 'pending',
+                'order_title' => 'Subscription Order &ndash; '.date('F d, Y').' @ '.date('h:i A'),
+                'customer_user'=>$customer_id,
+                'payment_method'=> $payment_method,
+                'customer_ip_address'=>get_client_ip(),
+                'customer_user_agent'=>$_SERVER['HTTP_USER_AGENT'],
+                'order_currency'=>env('default_currency_code'),
+                'billing_address' => json_encode($billing_info),
+                'shipping_address' => json_encode($shipping_info),
+                'cart_id' => $cart_products['cart_id']
+            ];
+    
+            $order_ids['subscription'] = $master->insertData('tbl_orders', $order_data);
+            $order_ids['subscription'] = $master->last_insert_id();
+            
             $order_total = 0;
-
-            foreach($cart_products['products'] as $item) {
-
+            $subs_item_price=0;
+            
+            foreach($subscription_items as $item) {
                 $product = $ProductsModel->product_by_id($item['product_id']);
-
                 $item_meta = $item;
-
                 $order_items = [
-                    'order_id'=>$new_order_id,
-                    'product_name'=>$product->title,
-                    'item_type'=>'line_item'
+                    'order_id' => $order_ids['subscription'],
+                    'product_name' => $product->title,
+                    'item_type' => 'line_item'
                 ];
-
+    
                 $master->insertData('tbl_order_items', $order_items);
-
                 $item_id = $master->last_insert_id();
-
+    
                 foreach($item_meta as $key=>$value) {
+                        if ($key === 'item_price') {
+                            $subs_item_price = $value; 
+                        }
+
                     if(is_array($value)) {
                         $value = json_encode($value);
                     }
                     $master->insertData('tbl_order_item_meta', ['meta_key'=>$key,'meta_value'=>$value,'item_id'=>$item_id]);
                 }
-
-                if(!empty($item['replace_order'])) {
-                    $old_order_id = $item['replace_order'];
-                    $o_order_items = $orderModel->order_items($old_order_id);
-                    foreach($o_order_items as $item) {
-                        $o_item_id = $item['order_item_id'];
-                        $master->delete_data('tbl_order_item_meta','item_id',$o_item_id);
-                    }
-                    $master->delete_data('tbl_orders','order_id',$old_order_id);
-                    $master->delete_data('tbl_orders','parent_id',$old_order_id);
-                    $master->delete_data('tbl_order_meta','order_id',$old_order_id);
-                }
-
             }
-
-
-
-            $order_total = $cart_products['cart_total'];
-            $shipping_cost = $cart_products['shipping_cost'];
-            $shipping_method = $cart_products['shipping_name'];
-            $shipping_vat_amt = $cart_products['shipping_tax'];
-            $product_total = $cart_products['product_total'];
-            $has_shipping = $cart_products['has_shipping'];
-            $free_shipping = $cart_products['free_shipping'];
-
-            $order_tax = $cart_products['total_tax'];
-            $discount_tax = 0;
-
-            unset($cart_products['products']);
-
-            $shipping_discount = 0;
-            $shipping_add = 0;
-            $shipping_options = '';
-
-            $paid_date = !empty($getPost['order_paid']) ? date('Y-m-d h:i:s') : '';
-
+    
             $order_meta = array_merge($cart_products, [
                 'customer_user' => $customer_id,
-                'payment_method'=>$payment_method,
-                'payment_method_title'=>payment_method_map($payment_method),
-                'customer_ip_address'=>get_client_ip(),
-                'customer_user_agent'=>$_SERVER['HTTP_USER_AGENT'],
-                'created_via'=>'checkout',
-                'order_currency'=>env('default_currency_code'),
-                'cart_discount'=>$discount_amount,
-                'order_comments'=>$order_comments,
-                'order_shipping'=>$shipping_cost,
-                'has_shipping'=>$has_shipping,
-                'free_shipping'=>$free_shipping,
-                'order_shipping_title'=>$shipping_method,
-                'order_shipping_tax'=>$shipping_vat_amt,
-                'order_total'=>$order_total,
-                'order_tax' => $order_tax,
+                'payment_method' => $payment_method,
+                'payment_method_title' => payment_method_map($payment_method),
+                'customer_ip_address' => get_client_ip(),
+                'customer_user_agent' => $_SERVER['HTTP_USER_AGENT'],
+                'created_via' => 'checkout',
+                'order_currency' => env('default_currency_code'),
+                'cart_discount' => $discount_amount,
+                'order_comments' => $order_comments,
+                
+                // 'order_shipping' => $cart_products['shipping_cost'],
+                'order_shipping' => 0,
+                
+                'has_shipping' => $cart_products['has_shipping'],
+                'free_shipping' => $cart_products['free_shipping'],
+                'order_shipping_title' => $cart_products['shipping_name'],
+                'order_shipping_tax' => $cart_products['shipping_tax'],
+
+                // 'order_total' => $cart_products['cart_total'],
+                'order_total' => $subs_item_price,
+               
+                'order_tax' => $cart_products['total_tax'],
                 'price_with_tax' => $price_with_tax,
                 'display_tax_price' => $display_tax_price,
-                'cart_discount_tax' => $discount_tax,
+                'cart_discount_tax' => 0,
                 'prices_include_tax' => $include_tax,
-                'product_total' => $product_total,
-                'paid_date'=>$paid_date,
-                'order_date'=>date('Y-m-d h:i:s'),
-                'purchase_order_number' => $purchase_order_number,
+                
+                // 'product_total' => $cart_products['product_total'],
+                'product_total' => $subs_item_price,
 
+                'paid_date' => !empty($getPost['order_paid']) ? date('Y-m-d h:i:s') : '',
+                'order_date' => date('Y-m-d h:i:s'),
+                'purchase_order_number' => $getPost['purchase_order_number'] ?? '',
+                
                 'billing_first_name'=>$first_name,
                 'billing_last_name'=>$last_name,
                 'billing_address_1'=>$billing_address1,
@@ -1264,30 +1492,146 @@ class CartModel extends BaseController {
                 'shipping_add' => $shipping_add,
                 'shipping_options' => $shipping_options
             ]);
-
+    
             foreach($order_meta as $key=>$value) {
                 if(is_array($value)) {
                     $value = json_encode($value);
                 }
-                $master->insertData('tbl_order_meta', ['meta_key'=>$key,'meta_value'=>$value, 'order_id'=>$new_order_id]);
+                $master->insertData('tbl_order_meta', ['meta_key'=>$key,'meta_value'=>$value, 'order_id'=>$order_ids['subscription']]);
             }
-
+    
             $master->insertData('tbl_order_items', [
                 'item_type' => 'shipping',
-                'order_id' => $new_order_id,
-                'product_name' => $shipping_method
+                'order_id' => $order_ids['subscription'],
+                'product_name' => $cart_products['shipping_name']
             ]);
-
+    
             $master->insertData('tbl_order_items', [
                 'item_type' => 'tax',
-                'order_id' => $new_order_id,
-                'product_name' => $shipping_vat_amt
+                'order_id' => $order_ids['subscription'],
+                'product_name' => $cart_products['shipping_tax']
             ]);
         }
+    
+        // Create order for other products if present
+        if (!empty($other_items)) {
+            $order_data = [
+                'status'=>!empty($getPost['post_status']) ? $getPost['post_status'] : 'pending',
+                'order_title' => 'Product Order &ndash; '.date('F d, Y').' @ '.date('h:i A'),
+                'customer_user'=>$customer_id,
+                'payment_method'=> $payment_method,
+                'customer_ip_address'=>get_client_ip(),
+                'customer_user_agent'=>$_SERVER['HTTP_USER_AGENT'],
+                'order_currency'=>env('default_currency_code'),
+                'billing_address' => json_encode($billing_info),
+                'shipping_address' => json_encode($shipping_info),
+                'cart_id' => $cart_products['cart_id']
+            ];
+    
+            $order_ids['product'] = $master->insertData('tbl_orders', $order_data);
+            $order_ids['product'] = $master->last_insert_id();
+    
+            foreach($other_items as $item) {
+                $product = $ProductsModel->product_by_id($item['product_id']);
+                $item_meta = $item;
+                $order_items = [
+                    'order_id' => $order_ids['product'],
+                    'product_name' => $product->title,
+                    'item_type' => 'line_item'
+                ];
+    
+                $master->insertData('tbl_order_items', $order_items);
+                $item_id = $master->last_insert_id();
+    
+                foreach($item_meta as $key=>$value) {
+                    if(is_array($value)) {
+                        $value = json_encode($value);
+                    }
+                    $master->insertData('tbl_order_item_meta', ['meta_key'=>$key,'meta_value'=>$value,'item_id'=>$item_id]);
+                }
+            }
+    
+            $order_meta = array_merge($cart_products, [
+                'customer_user' => $customer_id,
+                'payment_method' => $payment_method,
+                'payment_method_title' => payment_method_map($payment_method),
+                'customer_ip_address' => get_client_ip(),
+                'customer_user_agent' => $_SERVER['HTTP_USER_AGENT'],
+                'created_via' => 'checkout',
+                'order_currency' => env('default_currency_code'),
+                'cart_discount' => $discount_amount,
+                'order_comments' => $order_comments,
+                'order_shipping' => $cart_products['shipping_cost'],
+                'has_shipping' => $cart_products['has_shipping'],
+                'free_shipping' => $cart_products['free_shipping'],
+                'order_shipping_title' => $cart_products['shipping_name'],
+                'order_shipping_tax' => $cart_products['shipping_tax'],
+                
+                // 'order_total' => $cart_products['cart_total'],
+                'order_total' => $cart_products['cart_total'] - $subs_item_price,
+                
+                'order_tax' => $cart_products['total_tax'],
+                'price_with_tax' => $price_with_tax,
+                'display_tax_price' => $display_tax_price,
+                'cart_discount_tax' => 0,
+                'prices_include_tax' => $include_tax,
+                
+                // 'product_total' => $cart_products['product_total'],
+                'product_total' => $cart_products['product_total'] - $subs_item_price,
+                
+                'paid_date' => !empty($getPost['order_paid']) ? date('Y-m-d h:i:s') : '',
+                'order_date' => date('Y-m-d h:i:s'),
+                'purchase_order_number' => $getPost['purchase_order_number'] ?? '',
+                
+                'billing_first_name'=>$first_name,
+                'billing_last_name'=>$last_name,
+                'billing_address_1'=>$billing_address1,
+                'billing_address_2'=>$billing_address2,
+                'billing_country'=>$billing_country,
+                'billing_phone'=>$billing_phone,
+                'billing_postcode'=>$billing_postcode,
+                'billing_city'=>$billing_city,
+                'billing_email'=>$billing_email,
+                'billing_address_index'=>$first_name.' '.$last_name.' '.$billing_address1.' '.$billing_address2.' '.$billing_email.' '.$billing_phone,
 
-        return $new_order_id;
+                'shipping_first_name'=>$first_name,
+                'shipping_last_name'=>$last_name,
+                'shipping_address_1'=>$shipping_address1,
+                'shipping_address_2'=>$shipping_address2,
+                'shipping_country'=>$shipping_country,
+                'shipping_phone'=>$billing_phone,
+                'shipping_postcode'=>$shipping_postcode,
+                'shipping_city'=>$shipping_city,
+                'shipping_email'=>$billing_email,
+                'shipping_address_index'=>$first_name.' '.$last_name.' '.$shipping_address1.' '.$shipping_address2.' '.$billing_email.' '.$billing_phone,
+                'shipping_discount' => $shipping_discount,
+                'shipping_add' => $shipping_add,
+                'shipping_options' => $shipping_options
+            ]);
+    
+            foreach($order_meta as $key=>$value) {
+                if(is_array($value)) {
+                    $value = json_encode($value);
+                }
+                $master->insertData('tbl_order_meta', ['meta_key'=>$key,'meta_value'=>$value, 'order_id'=>$order_ids['product']]);
+            }
+    
+            $master->insertData('tbl_order_items', [
+                'item_type' => 'shipping',
+                'order_id' => $order_ids['product'],
+                'product_name' => $cart_products['shipping_name']
+            ]);
+    
+            $master->insertData('tbl_order_items', [
+                'item_type' => 'tax',
+                'order_id' => $order_ids['product'],
+                'product_name' => $cart_products['shipping_tax']
+            ]);
+        }
+    
+        return $order_ids;
     }
-
+    
 
 
 

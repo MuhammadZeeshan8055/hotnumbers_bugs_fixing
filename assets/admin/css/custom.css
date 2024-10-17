@@ -11979,6 +11979,33 @@ body.browse_media_sidebar_open #main .container body.sidebar_closing .browse_med
   body.browse_media_sidebar_open #main .container .login_page .login_form {
     width: 332px;
   }
+  .datatable .books_listing .toolbar {
+      display: inline-block;
+      margin-left: 0;
+  }
+
+  .datatable .books_listing:has(.toolbar) .dataTables_wrapper {
+      margin-top: 1em;
+  }
+
+  div#books_table_filter {
+      width: 50%;
+  }
+}
+
+@media screen and (min-width: 425px) {
+  .datatable .books_listing .toolbar {
+      display: inline-block;
+      margin-left: 0;
+  }
+
+  .datatable .books_listing:has(.toolbar) .dataTables_wrapper {
+      margin-top: 1em;
+  }
+
+  div#books_table_filter {
+      width: 50%;
+  }
 }
 @media screen and (max-height: 450px) {
   body.browse_media_sidebar_open #main .container .sidebar {

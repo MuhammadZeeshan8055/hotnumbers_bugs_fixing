@@ -216,7 +216,7 @@ class CheckoutModel extends BaseController {
 
                     $product = $productModel->product_by_id($item_meta['product_id'],'title');
 
-                    $notification->create('Order#'._order_number($orderID).' '.$product->title.' x '.$item_meta['quantity'], 'orders/view/'.$orderID,'shop_order',$customerID);
+                    $notification->create('Order received#'._order_number($orderID).' '.$product->title.' x '.$item_meta['quantity'], 'orders/view/'.$orderID,'shop_order',$customerID,'1');
 
                     $this->ProductsModel->reduce_stock($item_meta['product_id'],$item_meta['quantity']);
 

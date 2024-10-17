@@ -29,7 +29,7 @@ class Categories extends BaseController
         $parent = 1;
         $productModel = model('ProductsModel');
         $this->data['productModel'] = model('ProductsModel');
-        $this->data['categories'] = $this->master->query("SELECT cats.*, COUNT(prod_cat.prod_cat_id) AS prod_count FROM tbl_categories AS cats JOIN tbl_product_categories AS prod_cat ON prod_cat.category_id=cats.id JOIN tbl_products AS prod ON prod.id=prod_cat.product_id WHERE cats.group_name='product_cat' GROUP BY cats.id ORDER BY cats.sort_order ASC");
+        $this->data['categories'] = $this->master->query("SELECT cats.*, COUNT(prod_cat.prod_cat_id) AS prod_count FROM tbl_categories AS cats LEFT JOIN tbl_product_categories AS prod_cat ON prod_cat.category_id = cats.id LEFT JOIN tbl_products AS prod ON prod.id = prod_cat.product_id WHERE cats.group_name = 'product_cat' GROUP BY cats.id ORDER BY cats.sort_order ASC");
 
         $this->data['content'] = ADMIN . "/products/product_categories";
         $this->data['media'] = model('Media');
@@ -108,19 +108,45 @@ class Categories extends BaseController
         _render_page('/' . ADMIN . '/index', $this->data);
     }
 
+    // public function post_categories()
+    // {
+    //     $parent = 1;
+    //     $this->data['productModel'] = model('ProductsModel');
+    //     $this->data['categories'] = $this->master->getRows($this->table,['group_name'=>'product_cat']);
+    //     $this->data['content'] = ADMIN . "/categories/page-listing";
+    //     $this->data['media'] = model('Media');
+    //     $this->data['parent'] = $parent;
+    //     $this->data['page'] ="post-categories";
+    //     $this->data['group'] = "post";
+
+    //     _render_page('/' . ADMIN . '/index', $this->data);
+    // }
+    
     public function post_categories()
     {
         $parent = 1;
         $this->data['productModel'] = model('ProductsModel');
-        $this->data['categories'] = $this->master->getRows($this->table,['group_name'=>'product_cat']);
+
+        // Fetch categories with sorting by sort_order ascending
+        $this->data['categories'] = $this->master->getRows(
+            $this->table,
+            ['group_name' => 'product_cat'],
+            '*',
+            '',
+            '',
+            'ASC', // Order direction
+            'sort_order' // Order by column
+        );
+
         $this->data['content'] = ADMIN . "/categories/page-listing";
         $this->data['media'] = model('Media');
         $this->data['parent'] = $parent;
-        $this->data['page'] ="post-categories";
+        $this->data['page'] = "post-categories";
         $this->data['group'] = "post";
 
         _render_page('/' . ADMIN . '/index', $this->data);
     }
+
 
     public function add()
     {

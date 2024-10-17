@@ -50,6 +50,9 @@
                             <select class="select2" data-search="false" onchange="select_bulk_action(this)">
                                 <option value="">--</option>
                                 <option value="<?php echo admin_url() ?>trash-products/" data-prompt="Are you sure to move selected products to Trash?" data-refresh="1">Trash Products</option>
+                                <option value="<?php echo admin_url() ?>publish-products/" data-prompt="Are you sure to move selected products to Publish?" data-refresh="1">Publish Products</option>
+                                <option value="<?php echo admin_url() ?>draft-products/" data-prompt="Are you sure to move selected products to Draft?" data-refresh="1">Draft Products</option>
+                                <option value="<?php echo admin_url() ?>private-products/" data-prompt="Are you sure to move selected products to Private?" data-refresh="1">Private Products</option>
                             </select>
                         </div>
                     </div>

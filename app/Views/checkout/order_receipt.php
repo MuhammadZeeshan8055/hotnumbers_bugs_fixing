@@ -39,6 +39,7 @@ if(!empty($order)) {
         <?php
 
         $payment_method=$order['payment_method'];
+        $transaction_id=$order['transaction_id'];
         $shipping_method = '';
         $discount = '';
         $free_shipping_count = 0;
@@ -111,8 +112,7 @@ if(!empty($order)) {
                 $item_total += !empty($meta['price']) ? $meta['price'] : 0;
 
                 $productID = @$meta['product_id'];
-                $sku = '';
-
+                $sku = '';     
                 if(!empty($meta['type']) && $meta['type'] == 'club_subscription') {
                     $is_subscription = true;
                 }
@@ -240,14 +240,51 @@ if(!empty($order)) {
                             <div class="input_field">
                                 <label>Coffee Selected for Customer:</label>
                                 <div>
-                                    <select class="select2" name="customer_coffee" onchange="this.form.submitbtn.disabled = false; this.form.submitbtn.click()">
-                                        <?php foreach($coffee_products as $product) {
-                                            $selected = $customer_coffee === $product['id'] ? 'selected':'';
+                                    <?php
+                                        if($order['status']=='processing'){
+                                    ?>
+                                        <select class="select2" name="customer_coffee" onchange="this.form.submitbtn.disabled = false; this.form.submitbtn.click()">
+                                            <?php foreach($coffee_products as $product) {
+                                                $selected = $customer_coffee === $product['title'] ? 'selected':'';
+                                                ?>
+                                                <option <?php echo $selected ?> value="<?php echo $product['title'] ?>"><?php echo $product['title'] ?></option>
+                                                <?php
+                                            }?>
+                                        </select>
+                                    <?php
+                                        }elseif($order['status']=='completed'){
+                                    ?>
+                                        <select class="select2" name="customer_coffee" onchange="this.form.submitbtn.disabled = false; this.form.submitbtn.click()">
+                                            <?php 
+                                            // Find the selected coffee product
+                                            foreach($coffee_products as $product) {
+                                                if ($customer_coffee === $product['title']) {
+                                                    ?>
+                                                    <option selected value="<?php echo $product['title'] ?>">
+                                                        <?php echo $product['title'] ?>
+                                                    </option>
+                                                    <?php
+                                                    break; // Exit loop once the selected product is found
+                                                }
+                                            }
                                             ?>
-                                            <option <?php echo $selected ?> value="<?php echo $product['id'] ?>"><?php echo $product['title'] ?></option>
-                                            <?php
-                                        }?>
-                                    </select>
+                                        </select>
+                                    <?php
+                                        }else{
+                                    ?>
+                                        <select class="select2" name="customer_coffee" onchange="this.form.submitbtn.disabled = false; this.form.submitbtn.click()">
+                                            <?php foreach($coffee_products as $product) {
+                                                $selected = $customer_coffee === $product['title'] ? 'selected':'';
+                                                ?>
+                                                <option <?php echo $selected ?> value="<?php echo $product['title'] ?>"><?php echo $product['title'] ?></option>
+                                                <?php
+                                            }?>
+                                        </select>
+
+                                    <?php
+                                        }
+                                    ?>
+                                   
                                 </div>
                                 <div hidden>
                                     <button type="submit" name="submitbtn" value="1"></button>
@@ -367,7 +404,9 @@ if(!empty($order)) {
                     <tr align="top" style="vertical-align: top; text-align: left; border-top: 1px solid #eee;">
                         <th style="text-align: left">Total: </th>
                         <td style=" padding-top: 10px; text-align: right">
-                            <?php echo _price($order_subtotal); ?>
+                            <?php 
+                                echo _price($order_subtotal); 
+                            ?>
                             <?php
                                 if($order_meta['has_shipping']) { 
                                     if($vat && $display_tax_price === "including_tax") {

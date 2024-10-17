@@ -174,6 +174,7 @@ class Users extends BaseController
             $user_id = $this->uri->getSegment(4);
             $url = $this->request->getPost('current_url');
             $mailModel = model('MailModel');
+            $notification = model('NotificationModel');
 
             $db_data = [
               'fname'=>'',
@@ -299,6 +300,31 @@ class Users extends BaseController
                 $user_id = $this->master->last_insert_id();
             }
 
+            $login_uid = is_logged_in();
+            
+
+            if($data['role']=="4"){
+
+                $check=record_exists_in_notifications('New Wholesale Registration#'.$user_id);
+
+                if(empty($check)){
+                    $notification->create('New Wholesale Registration#'.$user_id, 'users/edit/'.$user_id,'New Wholesale Registration',$login_uid,$customerID);
+                }
+            }else{
+                $check=record_exists_in_notifications('New User#'.$user_id);
+
+                if(empty($check)){
+                    $notification->create('New User#'.$user_id, 'users/edit/'.$user_id,'New User Registered',$login_uid,$customerID);
+                }
+            }
+
+          
+            // $check=record_exists_in_notifications('New User#'.$user_id);
+
+            // if(empty($check)){
+            //     $notification->create('New User#'.$user_id, 'users/edit/'.$user_id,'New User Registered',$login_uid,$customerID);
+            // }
+            
             foreach($user_meta as $key=>$value) {
                 $value = addslashes($value);
                 $exists = $this->master->getRow('tbl_user_meta',['user_id'=>$user_id,'meta_key'=>$key]);
