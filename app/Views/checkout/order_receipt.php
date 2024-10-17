@@ -347,7 +347,7 @@ if(!empty($order)) {
                         ?>
                         <tr align="top" style="vertical-align: top;text-align: left">
                             <td>User Discount: </td>
-                            <td style="padding-bottom: 10px; text-align: right">-<?php echo _price($order_meta['user_discount_text']) ?></td>
+                            <td style="padding-bottom: 10px; text-align: right">-<?php echo ($order_meta['user_discount_text']) ?></td>
                         </tr>
                         <?php
                     }
