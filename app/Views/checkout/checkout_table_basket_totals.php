@@ -137,72 +137,86 @@ if(!empty($shipping_methods)) {
         <tr class="woocommerce-shipping-totals shipping" align="top">
             <th>Shipping</th>
             <td data-title="Shipping">
-                <?php if(empty($cart['free_shipping'])) {
-                    ?>
+                <?php if(empty($cart['free_shipping'])) { ?>
                     <ul id="shipping_method" class="woocommerce-shipping-methods">
                         <?php
                         $method_vat = 0;
-
                         $shipping_id = $cart['shipping_id'];
                         $vat_price = !empty($cart['total_tax']) ? $cart['total_tax'] : 0;
                         $tax_name = !empty($cart['tax_name']) ? $cart['tax_name'] : '';
-                        foreach($shipping_methods as $i=>$method) {
+
+                        foreach($shipping_methods as $i => $method) {
                             $method_name = $method['name'];
                             $method_amount = floatval($method['calculated_value']);
-                            if(!empty($shipping_id)) {
+                            
+                            // For internal users, show "Van Delivery"
+                            if (is_internal()) {
+                                if (strpos($method_name, 'Van Delivery') === false) {
+                                    continue; // Skip all methods except "Van Delivery" for internal users
+                                }
+                                // Select Van Delivery by default
+                                $checked = true;
+                                $checked_shipping_price = $method_amount;
+                            } else {
+                                // For external users, hide "Van Delivery"
+                                if (strpos($method_name, 'Van Delivery') !== false) {
+                                    continue; // Skip "Van Delivery" for non-internal users
+                                }
+                                if (!empty($shipping_id)) {
                                     $checked = $shipping_id == $i;
                                     $checked_shipping_price = $method_amount;
-                            }else {
-                                $checked = $i==0;
-                                if($i === 0) {
-                                    $checked_shipping_price = $method_amount;
+                                } else {
+                                    $checked = $i == 0;
+                                    if ($i === 0) {
+                                        $checked_shipping_price = $method_amount;
+                                    }
                                 }
                             }
+
+                            // Apply shipping discounts and rules if available
                             if($cart['shipping_discount']) {
-                                $method_amount = free_ship_amount($method_amount,$product_count,$free_ship_count);
+                                $method_amount = free_ship_amount($method_amount, $product_count, $free_ship_count);
                             }
-                            if(!empty($cart['shipping_rule'])) {
-                                if($cart['shipping_rule']['option'] == 'discount') {
-                                    if($cart['shipping_rule']['type'] == 'percent') {
+                            if (!empty($cart['shipping_rule'])) {
+                                if ($cart['shipping_rule']['option'] == 'discount') {
+                                    if ($cart['shipping_rule']['type'] == 'percent') {
                                         $method_amount = percent_reduce($method_amount, $cart['shipping_rule']['value']);
                                     }
-                                    if($cart['shipping_rule']['type'] == 'fixed') {
+                                    if ($cart['shipping_rule']['type'] == 'fixed') {
                                         $method_amount = $method_amount - $cart['shipping_rule']['value'];
                                     }
                                 }
                             }
+
                             $method_amount_text = _price($method_amount);
                             ?>
                             <li>
                                 <label for="shipping_method_<?php echo $i; ?>">
-                                    <input type="radio" name="shipping_method" id="shipping_method_<?php echo $i; ?>" data-amount="<?php echo $method_amount ?>" value="<?php echo $i ?>" class="shipping_method" data-vat="<?php echo $vat_price ? number_format($vat_price, 2) : '' ?>" data-tax-name="<?php echo $tax_name ?>" <?php echo $checked ? 'checked="checked"':'' ?>>
-                                    <?php echo $method_name ?>: <span class="woocommerce-Price-amount amount"><bdi><?php echo $method_amount_text ?></bdi></span>
+                                    <input type="radio" name="shipping_method" id="shipping_method_<?php echo $i; ?>" data-amount="<?php echo $method_amount ?>" value="<?php echo $i ?>" class="shipping_method" data-vat="<?php echo $vat_price ? number_format($vat_price, 2) : '' ?>" data-tax-name="<?php echo $tax_name ?>" <?php echo $checked ? 'checked="checked"' : ''; ?>>
+                                    <?php echo $method_name; ?>: <span class="woocommerce-Price-amount amount"><bdi><?php echo $method_amount_text; ?></bdi></span>
                                 </label>
                             </li>
                             <?php
                         }
                         ?>
                     </ul>
+
                     <?php
-                        if(!empty($cart['shipping_discount']) && !empty($cart['shipping_rule']) && get_setting('show_shipping_discount')) {
-                            $shipping_options = $cart['shipping_rule'];
-                            ?>
-                            <p>Shipping discount: -<?php if($shipping_options['type'] === 'percent') {echo $shipping_options['value'].'%';}else {echo $shipping_options['value'];} ?></p>
-                                <?php
-                        }
-                    ?>
-                    <?php
-                    if($curr_page == "cart") {
+                    if (!empty($cart['shipping_discount']) && !empty($cart['shipping_rule']) && get_setting('show_shipping_discount')) {
+                        $shipping_options = $cart['shipping_rule'];
+                        ?>
+                        <p>Shipping discount: -<?php echo ($shipping_options['type'] === 'percent') ? $shipping_options['value'].'%' : $shipping_options['value']; ?></p>
+                        <?php
+                    }
+                    
+                    if ($curr_page == "cart") {
                         shipping_calculator_html();
                     }
-                }
-                else {
-                    ?>
+                } else { ?>
                     <p>Free shipping</p>
-                <?php
-                }
-                ?>
+                <?php } ?>
             </td>
+
         </tr>
         <?php
     }

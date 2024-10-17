@@ -369,9 +369,7 @@ if(!empty($order)) {
                     <tr align="top" style="vertical-align: top;text-align: left">
                         <td>Shipping: </td>
                         <td style="text-align: right">
-                            <?php
-
-                            if($shipping_cost) { ?>
+                          
                                 <div style="font-size: 14px"><?php echo $shipping_method ?></div>
                                 <div><?php
                                     if($shipping_discount) {
@@ -381,11 +379,7 @@ if(!empty($order)) {
                                     }
                                     $shipping_total = $shipping_cost;
                                     ?></div>
-                            <?php }else {
-                                ?>
-                                <p>Free Shipping</p>
-                                <?php
-                            }?>
+                          
                         </td>
                     </tr>
 
