@@ -1,5 +1,5 @@
 <div class="container">
-    <?php admin_page_title('Product Categories'); ?>
+    <?php admin_page_title('Product Sorting'); ?>
 
 
         <div class="datatable">
