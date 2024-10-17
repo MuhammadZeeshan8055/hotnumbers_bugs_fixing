@@ -282,7 +282,7 @@ function order_statuses() {
         'completed' => 'Completed',
         'processing' => 'Processing',
         'pending' => 'Pending Payment',
-        //'on-hold' => 'Pause',
+        'on-hold' => 'On Hold',
         //'ready_to_ship' => 'Ready to ship',
         'cancelled' => 'Cancelled',
         'refund' => 'Refunded',
