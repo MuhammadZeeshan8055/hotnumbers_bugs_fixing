@@ -257,7 +257,7 @@
                                             <th>Van Delivery</th>
                                             <td>
                                                 <div class="input_field inline-checkbox">
-                                                    <label> <input type="checkbox" name="meta[van_delivery]" value="1" <?php echo !empty($user_meta['van_delivery']) ? 'checked':'' ?>>
+                                                    <label> <input type="checkbox" name="meta[van_delivery]" value="1" <?php echo !empty($user_meta['van_delivery ']) ? 'checked':'' ?>>
                                                     Enable</label>
                                                 </div>
                                             </td>
