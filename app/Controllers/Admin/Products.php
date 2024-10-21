@@ -708,6 +708,7 @@ href="javascript:void(0)"></i> <i class="lni lni-trash-can"></i></a> &nbsp;';
     {
         if ($id > 0) {
             $this->master->delete_data($this->table, 'id', $id);
+            $this->master->delete_data('tbl_product_categories', 'product_id', $id);
             $this->res['ok'] = '1';
             $this->res['id'] = $id;
             echo json_encode($this->res);
