@@ -143,6 +143,18 @@ function get_variable_product_stock_zero($pid) {
 }
 
 
+function getSortOrder($id){
+    $sql = "
+      SELECT sort_order FROM `tbl_product_categories` WHERE `product_id` = $id
+    ";
+    $master = model('MasterModel');
+    $q = $master->query($sql, true, true);
+    return $q;
+
+    echo $q;
+    die();
+}
+
 function php_errors() {
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);

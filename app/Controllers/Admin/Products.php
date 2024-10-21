@@ -503,6 +503,8 @@ href="javascript:void(0)"></i> <i class="lni lni-trash-can"></i></a> &nbsp;';
             
             }
 
+            $sortOrder=getSortOrder($data['id']);
+
             $data['stock_managed'] = $this->request->getPost('stock_managed') === 'yes'?'yes':'no';
 
             $data['img'] = !empty($this->request->getPost('product_images')) ? implode(',',$this->request->getPost('product_images')) : '';
@@ -574,7 +576,7 @@ href="javascript:void(0)"></i> <i class="lni lni-trash-can"></i></a> &nbsp;';
 
             if(!empty($cats)) {
                 foreach($cats as $cat) {
-                    $this->master->insertData('tbl_product_categories',['product_id'=>$id,'category_id'=>$cat]);
+                    $this->master->insertData('tbl_product_categories',['product_id'=>$id,'category_id'=>$cat,'sort_order'=>$sortOrder['sort_order']]);
                 }
             }
             // $variation_data = [];
