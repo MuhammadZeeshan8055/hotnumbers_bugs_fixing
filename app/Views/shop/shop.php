@@ -641,7 +641,7 @@ $(document).ready(function() {
 
         if (selectedOption && productId) {
             $.ajax({
-                url: "<?php echo base_url('/testing_price'); ?>",
+                url: "<?php echo base_url('/get_price'); ?>",
                 type: "POST",
                 data: {
                     product_id: productId,

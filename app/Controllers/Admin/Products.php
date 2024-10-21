@@ -113,7 +113,7 @@ class Products extends BaseController
     }
     
 
-    public function product_sortorder_testing() {
+    public function product_sortorder_update() {
 
         // Check if the request method is POST
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {

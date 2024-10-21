@@ -77,7 +77,7 @@ $routes->group('account', ['filter' => 'AccountFilter'], function ($routes) {
     $routes->get('disable-payment-method/(:any)', 'Account::disable_payment_method/$1');
 });
 
-$routes->post('/testing_price', 'Shop::get_price');
+$routes->post('/get_price', 'Shop::get_price');
 
 $routes->get('shop', 'Shop::index');
 $routes->get('shop/category/(:any)', 'Shop::shop_by_category/$1');
@@ -231,7 +231,7 @@ $routes->group('admin', ['filter' => 'AdminFilter'], static function ($routes) {
 
     // for product sorting
     $routes->get('product-sorting', 'Admin/Products::product_sorting');
-    $routes->post('product-sortorder-testing', 'Admin/Products::product_sortorder_testing');
+    $routes->post('product-sortorder', 'Admin/Products::product_sortorder_update');
 
 
 
