@@ -116,7 +116,7 @@ if(!empty($shipping_methods)) {
 //        }
 //    }
 
-    //pr($cart, false);
+    // pr($cart, false);
 
     if(!empty($cart['shipping_discount']) && !empty($cart['shipping_rule'])) {
         $shipping_options = $cart['shipping_rule'];
@@ -129,6 +129,10 @@ if(!empty($shipping_methods)) {
            <?php
         }*/
     }
+
+
+    $userModel = model('UserModel');
+    $van_delivery = $userModel->get_user_meta($uid, 'van_delivery', true);
 
     if(!empty($cart['has_shipping'])) {
         $free_ship_count = !empty($cart['shipping_free_products']) ? count($cart['shipping_free_products']) : 0;
@@ -145,14 +149,23 @@ if(!empty($shipping_methods)) {
                         $vat_price = !empty($cart['total_tax']) ? $cart['total_tax'] : 0;
                         $tax_name = !empty($cart['tax_name']) ? $cart['tax_name'] : '';
 
-                        foreach($shipping_methods as $i => $method) {
+                        $shipping_options = $cart['shipping_rule'];
+
+                        foreach ($shipping_methods as $i => $method) {
                             $method_name = $method['name'];
                             $method_amount = floatval($method['calculated_value']);
-                            
+                        
                             // For internal users, show "Van Delivery"
                             if (is_internal()) {
                                 if (strpos($method_name, 'Van Delivery') === false) {
                                     continue; // Skip all methods except "Van Delivery" for internal users
+                                }
+                                // Select Van Delivery by default
+                                $checked = true;
+                                $checked_shipping_price = $method_amount;
+                            } elseif (is_wholesaler() && ($shipping_options['type'] === 'percent' && $shipping_options['value'] == 100) && !empty($van_delivery) && $van_delivery == 1) {
+                                if (strpos($method_name, 'Van Delivery') === false) {
+                                    continue; // Skip all methods except "Van Delivery" for wholesalers with 100% shipping
                                 }
                                 // Select Van Delivery by default
                                 $checked = true;
@@ -172,9 +185,16 @@ if(!empty($shipping_methods)) {
                                     }
                                 }
                             }
-
+                        
+                            // Remove Royal Mail options if the shipping option is 100%
+                            if (isset($cart['shipping_rule']) && $cart['shipping_rule']['type'] === 'percent' && $cart['shipping_rule']['value'] == 100) {
+                                if (strpos($method_name, 'Royal Mail') !== false) {
+                                    continue; // Skip Royal Mail methods
+                                }
+                            }
+                        
                             // Apply shipping discounts and rules if available
-                            if($cart['shipping_discount']) {
+                            if ($cart['shipping_discount']) {
                                 $method_amount = free_ship_amount($method_amount, $product_count, $free_ship_count);
                             }
                             if (!empty($cart['shipping_rule'])) {
@@ -187,7 +207,7 @@ if(!empty($shipping_methods)) {
                                     }
                                 }
                             }
-
+                        
                             $method_amount_text = _price($method_amount);
                             ?>
                             <li>
@@ -198,17 +218,28 @@ if(!empty($shipping_methods)) {
                             </li>
                             <?php
                         }
+
+                        
                         ?>
                     </ul>
 
                     <?php
-                    if (!empty($cart['shipping_discount']) && !empty($cart['shipping_rule']) && get_setting('show_shipping_discount')) {
-                        $shipping_options = $cart['shipping_rule'];
-                        ?>
-                        <p>Shipping discount: -<?php echo ($shipping_options['type'] === 'percent') ? $shipping_options['value'].'%' : $shipping_options['value']; ?></p>
-                        <?php
+                   // Check for shipping discounts and rules if van delivery is not set
+                    if (empty($van_delivery) || $van_delivery != 1) {
+                        if (!empty($cart['shipping_discount']) && !empty($cart['shipping_rule']) && get_setting('show_shipping_discount')) {
+                            $shipping_options = $cart['shipping_rule'];
+
+                            // Change the shipping discount message if the condition is met
+                            if ($shipping_options['type'] === 'percent' && $shipping_options['value'] == 100) {
+                                echo '<p>Free Shipping Applied</p>';
+                            } else {
+                                ?>
+                                <p>Shipping discount: -<?php echo ($shipping_options['type'] === 'percent') ? $shipping_options['value'].'%' : $shipping_options['value']; ?></p>
+                                <?php
+                            }
+                        }
                     }
-                    
+
                     if ($curr_page == "cart") {
                         shipping_calculator_html();
                     }
@@ -216,8 +247,8 @@ if(!empty($shipping_methods)) {
                     <p>Free shipping</p>
                 <?php } ?>
             </td>
-
         </tr>
+
         <?php
     }
 

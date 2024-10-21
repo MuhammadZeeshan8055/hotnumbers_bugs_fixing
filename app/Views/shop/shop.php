@@ -24,7 +24,6 @@
         display: flex; /* Flexbox for category and products */ 
         flex-wrap:wrap;
         margin-bottom: 20px; /* Space between categories */
-        border-bottom: 1px solid #ddd; /* Border for separation */
         max-width:100%;
         gap:10px;
     }
@@ -344,8 +343,29 @@
                         .icon-wrapper:hover span {
                             color: white;
                         }
-
-
+                        a.category-link.active {
+                        text-decoration:none;
+                        }
+                        a.category-link.active p {
+                            color: var(--red);
+                            font-weight: 600;
+                        }
+                        .cart-close-button {
+                            display: flex;
+                            gap: 20px;
+                            align-items: center;
+                        }
+                        .cancel_button {
+                            display: inline-block;
+                            padding: 6px 18px ;
+                            background-color: #d2d2d2 ;
+                            color: black ;
+                            text-align: center;
+                            text-decoration: none;
+                            border-radius: 0px ;
+                            cursor: pointer;
+                            transition: background-color 0.3s;
+                        }
                         /* Responsive adjustments */
                         @media (max-width: 768px) {
                         table.custom-table {
@@ -362,239 +382,164 @@
                             ?>
 
                             <div class="category-product-list">
-                                
-                                    <!-- Categories Section -->
-                                    <div class="categories-list" id="stickyCategories">
-                                        <ul class="category-links">
-                                            <?php foreach ($loop_data as $row) { ?>
-                                                <li>
-                                                    <a href="#category-<?php echo $row['cid']; ?>" class="category-link">
-                                                        
-                                                        <p class="category-title"><?php echo $row['title']; ?></p>
-                                                    </a>
-                                                </li>
-                                            <?php } ?>
-                                        </ul>
-                                    </div>
+                                <!-- Categories Section -->
+                                <div class="categories-list" id="stickyCategories">
+                                    <ul class="category-links">
+                                        <?php foreach ($loop_data as $index => $row) { ?>
+                                            <li>
+                                                <a href="javascript:void(0);" class="category-link <?php echo $index === 0 ? 'active' : ''; ?>" onclick="showCategory('<?php echo $row['cid']; ?>', this)">
+                                                    <p class="category-title"><?php echo $row['title']; ?></p>
+                                                </a>
+                                            </li>
+                                        <?php } ?>
+                                    </ul>
+                                </div>
 
-                                
-                                        <div class='category-container' id="category-<?php echo $row['cid']; ?>">
-                                            <?php
-                                                foreach($loop_data as $row)
-                                                {
-                                                    $category_name=$row['title'];
-                                                ?>
-                                                <div class='products-listing'>
-                                                    
-                                                    <table style="width: 100%;">
-                                                        <thead >
-                                                            <tr>
-                                                                <th>Category</th>
-                                                                <th>Image</th>
-                                                                <th>Product Title</th>
-                                                                <th>Price</th>
-                                                                <th style="text-align:center">Action</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <?php if (!empty($row['products'])) {
-                                                                foreach ($row['products'] as $product) { 
-                                                                    $attributes = !empty($product['attributes']) && $product['type'] == "variable" ? json_decode($product['attributes'],true) : [];
-                                                                
-                                                            ?>
-                                                            <tr>
-                                                                <td>
-                                                                    <?=$category_name?>
-                                                                </td>
-                                                                <td>
-                                                                    <div>
-                                                                        <a href="<?php echo site_url($product['url']) ?>">
-                                                                            <img src="<?php echo $product['image']; ?>" class="product-list-image">
-                                                                            
-                                                                        </a>
-                                                                    </div>
-                                                                </td>
-                                                                <td>
-                                                                    <a href="<?php echo site_url($product['url']) ?>">
-                                                                        <span><?php echo $product['title']; ?></span>
-                                                                    </a>
-                                                                </td>
-
-                                                                <?php
-                                                                    $is_variation = false;
-                                                                    $err = false;
-                                                                    if(!empty($attributes) && $product['type'] == "variable") {
-
-                                                                        $var_list = [];
-                                                                        if($product['type'] == "variable" && !empty($variation_arr)) {
-                                                                            foreach($variation_arr as $variation) {
-                                                                                foreach($variation['keys'] as $id=>$k) {
-                                                                                    $k = empty($k) ? 'any': $k;
-                                                                                    $var_list[$id][] = $k;
-                                                                                }
-                                                                            }
-                                                                        }
-
-                                                                        foreach($attributes as $attribute) {
-                                                                            $label = $attribute['label'];
-                                                                            $label_id = strtolower($label);
-                                                                            $label_id = str_replace(' ','-',$label_id);
-                                                                            if(!empty($attribute['attribute_variation'])) {
-                                                                                $is_variation = true;
-                                                                ?>
-
-                                                                                
-
-                                                                
-
-                                                                <?php       }
-                                                                        }
-                                                                    }else{
-
-                                                                ?>
-                                                                    
-                                                                <?php
-                                                                    }
-                                                                ?>
-                                                                <!-- <td>
-                                                                    <select name="" id="">
-                                                                        <option value="">Select Variation</option>
-                                                                        <option value="">sfg</option>
-                                                                        <option value="">sfg</option>
-                                                                        <option value="">sfg</option>
-                                                                    </select>
-                                                                </td> -->
-                                                            
-                                                                <?php
-                                                                    if($product['type'] != "variable"){
-                                                                        $price = isset($product['price']) && is_numeric($product['price']) ? (float)$product['price'] : 0.00;
-                                                                        $price_text = '<span class="woocommerce-Price-currencySymbol">'._price(number_format($price, 2)).'</span>';
-                                                                    ?>
-                                                                        <td>
-                                                                            <span id="product_price">
-                                                                                <?=$price_text?>
-                                                                            </span>
-                                                                        </td>
-                                                                    <?php
-                                                                    }else{
-                                                                ?>
-                                                                        <td>-</td>
-                                                                <?php
-                                                                    }
-                                                                ?>
-                                                                <td style="text-align:center">
-                                                                    <div class="icon-wrapper" onclick="openModal('<?php echo $product['id']; ?>')">
-                                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30">
-                                                                            <path fill="white" d="M7 18c-1.104 0-2 .896-2 2s.896 2 2 2 2-.896 2-2-.896-2-2-2zm10 0c-1.104 0-2 .896-2 2s.896 2 2 2 2-.896 2-2-.896-2-2-2zM7.01 15h10.736c.885 0 1.654-.593 1.886-1.455l2.152-8.139c.16-.605-.313-1.209-.935-1.209H5.21l-.303-1.514C4.805 2.282 4.244 2 3.654 2H1v2h2.664l3.005 15h11.631v-2H7.01l-.548-2zm13.703-8l-1.714 6.485a1 1 0 0 1-.965.715H6.64l-1.2-7.2h15.272z"/>
-                                                                        </svg>
-                                                                        <span>Add</span>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>                                            
-                                                            
-                                                            <?php
-                                                                }
-                                                            }
-                                                            ?>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                                <?php
-                                                }
-                                            ?>
-                                        </div>
-
-                                
-
-                                <?php
-                                    foreach($loop_data as $row)
-                                    {
-                                ?>
-                                        <!-- Modals Section - outside the table -->
-                                        <?php if (!empty($row['products'])) 
-                                            {
-                                                    foreach ($row['products'] as $product) 
-                                                    {
-                                                        $attributes = !empty($product['attributes']) && $product['type'] == "variable" ? json_decode($product['attributes'], true) : [];
+                                <div class='category-container'>
+                                    <?php foreach ($loop_data as $index => $row) { ?>
+                                        <div class='products-listing' id="category-<?php echo $row['cid']; ?>" style="display: <?php echo $index === 0 ? 'block' : 'none'; ?>;">
+                                            <table style="width: 100%;">
+                                                <thead>
+                                                    <tr>
+                                                        <!-- <th>Category</th> -->
+                                                        <th>Image</th>
+                                                        <th>Product Title</th>
+                                                        <th>Price</th>
+                                                        <th style="text-align:center">Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php if (!empty($row['products'])) {
+                                                        foreach ($row['products'] as $product) {
+                                                            $attributes = !empty($product['attributes']) && $product['type'] == "variable" ? json_decode($product['attributes'], true) : [];
                                                     ?>
-                                                        <div id="modal-<?php echo $product['id']; ?>" class="modal" style="display:none;">
-                                                            <div class="modal-content">
-                                                                <span class="close" onclick="closeModal('<?php echo $product['id']; ?>')">&times;</span>
-                                                                <form class="variations_form cart validate" action="" method="post" enctype="multipart/form-data">
-                                                                    <div class="modal-image-wrapper">
-                                                                        <img src="<?php echo $product['image']; ?>" style="border-radius: 2px;margin-bottom: 10px;">
-                                                                    </div>
-                                                                    <h5><?php echo $product['title']; ?></h5>
-                                                                    <!-- Variations and attributes -->
-                                                                    <table class="variations" cellspacing="0">
-                                                                        <tbody>
-                                                                            <?php if (!empty($attributes) && $product['type'] == "variable") {
-                                                                                foreach ($attributes as $attribute) {
-                                                                                    if (!empty($attribute['attribute_variation'])) {
-                                                                                        $label = $attribute['label'];
-                                                                                        $label_id = strtolower(str_replace(' ', '-', $label));
-                                                                            ?>
-                                                                            <tr>
-                                                                                <td width="150"><?php echo ucfirst($label); ?>:</td>
-                                                                                <td style="padding:12px">
-                                                                                    <select name="variations[attribute_<?php echo $label_id; ?>]" required>
-                                                                                        <option value="">Select an option</option>
-                                                                                        <?php foreach ($attribute['value'] as $variation) { ?>
-                                                                                        <option value="<?php echo $variation; ?>"><?php echo $variation; ?></option>
-                                                                                        <?php } ?>
-                                                                                    </select>
-                                                                                </td>
-                                                                            </tr>
-                                                                            <?php } } } ?>
-                                                                            <tr>
-                                                                                <td>Quantity:</td>
-                                                                                <td><input type="number" name="quantity" value="1" min="1"></td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <?php
-                                                                                    if($product['type'] != "variable"){
-                                                                                        $price = isset($product['price']) && is_numeric($product['price']) ? (float)$product['price'] : 0.00;
-                                                                                        $price_text = '<span class="woocommerce-Price-currencySymbol">'._price(number_format($price, 2)).'</span>';
-                                                                                    ?>
-                                                                                        <td width="150" height="60px" class="label" style="padding:12px">Price: </td>
-                                                                                        <td style="padding:12px">
-                                                                                            <span id="product_price">
-                                                                                                <?=$price_text?>
-                                                                                            </span>
-                                                                                        </td>
-                                                                                    <?php
-                                                                                    }else{
-                                                                                    ?>
-
-                                                                                        <td width="150" height="60px" class="label" style="padding:12px">Price:</td>
-                                                                                        <td><span class="product_price"> </span></td>
-
-                                                                                    <?php
-                                                                                    }
-                                                                                ?>
-                                                                                <span class="product_price" style="display:none"></span>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <td colspan="2">
-                                                                                    <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
-                                                                                    <button type="submit" class="single_add_to_cart_button">Add to Cart</button>
-                                                                                </td>
-                                                                            </tr>
-                                                                        </tbody>
-                                                                    </table>
-                                                                </form>
+                                                    <tr>
+                                                        <!-- <td><?= $row['title'] ?></td> -->
+                                                        <td>
+                                                            <div>
+                                                                <a href="<?php echo site_url($product['url']) ?>">
+                                                                    <img src="<?php echo $product['image']; ?>" class="product-list-image">
+                                                                </a>
                                                             </div>
-                                                        </div>
-                                                    <?php 
-                                                    } 
-                                            } 
-                                        ?>
-                                        
+                                                        </td>
+                                                        <td>
+                                                            <a href="<?php echo site_url($product['url']) ?>">
+                                                                <span><?php echo $product['title']; ?></span>
+                                                            </a>
+                                                        </td>
+                                                        <td>
+                                                            <?php
+                                                                $productModel = model('ProductsModel');
 
-                                <?php        
-                                    }
-                                ?>
+                                                                if($product['type'] == "variable"){
+                                                                    $price = $productModel->product_price($product['id']);
+                                                                    $p = $price[0];
+                                                                    $discount_price = $productModel->product_reduced_price($p);
+                                                                    if($discount_price) {
+                                                                        $p = $discount_price;
+                                                                    }
+                                                                    $price_text = '<span class="woocommerce-Price-currencySymbol">From '._price(number_format($p,2)).'</span>';
+
+                                                                }else{
+
+                                                                    $price = isset($product['price']) && is_numeric($product['price']) ? (float)$product['price'] : 0.00;
+                                                                    $price_text = '<span class="woocommerce-Price-currencySymbol">' . _price(number_format($price, 2)) . '</span>';
+    
+                                                                }
+
+                                                                                                                               
+                                                            ?>
+                                                            <span id="product_price"><?= $price_text ?></span>
+                                                        </td>
+                                                        <td style="text-align:center">
+                                                            <div class="icon-wrapper" onclick="openModal('<?php echo $product['id']; ?>')">
+                                                                <span>Add</span>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <?php } } ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    <?php } ?>
+                                </div>
+
+                                <?php foreach ($loop_data as $row) { ?>
+                                    <!-- Modals Section - outside the table -->
+                                    <?php if (!empty($row['products'])) {
+                                        foreach ($row['products'] as $product) {
+                                            $attributes = !empty($product['attributes']) && $product['type'] == "variable" ? json_decode($product['attributes'], true) : [];
+                                    ?>
+                                            <div id="modal-<?php echo $product['id']; ?>" class="modal" style="display:none;">
+                                                <div class="modal-content">
+                                                    <span class="close" onclick="closeModal('<?php echo $product['id']; ?>')">&times;</span>
+                                                    <form class="variations_form cart validate" action="" method="post" enctype="multipart/form-data">
+                                                        <div class="modal-image-wrapper">
+                                                            <img src="<?php echo $product['image']; ?>" style="border-radius: 2px;margin-bottom: 10px;">
+                                                        </div>
+                                                        <h5><?php echo $product['title']; ?></h5>
+                                                        <!-- Variations and attributes -->
+                                                        <table class="variations" cellspacing="0">
+                                                            <tbody>
+                                                                <?php if (!empty($attributes) && $product['type'] == "variable") {
+                                                                    foreach ($attributes as $attribute) {
+                                                                        if (!empty($attribute['attribute_variation'])) {
+                                                                            $label = $attribute['label'];
+                                                                            $label_id = strtolower(str_replace(' ', '-', $label));
+                                                                ?>
+                                                                <tr>
+                                                                    <td width="150"><?php echo ucfirst($label); ?>:</td>
+                                                                    <td style="padding:12px">
+                                                                        <select name="variations[attribute_<?php echo $label_id; ?>]" required>
+                                                                            <option value="">Select an option</option>
+                                                                            <?php foreach ($attribute['value'] as $variation) { ?>
+                                                                            <option value="<?php echo $variation; ?>"><?php echo $variation; ?></option>
+                                                                            <?php } ?>
+                                                                        </select>
+                                                                    </td>
+                                                                </tr>
+                                                                <?php } } } ?>
+                                                                <tr>
+                                                                    <td>Quantity:</td>
+                                                                    <td><input type="number" name="quantity" value="1" min="1"></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <?php
+                                                                        if ($product['type'] != "variable") {
+                                                                            $price = isset($product['price']) && is_numeric($product['price']) ? (float)$product['price'] : 0.00;
+                                                                            $price_text = '<span class="woocommerce-Price-currencySymbol">' . _price(number_format($price, 2)) . '</span>';
+                                                                    ?>
+                                                                        <td width="150" height="60px" class="label" style="padding:12px">Price: </td>
+                                                                        <td style="padding:12px">
+                                                                            <span id="product_price"><?= $price_text ?></span>
+                                                                        </td>
+                                                                    <?php } else { ?>
+                                                                        <td width="150" height="60px" class="label" style="padding:12px">Price:</td>
+                                                                        <td><span class="product_price"> </span></td>
+                                                                    <?php } ?>
+                                                                    <span class="product_price" style="display:none"></span>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td colspan="2">
+                                                                        <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
+
+                                                                        <div class="cart-close-button">
+                                                                            <button type="submit" class="single_add_to_cart_button">Add to Cart</button>
+                                                                            <span class="cancel_button" onclick="closeModal('<?php echo $product['id']; ?>')">Cancel</span>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td colspan="2">
+                                                                        
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                    <?php } } } ?>
                             </div>
+
 
                             <?php
                         }else{
@@ -748,3 +693,41 @@ document.querySelectorAll('.category-links a').forEach(anchor => {
 
 </script>
 
+<script>
+function showCategory(categoryId) {
+    // Hide all categories
+    const allCategories = document.querySelectorAll('.products-listing');
+    allCategories.forEach(function(category) {
+        category.style.display = 'none';
+    });
+
+    // Show the selected category
+    const selectedCategory = document.getElementById('category-' + categoryId);
+    if (selectedCategory) {
+        selectedCategory.style.display = 'block';
+    }
+}
+</script>
+
+<script>
+    function showCategory(categoryId, element) {
+        // Hide all categories
+        var categories = document.querySelectorAll('.products-listing');
+        categories.forEach(function (category) {
+            category.style.display = 'none';
+        });
+
+        // Show the selected category
+        var selectedCategory = document.getElementById('category-' + categoryId);
+        if (selectedCategory) {
+            selectedCategory.style.display = 'block';
+        }
+
+        // Remove active class from all links and add to the clicked link
+        var links = document.querySelectorAll('.category-link');
+        links.forEach(function (link) {
+            link.classList.remove('active');
+        });
+        element.classList.add('active');
+    }
+</script>

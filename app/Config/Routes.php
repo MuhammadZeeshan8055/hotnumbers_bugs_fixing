@@ -77,6 +77,8 @@ $routes->group('account', ['filter' => 'AccountFilter'], function ($routes) {
     $routes->get('disable-payment-method/(:any)', 'Account::disable_payment_method/$1');
 });
 
+$routes->post('/testing_price', 'Shop::get_price');
+
 $routes->get('shop', 'Shop::index');
 $routes->get('shop/category/(:any)', 'Shop::shop_by_category/$1');
 $routes->get('shop/product/getvariation', 'Shop::get_product_variation');
