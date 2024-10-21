@@ -320,9 +320,6 @@
                             background: var(--red);
                         }
 
-                        .icon-wrapper:hover {
-                            background-color: gray;
-                        }
 
                         .icon-wrapper svg path {
                             fill: white;
@@ -366,6 +363,52 @@
                             cursor: pointer;
                             transition: background-color 0.3s;
                         }
+
+                        /* tool tip style  */
+
+                        .icon-wrapper {
+                            position: relative;
+                            display: inline-block;
+                            cursor: pointer;
+                        }
+
+                        .icon-wrapper .tooltip {
+                            visibility: hidden;
+                            width: 120px;
+                            background-color: #555;
+                            color: #fff;
+                            text-align: center;
+                            padding: 5px;
+                            border-radius: 6px;
+
+                            /* Position the tooltip above the icon-wrapper */
+                            position: absolute;
+                            bottom: 125%; /* 125% places it above the icon-wrapper */
+                            left: 50%;
+                            transform: translateX(-50%);
+                            z-index: 1;
+
+                            /* Tooltip arrow */
+                            opacity: 0;
+                            transition: opacity 0.3s;
+                        }
+
+                        .icon-wrapper .tooltip::after {
+                            content: "";
+                            position: absolute;
+                            top: 100%; /* Arrow will be at the bottom of the tooltip */
+                            left: 50%;
+                            margin-left: -5px;
+                            border-width: 5px;
+                            border-style: solid;
+                            border-color: #555 transparent transparent transparent;
+                        }
+
+                        .icon-wrapper:hover .tooltip {
+                            visibility: visible;
+                            opacity: 1;
+                        }
+
                         /* Responsive adjustments */
                         @media (max-width: 768px) {
                         table.custom-table {
@@ -452,9 +495,26 @@
                                                             <span id="product_price"><?= $price_text ?></span>
                                                         </td>
                                                         <td style="text-align:center">
-                                                            <div class="icon-wrapper" onclick="openModal('<?php echo $product['id']; ?>')">
-                                                                <span>Add</span>
-                                                            </div>
+                                                            <?php
+                                                                    if($product['stock_status']=='outofstock'){
+                                                                ?>
+                                                                        
+                                                                        <div class="icon-wrapper" style="background:gray">
+                                                                            <span>Add</span>
+                                                                            <div class="tooltip">Out Of Stock</div>
+                                                                        </div>
+
+                                                                <?php
+                                                                    }else{
+                                                                        ?>
+                                                                            <div class="icon-wrapper" onclick="openModal('<?php echo $product['id']; ?>')">
+                                                                                <span>Add</span>
+                                                                            </div>
+
+                                                                        <?php
+                                                                    }
+
+                                                            ?>
                                                         </td>
                                                     </tr>
                                                     <?php } } ?>

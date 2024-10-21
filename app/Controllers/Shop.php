@@ -174,7 +174,8 @@ class Shop extends BaseController
                                     'title' => $product['title'],
                                     'image' => $product_image_src,
                                     'url' => 'shop/product/' . $product['slug'],
-                                    'price' => $product['price']
+                                    'price' => $product['price'],
+                                    'stock_status'=> $product['stock_status']
                                 ];
                             }
                         }
