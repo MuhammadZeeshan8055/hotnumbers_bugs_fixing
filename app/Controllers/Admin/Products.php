@@ -510,15 +510,51 @@ href="javascript:void(0)"></i> <i class="lni lni-trash-can"></i></a> &nbsp;';
             $data['img'] = !empty($this->request->getPost('product_images')) ? implode(',',$this->request->getPost('product_images')) : '';
 
             $data['slug'] = toSlugUrl($data['title']);
-
-            $attributes = [];
-            if(!empty($data['attributes'])) {
-                $attributes = ($data['attributes']);
-                foreach ($attributes as $i => $attribute) {
-                    $attribute['value'] = explode(' | ', $attribute['value']);
-                    $attributes[$i] = $attribute;
+            
+            
+            //handling products attributes
+            if(!empty($data['id'])){
+                $attributes = [];
+                if(!empty($data['attributes'])) {
+                    $attributes = ($data['attributes']);
+                    foreach ($attributes as $i => $attribute) {
+                        $attribute['value'] = explode(' | ', $attribute['value']);
+                        $attributes[$i] = $attribute;
+                    }
+                }
+            }else{
+                $attributes = [];
+                if (!empty($data['attributes'])) {
+                    $attributes = ($data['attributes']);
+                    foreach ($attributes as $i => $attribute) {
+                        // Check if 'attribute_variation' key exists and set its value to 1
+                        if (isset($attribute['attribute_variation'])) {
+                            $attribute['attribute_variation'] = 1;
+                        }
+                
+                        // Check if 'attribute_visibility' key exists and set its value to 1
+                        if (isset($attribute['attribute_visibility'])) {
+                            $attribute['attribute_visibility'] = 1;
+                        }
+                
+                        // Check if both 'attribute_variation' and 'attribute_visibility' exist
+                        if (isset($attribute['attribute_variation']) && isset($attribute['attribute_visibility'])) {
+                            $attribute['attribute_variation'] = 1;
+                            $attribute['attribute_visibility'] = 1;
+                        }
+                
+                        // Split the 'value' string into an array
+                        $attribute['value'] = explode(' | ', $attribute['value']);
+                        
+                        // Update the attributes array with the modified attribute
+                        $attributes[$i] = $attribute;
+                    }
                 }
             }
+
+           
+            
+             
 
             $dbdata = [
                 'title'=>$data['title'],
@@ -597,6 +633,28 @@ href="javascript:void(0)"></i> <i class="lni lni-trash-can"></i></a> &nbsp;';
             //     'variation' => json_encode($variation_data)
             // ];
 
+
+            // previous code this is set for only attribute_date 
+
+            // $variation_data = [];
+            // if (!empty($data['variations'])) {
+            //     foreach ($data['variations'] as &$variation) {
+            //         // Check if 'regular_price' is empty and set it to '0' if it is
+            //         if (isset($variation['values']['regular_price']) && $variation['values']['regular_price'] === '') {
+            //             $variation['values']['regular_price'] = '0';
+            //         }
+
+            //         // Remove any leading or trailing whitespace around 'attribute_date'
+            //         if (isset($variation['keys']['attribute_date'])) {
+            //             $variation['keys']['attribute_date'] = trim($variation['keys']['attribute_date']);
+            //         }
+
+            //         // Add the processed variation to the array
+            //         $variation_data[] = $variation;
+            //     }
+            //     unset($variation); // Break the reference with the last element
+            // }
+
             $variation_data = [];
             if (!empty($data['variations'])) {
                 foreach ($data['variations'] as &$variation) {
@@ -605,9 +663,11 @@ href="javascript:void(0)"></i> <i class="lni lni-trash-can"></i></a> &nbsp;';
                         $variation['values']['regular_price'] = '0';
                     }
 
-                    // Remove any leading or trailing whitespace around 'attribute_date'
-                    if (isset($variation['keys']['attribute_date'])) {
-                        $variation['keys']['attribute_date'] = trim($variation['keys']['attribute_date']);
+                    // Trim whitespace from all keys in the 'keys' array
+                    if (isset($variation['keys']) && is_array($variation['keys'])) {
+                        foreach ($variation['keys'] as $key => $value) {
+                            $variation['keys'][$key] = trim($value);
+                        }
                     }
 
                     // Add the processed variation to the array
@@ -709,6 +769,7 @@ href="javascript:void(0)"></i> <i class="lni lni-trash-can"></i></a> &nbsp;';
         if ($id > 0) {
             $this->master->delete_data($this->table, 'id', $id);
             $this->master->delete_data('tbl_product_categories', 'product_id', $id);
+            $this->master->delete_data('tbl_product_variations', 'product_id', $id);
             $this->res['ok'] = '1';
             $this->res['id'] = $id;
             echo json_encode($this->res);

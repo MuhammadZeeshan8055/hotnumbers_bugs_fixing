@@ -100,6 +100,10 @@
         .item-meta p {
             font-size: 11px;
         }
+        .page_break {
+            page-break-after: always; /* Use page-break-after for correct behavior */
+        }
+
     </style>
 
 </head>
@@ -207,53 +211,63 @@
                         <br>
                         <br>
 
-                        <?php if(!empty($slip['order_items'])) {?>
-                        <table class="order_receipt table" cellpadding="0" cellspacing="0" width="100%" style="text-align: left">
-                            <thead>
-                                <tr>
-                                    <th width="80%">Product</th>
-                                    <th>Quantity</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach($slip['order_items'] as $item) {
-                                    $product_name = @$item['product_name'];
-
-                                    $meta = @$item['item_meta'];
-                                    $meta_values = !empty($meta['variation']['values']) ? $meta['variation']['values'] : [];
-                                    if($item['item_type'] === "line_item") {
+                        <?php if (!empty($slip['order_items'])) { ?>
+                            <table class="order_receipt table" cellpadding="0" cellspacing="0" width="100%" style="text-align: left">
+                                <thead>
+                                    <tr>
+                                        <th width="80%">Product</th>
+                                        <th>Quantity</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    $count = 0;
+                                    foreach ($slip['order_items'] as $item) {
+                                        $product_name = @$item['product_name'];
+                                        $meta = @$item['item_meta'];
+                                        $meta_values = !empty($meta['variation']['values']) ? $meta['variation']['values'] : [];
+                                        
+                                        if ($item['item_type'] === "line_item") {
+                                            // Start a new row for each item
+                                            echo '<tr>';
+                                            echo '<td>';
+                                            echo '<p>' . $product_name . '</p>';
+                                            echo '<div class="item-meta">';
+                                            
+                                            if (!empty($meta_values['sku'])) {
+                                                echo '<p><b>SKU:</b> ' . $meta_values['sku'] . '</p>';
+                                            }
+                                            
+                                            if (!empty($meta['variations'])) {
+                                                foreach (json_decode($meta['variations'], true) as $key => $variation) {
+                                                    $key = str_replace('attribute_', '', $key);
+                                                    $key = str_replace('_', ' ', $key);
+                                                    $key = ucfirst($key);
+                                                    if (is_array($variation)) {
+                                                        $variation = implode(', ', $variation);
+                                                    }
+                                                    echo '<p><b>' . $key . ':</b> ' . $variation . '</p>';
+                                                }
+                                            }
+                                            
+                                            echo '</div>';
+                                            echo '</td>';
+                                            echo '<td>' . $meta['quantity'] . '</td>';
+                                            echo '</tr>';
+                        
+                                            $count++;
+                        
+                                            // Add a page break after every 12 records
+                                            if ($count % 12 == 0) {
+                                                echo '<div class="page_break"></div>'; // Page break after every 10 items
+                                            }
+                                        }
+                                    }
                                     ?>
-                                <tr>
-                                    <td>
-                                       <p> <?php echo $product_name ?></p>
-                                        <div class="item-meta">
-                                            <?php if(!empty($meta_values['sku'])) {
-                                                ?>
-                                                <p><b>SKU:</b> <?php echo $meta_values['sku'] ?></p>
-                                                <?php
-                                            }?>
-                                            <?php  if(!empty($meta['variations'])){
-                                                    foreach(json_decode($meta['variations'],true) as $key=>$variation) {
-                                                        $key = str_replace('attribute_','',$key);
-                                                        $key = str_replace('_',' ',$key);
-                                                        $key = ucfirst($key);
-                                                        if(is_array($variation)) {
-                                                            $variation = implode(', ',$variation);
-                                                        }
-                                                ?>
-                                                <p><b><?php echo $key ?>: </b><?php echo $variation ?></p>
-                                             <?php }
-                                            }?>
-                                        </div>
-                                    </td>
-                                    <td><?php echo $meta['quantity'] ?></td>
-                                </tr>
-                                <?php }
-                                }?>
-
-                            </tbody>
-                        </table>
+                                </tbody>
+                            </table>
                         <?php } ?>
+
 
                         <?php
 //                            echo view('checkout/order_receipt',[
@@ -292,8 +306,8 @@
             <div class="page_break"></div>
            <?php
             }
-        }
-     ?>
+            }
+        ?>
 
 
             <div style="clear: both"></div>

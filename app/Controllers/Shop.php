@@ -22,31 +22,24 @@ class Shop extends BaseController
     public function get_price() {
         $productId = $this->request->getPost('product_id');
         $targetVariation = $this->request->getPost('variation');
+        $attributeName = $this->request->getPost('attribute');
     
         // Get the variation product price
         $values = get_variation_product_price($productId);
-    
-        // Decode the JSON string in the 'variation' key
         $variations = json_decode($values['variation'], true);
     
-        // Search through variations to find the one that matches weight, size, or quantity
+        // Search through variations to find the one that matches the target variation
         foreach ($variations as $variation) {
-            // Check if targetVariation matches 'attribute_weight', 'attribute_size', or 'attribute_quantity'
-            if (
-                (isset($variation['keys']['attribute_weight']) && $variation['keys']['attribute_weight'] == $targetVariation) ||
-                (isset($variation['keys']['attribute_size']) && $variation['keys']['attribute_size'] == $targetVariation) ||
-                (isset($variation['keys']['attribute_quantity']) && $variation['keys']['attribute_quantity'] == $targetVariation)
-            ) {
-                // If matching variation is found, print the price
+            // Check if targetVariation matches the dynamically sent attribute name
+            if (isset($variation['keys']["attribute_$attributeName"]) && $variation['keys']["attribute_$attributeName"] == $targetVariation) {
                 echo $variation['values']['regular_price'];
                 return; // Stop after finding the match
             }
         }
     
         // If no matching variation is found, display a message
-        echo "No matching variation found.";
+        // echo "No matching variation found.";
     }
-
 
 
 

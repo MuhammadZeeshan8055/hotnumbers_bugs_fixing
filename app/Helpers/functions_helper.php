@@ -48,7 +48,7 @@ function get_variation_starting_price($pid){
     return $q; // Return true if the query result is not empty, false otherwise
 }
 function get_variation_product_price($pid){
-    $sql = "SELECT variation FROM `tbl_product_variations` WHERE product_id='$pid';";
+    $sql = "SELECT variation FROM `tbl_product_variations` WHERE product_id='$pid'";
     $master = model('MasterModel');
     $q = $master->query($sql, true, true);
     return $q; // Return true if the query result is not empty, false otherwise
@@ -280,13 +280,30 @@ function _order_status($status='') {
 function order_editable($order) {
     $can_edit = false;
     $order = (array)$order;
-    if(($order['status'] != "processing" && $order['status'] != "completed")) {
+
+    $customer_id=$order['customer_user'];
+
+    // checking for internal customers
+    $check_role=check_user_role($customer_id);
+   
+    if($order['status'] == "processing" && $check_role == '9'){
+        $can_edit = true;
+    }elseif(($order['status'] != "processing" && $order['status'] != "completed")) {
         $can_edit = true;
     }
     if($order['payment_method'] == 'invoice' && $order['status'] != "completed") {
         $can_edit = true;
     }
     return $can_edit;
+}
+
+function check_user_role($customer_id) {
+    $sql = "SELECT role FROM `tbl_users` WHERE user_id = '$customer_id'";
+    $master = model('MasterModel');
+    $q = $master->query($sql, true, true);
+    
+    // Check if the result is not empty and return the role
+    return !empty($q) ? $q['role'] : null; // Return the role or null if not found
 }
 
 function order_statuses() {

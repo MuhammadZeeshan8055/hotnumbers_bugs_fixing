@@ -408,12 +408,38 @@
                             visibility: visible;
                             opacity: 1;
                         }
-
+                        .select-box-alignment {
+                            display: flex;
+                            margin:18px 0 0 0;
+                            gap: 10px;
+                            align-items:center;
+                        }
+                        html body .wrapper label{
+                            padding:0px;
+                        }
+                        .select-box-alignment select {
+                            border-radius: 2px;
+                            font-size: 15px;
+                            background: black !important;
+                            color: white;
+                        }
+                        .swal2-container.swal2-bottom-end.swal2-backdrop-show {
+                            width: 250px !important;
+                        }
+                        .swal2-popup.swal2-toast.animated.fadeInDown.single_add_to_cart.error {
+                            width: 250px !important;
+                        }
                         /* Responsive adjustments */
                         @media (max-width: 768px) {
-                        table.custom-table {
-                            font-size: 14px; /* Slightly smaller font size for mobile */
+                            table.custom-table {
+                                font-size: 14px; /* Slightly smaller font size for mobile */
+                            }
                         }
+                        @media (max-width: 931px) {
+                            .products-listing {
+                                width: 130%;
+                                overflow-x: scroll;
+                            }
                         }
                         
                         </style>
@@ -441,163 +467,146 @@
                                 <div class='category-container'>
                                     <?php foreach ($loop_data as $index => $row) { ?>
                                         <div class='products-listing' id="category-<?php echo $row['cid']; ?>" style="display: <?php echo $index === 0 ? 'block' : 'none'; ?>;">
-                                            <table style="width: 100%;">
-                                                <thead>
-                                                    <tr>
-                                                        <!-- <th>Category</th> -->
-                                                        <th>Image</th>
-                                                        <th>Product Title</th>
-                                                        <th>Price</th>
-                                                        <th style="text-align:center">Action</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <?php if (!empty($row['products'])) {
-                                                        foreach ($row['products'] as $product) {
-                                                            $attributes = !empty($product['attributes']) && $product['type'] == "variable" ? json_decode($product['attributes'], true) : [];
-                                                    ?>
-                                                    <tr>
-                                                        <!-- <td><?= $row['title'] ?></td> -->
-                                                        <td>
-                                                            <div>
-                                                                <a href="<?php echo site_url($product['url']) ?>">
-                                                                    <img src="<?php echo $product['image']; ?>" class="product-list-image">
+                                        <table style="width: 100%; border-collapse: collapse;">
+                                            <thead>
+                                                <tr style="background-color: #f2f2f2;">
+                                                    <th>Image</th>
+                                                    <th>Product Title</th>
+                                                    <th>Price</th>
+                                                    <th style="text-align:center">Action</th>
+                                                    <th style="text-align:center">Quantity</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php if (!empty($row['products'])) {
+                                                    foreach ($row['products'] as $product) {
+                                                        $attributes = !empty($product['attributes']) && $product['type'] == "variable" ? json_decode($product['attributes'], true) : [];
+                                                        ?>
+                                                        <tr>
+                                                            <td>
+                                                                <div>
+                                                                    <a href="<?php echo site_url($product['url']); ?>">
+                                                                        <img src="<?php echo $product['image']; ?>" class="product-list-image" alt="<?php echo htmlspecialchars($product['title']); ?>">
+                                                                    </a>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                               
+                                                                <a href="<?php echo site_url($product['url']); ?>">
+                                                                    <span><?php echo $product['title']; ?></span>
                                                                 </a>
-                                                            </div>
-                                                        </td>
-                                                        <td>
-                                                            <a href="<?php echo site_url($product['url']) ?>">
-                                                                <span><?php echo $product['title']; ?></span>
-                                                            </a>
-                                                        </td>
-                                                        <td>
-                                                            <?php
+                                                                <br/>
+                                                                    <!-- Product attributes (for variable products) -->
+                                                                <div class="select-box-alignment">
+                                                                    <?php if (!empty($attributes) && $product['type'] == "variable") { ?>
+                                                                    <?php foreach ($attributes as $attribute) {
+                                                                        if (!empty($attribute['attribute_variation'])) {
+                                                                            $label = $attribute['label'];
+                                                                            $label_id = strtolower(str_replace(' ', '-', $label));
+                                                                            ?>
+                                                                            <label for="attribute_<?php echo $label_id; ?>"><?php echo $label; ?></label>
+                                                                            <select name="variations[attribute_<?php echo $label_id; ?>]" data-attribute="<?php echo $label_id; ?>" required form="form_<?php echo $product['id']; ?>">
+                                                                                <option value="">Select an option</option>
+                                                                                <?php foreach ($attribute['value'] as $variation) { ?>
+                                                                                    <option value="<?php echo $variation; ?>"><?php echo $variation; ?></option>
+                                                                                <?php } ?>
+                                                                            </select>
+                                                                        <?php }
+                                                                        } ?>
+                                                                    <?php } ?>
+                                                                </div>
+                                                             
+                                                            </td>
+                                                            <td>
+                                                                <?php
                                                                 $productModel = model('ProductsModel');
-
-                                                                if($product['type'] == "variable"){
+                                                                if ($product['type'] == "variable") {
                                                                     $price = $productModel->product_price($product['id']);
                                                                     $p = $price[0];
                                                                     $discount_price = $productModel->product_reduced_price($p);
-                                                                    if($discount_price) {
+                                                                    if ($discount_price) {
                                                                         $p = $discount_price;
                                                                     }
-                                                                    $price_text = '<span class="woocommerce-Price-currencySymbol">From '._price(number_format($p,2)).'</span>';
-
-                                                                }else{
-
+                                                                    $price_value = is_numeric($p) ? (float)$p : 0.00;  // Ensure $p is numeric, otherwise set a default value
+                                                                    $price_text = '<span class="woocommerce-Price-currencySymbol">From ' . _price(number_format($price_value, 2)) . '</span>';
+                                                                } else {
                                                                     $price = isset($product['price']) && is_numeric($product['price']) ? (float)$product['price'] : 0.00;
                                                                     $price_text = '<span class="woocommerce-Price-currencySymbol">' . _price(number_format($price, 2)) . '</span>';
-    
                                                                 }
-
-                                                                                                                               
-                                                            ?>
-                                                            <span id="product_price"><?= $price_text ?></span>
-                                                        </td>
-                                                        <td style="text-align:center">
-                                                            <?php
-                                                                    if($product['stock_status']=='outofstock'){
                                                                 ?>
-                                                                        
+                                                                <span class="base_price"><?= $price_text ?></span> <!-- Updated to use class for base price -->
+                                                                <span class="product_price"> </span>
+                                                            </td>
+                                                            <td style="text-align:center">
+                                                                <!-- Form for adding the product to the cart -->
+                                                                <form id="form_<?php echo $product['id']; ?>" class="variations_form cart validate" action="" method="post" enctype="multipart/form-data">
+                                                                    <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
+                                                                    <?php 
+
+                                                                        // if($product['type'] ==  "variable"){
+                                                                                                                                            
+                                                                        //     $product_id=$product['id'];
+                                                                        //     $check = check_manage_stock_for_variations($product_id);
+
+                                                                        //     // Decode the JSON string
+                                                                        //     $checkvariations = json_decode($check['variation'], true);
+                                                                            
+                                                                        //     if (is_array($checkvariations)) {
+                                                                        //         $manage_stock = 'no'; // Initialize default value
+                                                                        //         $stock_status = 'Out of Stock'; // Default stock status
+
+                                                                        //         foreach ($checkvariations as $variation) {
+                                                                        //             if ($variation['values']['manage_stock'] == 'yes') {
+                                                                        //                 $manage_stock = 'yes';
+                                                                        //             }
+                                                                                    
+                                                                        //             if ($variation['values']['stock_status'] == 'instock') {
+                                                                        //                 $stock_status_class = 'stock stock_available';
+                                                                        //                 $stock_status = 'In Stock';
+                                                                        //                 break; // Exit the loop if 'In Stock' is found
+                                                                        //             }
+                                                                        //         }
+                                                                        //     }
+                                                                        // }
+
+                                                                        // if($product['type'] ==  "variable" && $product['stock_managed']=='no' && $manage_stock=='no' && $product['stock_status']=='outofstock'){
+
+
+                                                                        if ($product['stock_status'] == 'outofstock') { 
+                                                                                                                                               
+
+                                                                        ?>
                                                                         <div class="icon-wrapper" style="background:gray">
                                                                             <span>Add</span>
                                                                             <div class="tooltip">Out Of Stock</div>
                                                                         </div>
+                                                                    <?php } else { ?>
+                                                                        <button type="submit" class="single_add_to_cart_button">Add</button>
+                                                                    <?php } ?>
+                                                                </form>
+                                                            </td>
+                                                            <td style="text-align:center">
+                                                                <!-- Quantity field inside the form, linked with the same form ID -->
+                                                                <input type="number" name="quantity" value="1" min="1" style="width: 60px;" form="form_<?php echo $product['id']; ?>">
+                                                            </td>
+                                                        </tr>
+                                                    <?php }
+                                                } ?>
+                                            </tbody>
+                                        </table>
 
-                                                                <?php
-                                                                    }else{
-                                                                        ?>
-                                                                            <div class="icon-wrapper" onclick="openModal('<?php echo $product['id']; ?>')">
-                                                                                <span>Add</span>
-                                                                            </div>
 
-                                                                        <?php
-                                                                    }
 
-                                                            ?>
-                                                        </td>
-                                                    </tr>
-                                                    <?php } } ?>
-                                                </tbody>
-                                            </table>
+
                                         </div>
                                     <?php } ?>
                                 </div>
 
-                                <?php foreach ($loop_data as $row) { ?>
-                                    <!-- Modals Section - outside the table -->
-                                    <?php if (!empty($row['products'])) {
-                                        foreach ($row['products'] as $product) {
-                                            $attributes = !empty($product['attributes']) && $product['type'] == "variable" ? json_decode($product['attributes'], true) : [];
-                                    ?>
-                                            <div id="modal-<?php echo $product['id']; ?>" class="modal" style="display:none;">
-                                                <div class="modal-content">
-                                                    <span class="close" onclick="closeModal('<?php echo $product['id']; ?>')">&times;</span>
-                                                    <form class="variations_form cart validate" action="" method="post" enctype="multipart/form-data">
-                                                        <div class="modal-image-wrapper">
-                                                            <img src="<?php echo $product['image']; ?>" style="border-radius: 2px;margin-bottom: 10px;">
-                                                        </div>
-                                                        <h5><?php echo $product['title']; ?></h5>
-                                                        <!-- Variations and attributes -->
-                                                        <table class="variations" cellspacing="0">
-                                                            <tbody>
-                                                                <?php if (!empty($attributes) && $product['type'] == "variable") {
-                                                                    foreach ($attributes as $attribute) {
-                                                                        if (!empty($attribute['attribute_variation'])) {
-                                                                            $label = $attribute['label'];
-                                                                            $label_id = strtolower(str_replace(' ', '-', $label));
-                                                                ?>
-                                                                <tr>
-                                                                    <td width="150"><?php echo ucfirst($label); ?>:</td>
-                                                                    <td style="padding:12px">
-                                                                        <select name="variations[attribute_<?php echo $label_id; ?>]" required>
-                                                                            <option value="">Select an option</option>
-                                                                            <?php foreach ($attribute['value'] as $variation) { ?>
-                                                                            <option value="<?php echo $variation; ?>"><?php echo $variation; ?></option>
-                                                                            <?php } ?>
-                                                                        </select>
-                                                                    </td>
-                                                                </tr>
-                                                                <?php } } } ?>
-                                                                <tr>
-                                                                    <td>Quantity:</td>
-                                                                    <td><input type="number" name="quantity" value="1" min="1"></td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <?php
-                                                                        if ($product['type'] != "variable") {
-                                                                            $price = isset($product['price']) && is_numeric($product['price']) ? (float)$product['price'] : 0.00;
-                                                                            $price_text = '<span class="woocommerce-Price-currencySymbol">' . _price(number_format($price, 2)) . '</span>';
-                                                                    ?>
-                                                                        <td width="150" height="60px" class="label" style="padding:12px">Price: </td>
-                                                                        <td style="padding:12px">
-                                                                            <span id="product_price"><?= $price_text ?></span>
-                                                                        </td>
-                                                                    <?php } else { ?>
-                                                                        <td width="150" height="60px" class="label" style="padding:12px">Price:</td>
-                                                                        <td><span class="product_price"> </span></td>
-                                                                    <?php } ?>
-                                                                    <span class="product_price" style="display:none"></span>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td colspan="2">
-                                                                        <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
 
-                                                                        <div class="cart-close-button">
-                                                                            <button type="submit" class="single_add_to_cart_button">Add to Cart</button>
-                                                                            <span class="cancel_button" onclick="closeModal('<?php echo $product['id']; ?>')">Cancel</span>
-                                                                        </div>
-                                                                    </td>
-                                                                    <td colspan="2">
-                                                                        
-                                                                    </td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                    <?php } } } ?>
+
+
+
+                                
                             </div>
 
 
@@ -692,25 +701,57 @@
 </script>
 
 <script>
-
 $(document).ready(function() {
-    // Handle variation changes for weight, size, and quantity
-    $('select[name="variations[attribute_weight]"], select[name="variations[attribute_size]"], select[name="variations[attribute_quantity]"]').change(function() {
-        var selectedOption = $(this).val();
-        var productId = $(this).closest('tr').nextAll('tr').find("input[name='product_id']").val();
+    // Use event delegation to handle changes on any attribute select
+    $(document).on('change', 'select[name^="variations\\[attribute_"]', function() {
+        var $currentSelect = $(this);
+        var productId = $currentSelect.closest('tr').find("input[name='product_id']").val();
+        var productPriceSpan = $currentSelect.closest('tr').find('.product_price');
+        var basePriceSpan = $currentSelect.closest('tr').find('.base_price');
 
-        if (selectedOption && productId) {
+        // Get all select boxes in the current row
+        var $selects = $currentSelect.closest('tr').find('select[name^="variations\\[attribute_"]');
+
+        // Initialize variables
+        var selectedOption = null;
+        var attributeName = null;
+
+        // Loop through each select box to find the first valid selection
+        $selects.each(function() {
+            var $select = $(this);
+            var value = $select.val();
+
+            // Check if this select has a value
+            if (value) {
+                selectedOption = value; // Store the first valid selection
+                attributeName = $select.data('attribute'); // Store the attribute name
+                return false; // Break the loop after finding the first valid selection
+            }
+        });
+
+        // If no valid selections were found, hide the price display and show base price
+        if (!selectedOption) {
+            productPriceSpan.hide();
+            basePriceSpan.show();
+            return; // Exit early
+        }
+
+        // If a valid selection was found, make the AJAX request
+        if (productId) {
             $.ajax({
                 url: "<?php echo base_url('/get_price'); ?>",
                 type: "POST",
                 data: {
                     product_id: productId,
-                    variation: selectedOption
+                    variation: selectedOption,
+                    attribute: attributeName // Send the attribute name for the valid selection
                 },
                 success: function(response) {
-                    // Update the price on success and add currency symbol
                     var currencySymbol = '£'; // Change this to your desired currency symbol
-                    $('.product_price').html(currencySymbol + response);
+                    if (response && response !== "No matching variation found") {
+                        productPriceSpan.html(currencySymbol + response).show();
+                        basePriceSpan.hide();
+                    } 
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     console.log("Error fetching price: " + textStatus, errorThrown);

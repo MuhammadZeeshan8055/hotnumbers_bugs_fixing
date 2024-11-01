@@ -48,6 +48,14 @@ if(!empty($product_row['id'])) {
                         </div>
                     </div>
                 </div>
+                <div style="display: inline-block">
+                    <div class="flex-start mb-16" >
+                        <div class="input_field checkbox">
+                            <input type="checkbox" class="used_for_variation" name="attributes[0][first_value_default]" onchange="first_value_default(this)" value="1">
+                            <label>Set first value as default</label>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -328,6 +336,16 @@ if(!empty($product_row['id'])) {
 </style>
 
 <script>
+
+    let attributeIndex = 0;
+    
+    function addAttribute() {
+        const template = document.getElementById('attribute-template').innerHTML;
+        const newAttribute = template.replace(/__index__/g, attributeIndex++);
+        document.getElementById('attribute_list').insertAdjacentHTML('beforeend', newAttribute);
+    }
+
+
     function toggle_variation_expand(_this) {
         $(_this).closest('#variation_list').find('.variation-details').removeClass('variation-open');
         $('#varation-open-overlay').remove();
@@ -490,6 +508,7 @@ if(!empty($product_row['id'])) {
     }
 
 
+
     function removenewAttribute(_this) {
         let msgtext = 'Remove this attribute?';
         const row = $(_this).closest('.attribute-row');
@@ -544,4 +563,179 @@ if(!empty($product_row['id'])) {
         });
 
     }
+
+
+// working code for all as tested
+// function first_value_default(checkbox) {
+//     let globalIndex = 0; // Global index to track the position of options across all select boxes
+
+//     // Function to update select boxes based on the checkbox state
+//     const updateSelectBoxes = function(newSelect = null) {
+//         const sections = ['#variation_list', '#append_list']; // Section IDs to look for select boxes
+
+//         sections.forEach(function(sectionId) {
+//             // Select boxes to update
+//             const selects = newSelect 
+//                 ? [newSelect] 
+//                 : document.querySelectorAll(`${sectionId} .select2.select2-hidden-accessible[name^="variations"][name*="[keys]"]`);
+
+//             selects.forEach(function(select) {
+//                 // Check for the "Any" option
+//                 const firstOption = select.querySelector('option[value=""]');
+
+//                 if (checkbox.checked) {
+//                     // If checkbox is checked, remove "Any" option
+//                     if (firstOption) {
+//                         firstOption.remove();
+//                     }
+
+//                     // Get all options in the select box
+//                     const options = Array.from(select.options);
+
+//                     // Ensure globalIndex stays within bounds
+//                     if (globalIndex < options.length) {
+//                         select.selectedIndex = globalIndex; // Set to the current globalIndex
+//                         globalIndex++; // Increment index for next select box
+//                     } else {
+//                         select.selectedIndex = options.length - 1; // Select the last option if out of bounds
+//                     }
+//                 } else {
+//                     // If checkbox is unchecked, add "Any" option if it doesn't exist
+//                     if (!firstOption) {
+//                         const label = select.previousElementSibling ? select.previousElementSibling.innerText : "Option";
+//                         const newOption = document.createElement('option');
+//                         newOption.value = "";
+//                         newOption.text = "Any " + label;
+//                         select.insertBefore(newOption, select.firstChild);
+
+//                         // Select the "Any" option
+//                         select.selectedIndex = 0; // Set to the newly added "Any" option
+//                     }
+//                 }
+//             });
+//         });
+//     };
+
+//     // Initial update of select boxes
+//     updateSelectBoxes();
+
+//     // Observe the DOM for dynamically added content (e.g., appended sections)
+//     const observer = new MutationObserver(function(mutationsList) {
+//         mutationsList.forEach(function(mutation) {
+//             mutation.addedNodes.forEach(function(node) {
+//                 if (node.nodeType === 1) { // Ensure the added node is an element
+//                     // Find newly added select boxes with the relevant naming pattern
+//                     const newSelects = node.querySelectorAll(`.select2.select2-hidden-accessible[name^="variations"][name*="[keys]"]`);
+//                     newSelects.forEach(function(newSelect) {
+//                         // Update newly added select boxes
+//                         updateSelectBoxes(newSelect);
+//                     });
+//                 }
+//             });
+//         });
+//     });
+
+//     // Start observing the document body for changes
+//     observer.observe(document.body, {
+//         childList: true, // Listen for direct children added or removed
+//         subtree: true    // Listen for changes deeper in the DOM
+//     });
+
+//     // Add change event listeners to each select box for maintaining unique selections
+//     sections.forEach(function(sectionId) {
+//         const selects = document.querySelectorAll(`${sectionId} .select2.select2-hidden-accessible[name^="variations"][name*="[keys]"]`);
+//         selects.forEach(function(select) {
+//             select.addEventListener('change', function() {
+//                 const selectedValue = this.value;
+//                 console.log(`Selected value for ${this.name}: ${selectedValue}`); // Debugging log
+//             });
+//         });
+//     });
+// }
+
+
+// Set first value as default for all attributes
+function first_value_default(checkbox) {
+    const updateSelectBoxes = function(newSelect = null) {
+        const sections = ['#variation_list', '#append_list']; // Add more section IDs if needed
+
+        sections.forEach(function(sectionId) {
+            // Find all select boxes for attributes only, based on a specific naming convention
+            const selects = newSelect 
+                ? [newSelect] 
+                : document.querySelectorAll(`${sectionId} .select2.select2-hidden-accessible[name^="variations"][name*="[keys]["]`); // Updated selector
+
+            // Loop through each select box
+            selects.forEach(function(select) {
+                // Find the option with value="" (the "Any" option)
+                const firstOption = select.querySelector('option[value=""]');
+
+                if (checkbox.checked) {
+                    // If checked, remove the option with value=""
+                    if (firstOption) {
+                        firstOption.remove();
+                    }
+
+                    // If there are still options available, select the first remaining option
+                    if (select.options.length > 0) {
+                        select.selectedIndex = 0; // Select the first available option
+                    }
+                } else {
+                    // If unchecked, re-add the option with value="" if it's missing
+                    if (!firstOption) {
+                        const label = select.previousElementSibling ? select.previousElementSibling.innerText : "Option";
+                        const newOption = document.createElement('option');
+                        newOption.value = "";
+                        newOption.text = "Any " + label;
+                        select.insertBefore(newOption, select.firstChild);
+
+                        // Select the newly added "Any" option
+                        select.selectedIndex = 0; // Select the "Any" option
+                    }
+                }
+            });
+        });
+    };
+
+    // Update the select boxes based on the checkbox state
+    updateSelectBoxes();
+
+    // Observe the DOM for dynamically added content (e.g., appended sections)
+    const observer = new MutationObserver(function(mutationsList) {
+        mutationsList.forEach(function(mutation) {
+            mutation.addedNodes.forEach(function(node) {
+                if (node.nodeType === 1) { // Ensure the added node is an element
+                    // Check for newly added select boxes for attributes
+                    const newSelects = node.querySelectorAll(`.select2.select2-hidden-accessible[name^="variations"][name*="[keys]["]`); // Updated selector
+                    newSelects.forEach(function(newSelect) {
+                        // Call updateSelectBoxes for the newly added select boxes only
+                        updateSelectBoxes(newSelect);
+                    });
+                }
+            });
+        });
+    });
+
+    // Start observing the entire document or specific container for changes
+    observer.observe(document.body, {
+        childList: true, // Listen for direct children added or removed
+        subtree: true    // Also listen for changes deeper in the DOM
+    });
+
+    // Add change event listeners to each select box to maintain unique selections
+    const sections = ['#variation_list', '#append_list']; // Add more section IDs if needed
+    sections.forEach(function(sectionId) {
+        const selects = document.querySelectorAll(`${sectionId} .select2.select2-hidden-accessible[name^="variations"][name*="[keys]["]`); // Updated selector
+        selects.forEach(function(select) {
+            select.addEventListener('change', function() {
+                const selectedValue = this.value;
+                console.log(`Selected value for ${this.name}: ${selectedValue}`); // Optional: for debugging
+            });
+        });
+    });
+}
+
+
+
+
 </script>
