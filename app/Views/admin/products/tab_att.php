@@ -117,9 +117,10 @@ if(!empty($product_row['id'])) {
                                                                 <option value="">Any <?php echo $label ?></option>
                                                                 <?php
                                                                 foreach ($variations_arr[$id] as $variation) {
-                                                                    $selected = $key === $variation ? 'selected':'';
+                                                                    // Trim both $key and $variation to remove any trailing/leading spaces
+                                                                    $selected = (trim($key) === trim($variation)) ? 'selected' : '';
                                                                     ?>
-                                                                    <option <?php echo $selected ?> value="<?php echo $variation ?>"><?php echo $variation ?></option>
+                                                                    <option <?php echo $selected ?> value="<?php echo trim($variation) ?>"><?php echo trim($variation) ?></option>
                                                                     <?php
                                                                 }
                                                                 ?>

@@ -309,7 +309,7 @@
                         }
 
                         /* cart trollery style  */
-                        .icon-wrapper {
+                        /* .icon-wrapper {
                             display: inline-flex;
                             align-items: center;
                             padding: 10px;
@@ -318,7 +318,7 @@
                             transition: background-color 0.3s ease;
                             cursor: pointer;
                             background: var(--red);
-                        }
+                        } */
 
 
                         .icon-wrapper svg path {
@@ -543,43 +543,50 @@
                                                                     <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
                                                                     <?php 
 
-                                                                        // if($product['type'] ==  "variable"){
+                                                                        if($product['type'] ==  "variable"){
                                                                                                                                             
-                                                                        //     $product_id=$product['id'];
-                                                                        //     $check = check_manage_stock_for_variations($product_id);
+                                                                            $product_id=$product['id'];
+                                                                            $check = check_manage_stock_for_variations($product_id);
 
-                                                                        //     // Decode the JSON string
-                                                                        //     $checkvariations = json_decode($check['variation'], true);
+                                                                            // Decode the JSON string
+                                                                            $checkvariations = json_decode($check['variation'], true);
                                                                             
-                                                                        //     if (is_array($checkvariations)) {
-                                                                        //         $manage_stock = 'no'; // Initialize default value
-                                                                        //         $stock_status = 'Out of Stock'; // Default stock status
+                                                                            if (is_array($checkvariations)) {
+                                                                                $manage_stock = 'no'; // Initialize default value
+                                                                                $stock_status = 'Out of Stock'; // Default stock status
 
-                                                                        //         foreach ($checkvariations as $variation) {
-                                                                        //             if ($variation['values']['manage_stock'] == 'yes') {
-                                                                        //                 $manage_stock = 'yes';
-                                                                        //             }
+                                                                                foreach ($checkvariations as $variation) {
+                                                                                    if ($variation['values']['manage_stock'] == 'yes') {
+                                                                                        $manage_stock = 'yes';
+                                                                                    }
                                                                                     
-                                                                        //             if ($variation['values']['stock_status'] == 'instock') {
-                                                                        //                 $stock_status_class = 'stock stock_available';
-                                                                        //                 $stock_status = 'In Stock';
-                                                                        //                 break; // Exit the loop if 'In Stock' is found
-                                                                        //             }
-                                                                        //         }
-                                                                        //     }
-                                                                        // }
+                                                                                    if ($variation['values']['stock_status'] == 'instock') {
+                                                                                        $stock_status_class = 'stock stock_available';
+                                                                                        $stock_status = 'In Stock';
+                                                                                        break; // Exit the loop if 'In Stock' is found
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        }
 
-                                                                        // if($product['type'] ==  "variable" && $product['stock_managed']=='no' && $manage_stock=='no' && $product['stock_status']=='outofstock'){
+                                                                        if($product['type'] ==  "variable" && $product['stock_managed']=='no' && $manage_stock=='no' && $product['stock_status']=='outofstock'){
+                                                                            ?>
 
+                                                                            <div class="icon-wrapper" style="background:gray">
+                                                                                <button type="submit" class="greyed_button single_add_to_cart_button" style="background:gray" disabled>Add</button>
+                                                                                <div class="tooltip">Out Of Stock</div>
+                                                                            </div>
 
-                                                                        if ($product['stock_status'] == 'outofstock') { 
+                                                                        <?php
+                                                                        }
+                                                                        elseif ($product['stock_status'] == 'outofstock') { 
                                                                                                                                                
 
                                                                         ?>
-                                                                        <div class="icon-wrapper" style="background:gray">
-                                                                            <span>Add</span>
-                                                                            <div class="tooltip">Out Of Stock</div>
-                                                                        </div>
+                                                                            <div class="icon-wrapper" style="background:gray">
+                                                                                <button type="submit" class="greyed_button single_add_to_cart_button" style="background:gray" disabled>Add</button>
+                                                                                <div class="tooltip">Out Of Stock</div>
+                                                                            </div>
                                                                     <?php } else { ?>
                                                                         <button type="submit" class="single_add_to_cart_button">Add</button>
                                                                     <?php } ?>

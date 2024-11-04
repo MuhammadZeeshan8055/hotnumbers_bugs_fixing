@@ -13,9 +13,25 @@ class Subscription extends BaseController
 
         $data['ProductsModel'] = $ProductsModel;
 
+        // $data['coffee_product'] = $ProductsModel->product_by_id(SUBSCRIPTION_PRODUCT_ID);
+        // pr($data['coffee_product']);
+        
+        //$variations = $ProductsModel->get_attributes(SUBSCRIPTION_PRODUCT_ID);
+
+        // Assuming this is your `product_by_id` function output
         $data['coffee_product'] = $ProductsModel->product_by_id(SUBSCRIPTION_PRODUCT_ID);
 
-        //$variations = $ProductsModel->get_attributes(SUBSCRIPTION_PRODUCT_ID);
+        // Loop through attributes and trim spaces from each value
+        if (!empty($data['coffee_product']->attributes)) {
+            $attributes = json_decode($data['coffee_product']->attributes);
+            foreach ($attributes as $attribute) {
+                if (!empty($attribute->value)) {
+                    // Trim each option within the value array
+                    $attribute->value = array_map('trim', $attribute->value);
+                }
+            }
+            $data['coffee_product']->attributes = json_encode($attributes);
+        }
 
         return view('subscription/coffee_club_subscription', $data);
     }
