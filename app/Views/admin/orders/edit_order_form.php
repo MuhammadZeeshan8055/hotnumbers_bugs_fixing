@@ -25,7 +25,8 @@ if(!empty($order_data)) {
     $order_items = $order_data['order_items'];
 }
 function product_info_template($data=[], $productsModel=[]) {
-    $pid = 0;
+    // pr($data,false);
+    $pid = $data['item_meta']['product_id'];
     $selected_variations = [];
     $order_item_id = !empty($data['order_item_id']) ? $data['order_item_id'] : 0;
 
@@ -60,8 +61,19 @@ function product_info_template($data=[], $productsModel=[]) {
                 </div>
             </div>
         </td>
-        <td class="option_variation input_field" align="top">
-        </td>
+        <?php
+            $variation_check = $data['item_meta']['variation'];
+            if(!empty($variation_check)){
+                ?>
+                    
+                    <td class="option_variation input_field" align="top"></td>
+                
+                <?php
+            }else{
+                echo '<td></td>';
+            }
+        ?>
+        
         <td class="input_field" width="70" align="top"><?php echo currency_symbol ?><span class="option_cost" style="padding-left: 2px;">0</span></td>
         <td class="input_field" align="top"><span class="option_qty"></span></td>
         <td class="input_field" width="70" align="top"><?php echo currency_symbol ?><span class="option_total" style="padding-left: 2px;">0</span></td>

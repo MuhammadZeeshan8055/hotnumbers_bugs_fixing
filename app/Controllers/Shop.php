@@ -114,7 +114,7 @@ class Shop extends BaseController
             if (!empty($cat)) {
                 if ($this->productModel->role_category_permission($cat->id)) {
                     // Fetch category products
-                    $active_cat_products = $this->productModel->products_by_category($cat->id, 'AND p.status="publish"', 'p.title, p.ID, p.type, p.attributes, p.stock_managed, p.stock, p.sold_individually, p.slug, p.img, p.title, p.price', 0, 1);
+                    $active_cat_products = $this->productModel->products_by_category($cat->id, 'AND p.status="publish"', 'p.title, p.ID, p.type, p.attributes, p.stock_managed, p.stock, p.sold_individually, p.slug, p.img, p.title, p.price,p.subscription', 0, 1);
 
                     if (!empty($active_cat_products)) {
                         // Category Image
@@ -168,7 +168,8 @@ class Shop extends BaseController
                                     'image' => $product_image_src,
                                     'url' => 'shop/product/' . $product['slug'],
                                     'price' => $product['price'],
-                                    'stock_status'=> $product['stock_status']
+                                    'stock_status'=> $product['stock_status'],
+                                    'subscription'=> $product['subscription']
                                 ];
                             }
                         }

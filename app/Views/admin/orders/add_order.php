@@ -60,7 +60,7 @@
                         'edit_mode' => 1
                     ];
                     $order_items = $order_data['order_items'];
-                    $form_action = admin_url().'orders/edit/'._order_number($order_data['order_id']);
+                    $form_action = admin_url().'orders/edit/'.$order_data['order_id'];
                 }else {
                     $form_action = admin_url().'orders/add';
                 }

@@ -445,48 +445,102 @@ class ProductsModel extends Model {
         }
     }
 
-    public function product_variation($product_id=0,$where=[],$filter_price=1) {
+    // public function product_variation($product_id=0,$where=[],$filter_price=1) {
 
+    //     $sql = "SELECT id,variation FROM tbl_product_variations WHERE product_id='$product_id' ";
+    //     //$product = $this->product_by_id($product_id,'price','any');
+    //     $row = $this->db->query($sql)->getRow();
+
+    //     if(!empty($row)) {
+    //         $values = [];
+    //         if(!empty($where)) {
+    //             if(!empty($where['sizes'])) {
+    //                 $where['sizes'] = implode(', ',$where['sizes']); //temp fix
+    //             }
+    //             $variations = json_decode($row->variation, true);
+
+    //             foreach($variations as $variation) {
+    //                 if(!empty($variation['keys'])) {
+    //                     if($filter_price && !strlen(trim($variation['values']['regular_price']))) {
+    //                         continue;
+    //                     }
+    //                     $var_keys = $variation['keys'];
+    //                     $var_keys = array_filter($var_keys);
+
+    //                     foreach(array_keys($variation['keys']) as $k) {
+    //                         $v = $variation['keys'][$k];
+    //                         if(empty($v)) {
+    //                             $var_keys[$k] = $where[$k];     //Dummy fill to match Any Key
+    //                         }
+    //                     }
+
+    //                     if($var_keys == $where) {
+    //                         $values = $variation;
+    //                     }
+    //                 }
+    //             }
+    //         }
+
+
+    //         if(!empty($values)) {
+    //             $values['id'] = $row->id;
+    //         }
+    //     }
+
+    //     return $values;
+    // }
+    
+     public function product_variation($product_id=0, $where=[], $filter_price=1) {
         $sql = "SELECT id,variation FROM tbl_product_variations WHERE product_id='$product_id' ";
-        //$product = $this->product_by_id($product_id,'price','any');
         $row = $this->db->query($sql)->getRow();
-
-        if(!empty($row)) {
+    
+        if (!empty($row)) {
             $values = [];
-            if(!empty($where)) {
-                if(!empty($where['sizes'])) {
-                    $where['sizes'] = implode(', ',$where['sizes']); //temp fix
+            if (!empty($where)) {
+                if (!empty($where['sizes'])) {
+                    $where['sizes'] = implode(', ', $where['sizes']); // temp fix
                 }
+    
                 $variations = json_decode($row->variation, true);
-
-                foreach($variations as $variation) {
-                    if(!empty($variation['keys'])) {
-                        if($filter_price && !strlen(trim($variation['values']['regular_price']))) {
+    
+                // Check if JSON decoding was successful
+                if ($variations === null) {
+                    return []; // Handle error
+                }
+    
+                foreach ($variations as $variation) {
+                    if (!empty($variation['keys'])) {
+                        if ($filter_price && !strlen(trim($variation['values']['regular_price']))) {
                             continue;
                         }
+    
                         $var_keys = $variation['keys'];
                         $var_keys = array_filter($var_keys);
-
-                        foreach(array_keys($variation['keys']) as $k) {
+    
+                        foreach (array_keys($variation['keys']) as $k) {
                             $v = $variation['keys'][$k];
-                            if(empty($v)) {
-                                $var_keys[$k] = $where[$k];     //Dummy fill to match Any Key
+    
+                            // Ensure $where[$k] exists before replacing empty values
+                            if (empty($v) && isset($where[$k])) {
+                                $var_keys[$k] = $where[$k]; // Dummy fill to match Any Key
                             }
                         }
-
-                        if($var_keys == $where) {
+    
+                        
+                        // Compare var_keys and where
+                        if (array_values($var_keys) == array_values($where)) {
                             $values = $variation;
+                            break; // Exit loop once a match is found
                         }
                     }
                 }
             }
-
-
-            if(!empty($values)) {
+    
+            if (!empty($values)) {
                 $values['id'] = $row->id;
             }
         }
-
+    
         return $values;
     }
 

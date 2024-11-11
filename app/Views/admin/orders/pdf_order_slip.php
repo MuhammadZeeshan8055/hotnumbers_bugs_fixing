@@ -257,8 +257,8 @@
                         
                                             $count++;
                         
-                                            // Add a page break after every 12 records
-                                            if ($count % 12 == 0) {
+                                            // Add a page break after every 7 records
+                                            if ($count % 7 == 0) {
                                                 echo '<div class="page_break"></div>'; // Page break after every 10 items
                                             }
                                         }

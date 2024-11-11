@@ -429,6 +429,21 @@
                         .swal2-popup.swal2-toast.animated.fadeInDown.single_add_to_cart.error {
                             width: 250px !important;
                         }
+
+                        .subscription_checkbox {
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            gap: 10px;
+                        }
+                        input[type="number"] {
+                            margin-bottom: 0px !important;
+                            padding: 7px !important;
+                            border: 1px solid;
+                            margin: 0em 0 !important;
+                            font-size: .9em;
+    
+                        }
                         /* Responsive adjustments */
                         @media (max-width: 768px) {
                             table.custom-table {
@@ -592,10 +607,12 @@
                                                                     <?php } ?>
                                                                 </form>
                                                             </td>
+                                                            
                                                             <td style="text-align:center">
                                                                 <!-- Quantity field inside the form, linked with the same form ID -->
                                                                 <input type="number" name="quantity" value="1" min="1" style="width: 60px;" form="form_<?php echo $product['id']; ?>">
                                                             </td>
+                                                           
                                                         </tr>
                                                     <?php }
                                                 } ?>
@@ -837,5 +854,20 @@ function showCategory(categoryId) {
             link.classList.remove('active');
         });
         element.classList.add('active');
+    }
+</script>
+
+<script>
+    function subscription_switch(productId) {
+        var selectBox = document.getElementById('select_' + productId);
+        var delivered_every = document.getElementById('delivered_every_' + productId);
+        var checkbox = document.getElementById('checkbox_' + productId);
+        if (checkbox.checked) {
+            selectBox.style.display = 'block';
+            delivered_every.style.display = 'block';
+        } else {
+            selectBox.style.display = 'none';
+            delivered_every.style.display = 'none';
+        }
     }
 </script>

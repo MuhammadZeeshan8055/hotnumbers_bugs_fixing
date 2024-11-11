@@ -406,8 +406,9 @@
                         </div>
                         <div class="media-caption">
                             <div class="left">
-                                <!-- <h3></span> <span class="name"><?php echo $media_file->name ?></span></h3> -->
-                                <!-- <div class="text-center media-size"><?php echo filesize_text($media_file->size) ?></div> -->
+                                <h3><span class="name"><?php echo $media_file->name ?></span></h3>
+                                <!-- <div 
+                                 le->size) ?></div> -->
                             </div>
                             <div class="right">
                                 <!-- <h3>ID:&nbsp;<span><?php echo $media_id ?></span></h3> -->

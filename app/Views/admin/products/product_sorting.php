@@ -90,7 +90,7 @@
                 });
                 form.set('data',JSON.stringify(order_data));
 
-                fetch('<?php echo admin_url() ?>product-sortorder',{
+                fetch('<?php echo admin_url() ?>product-sort-order',{
                     method: "POST",
                     body: form,
                 }).then(res=>res.json()).then((res)=>{

@@ -231,8 +231,7 @@ $routes->group('admin', ['filter' => 'AdminFilter'], static function ($routes) {
 
     // for product sorting
     $routes->get('product-sorting', 'Admin/Products::product_sorting');
-    $routes->post('product-sortorder', 'Admin/Products::product_sortorder_update');
-
+    $routes->post('product-sort-order', 'Admin/Products::product_sortorder_update');
 
 
     //wholesale orders
