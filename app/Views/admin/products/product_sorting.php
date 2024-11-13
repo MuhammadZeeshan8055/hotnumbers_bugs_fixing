@@ -52,7 +52,9 @@
                     $link = $matches[0] ?? null; // Get the first match or null if no match
                   
                     $prod_images=get_product_images_by_id($link);
-                            
+
+                    $edit_url = site_url().ADMIN.'/products/add/'.$cate->product_id;
+                    
                     if($status['status']=='publish'){
                     ?>
                     <tr class="table_row_<?php echo $cate->product_id ?>" data-id="<?php echo $cate->product_id ?>" data-cid="<?php echo $cate->category_id?>">
@@ -62,7 +64,7 @@
                         </td>
 
                         <td width="100"><?php echo $cat_img ?><img class="thumb" src="<?php echo base_url( '/assets/images/site-images/'.$prod_images['path'].'') ?>"></td>
-                        <td> <?php echo $status['title'] ?></td>
+                        <td><a href="<?php echo $edit_url; ?>"><?php echo $status['title']; ?></a></td>
                         
                        
                     </tr>
