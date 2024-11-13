@@ -450,10 +450,22 @@ if(!empty($order)) {
 
                      if(!empty($order_meta['order_comments'])) {
                          ?>
-                         <tr>
-                             <th style="text-align: left">Order note:</th>
-                             <td style="text-align: right; line-height: 1.8"><p><?php echo $order_meta['order_comments'] ?></p></td>
-                         </tr>
+                            <tr>
+                                <?php
+                                $url = current_url();
+
+                                if (strpos($url, 'orders/view/') === false) { 
+                                    // Show this content only if 'orders/view/' is NOT in the URL
+                                ?>
+                                    <th style="text-align: left">Order note:</th>
+                                    <td style="text-align: right; line-height: 1.8">
+                                        <p><?php echo $order_meta['order_comments']; ?></p>
+                                    </td>
+                                <?php
+                                }
+                                ?>
+                            </tr>
+
                              <?php
                      }
                     ?>

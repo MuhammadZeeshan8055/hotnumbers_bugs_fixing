@@ -62,8 +62,8 @@
         <div class="row">
             <div class="col-md-9">
                 <?php echo view('admin/orders/order_info_box',['order'=>$order]) ?>
-
                 <div id="products" class="table-box">
+                    <label>Order Notes : <?=$order_meta['order_comments']?></label>
                     <label>Product details
                     </label>
                     <br>
