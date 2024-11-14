@@ -319,6 +319,7 @@ function order_statuses() {
         'completed' => 'Completed',
         'processing' => 'Processing',
         'pending' => 'Pending Payment',
+        'active' => 'active',
         'on-hold' => 'On Hold',
         //'ready_to_ship' => 'Ready to ship',
         'cancelled' => 'Cancelled',
@@ -326,6 +327,7 @@ function order_statuses() {
         'failed' => 'Failed',
         'trashed' => 'Bin',
         'renew-failed' => 'Renew failed'
+       
     ];
 }
 

@@ -7,7 +7,7 @@ $processing_order_count = $get_count['total'];
 
 //subscription orders count
 
-$get_subscription_count = $masterModel->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE order_type='shop_subscription'",true,true);
+$get_subscription_count = $masterModel->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE order_type='shop_subscription' and status='processing'",true,true);
 $subscription_order_count = $get_subscription_count['total'];
 
 // retail customers count 
@@ -16,7 +16,7 @@ $get_retail_count = $masterModel->query("SELECT COUNT(o.order_id) AS total
 FROM tbl_orders o 
 INNER JOIN tbl_users u ON o.customer_user = u.user_id 
 INNER JOIN tbl_user_roles r ON u.role = r.id 
-WHERE r.id = 2", true, true);
+WHERE r.id = 2 and o.status='processing'", true, true);
 
 $retail_order_count = $get_retail_count['total'];
 
@@ -27,7 +27,7 @@ $get_wholesale_count = $masterModel->query("SELECT COUNT(o.order_id) AS total
 FROM tbl_orders o 
 INNER JOIN tbl_users u ON o.customer_user = u.user_id 
 INNER JOIN tbl_user_roles r ON u.role = r.id 
-WHERE r.id = 4", true, true);
+WHERE r.id = 4 and o.status='processing'", true, true);
 
 $wholesale_order_count = $get_wholesale_count['total'];
 
@@ -38,7 +38,7 @@ $get_internal_count = $masterModel->query("SELECT COUNT(o.order_id) AS total
 FROM tbl_orders o 
 INNER JOIN tbl_users u ON o.customer_user = u.user_id 
 INNER JOIN tbl_user_roles r ON u.role = r.id 
-WHERE r.id = 9", true, true);
+WHERE r.id = 9 and o.status='processing'", true, true);
 
 $internal_order_count = $get_internal_count['total'];
 
@@ -115,19 +115,19 @@ if(is_logged_in()) {
                          <ul class="sub-menu">
                             <li>
                                <a class="<?php echo ($page == 'retail_orders') ? 'active' : '' ?>"
-                                   href="<?php echo base_url(ADMIN); ?>/retail-orders?sort-cols=10&sort-orders=desc&page=25">Retail <?php if(!empty($retail_order_count)) { ?><div class="number-count"><?php echo $retail_order_count ?></div> <?php } ?></a>
+                                   href="<?php echo base_url(ADMIN); ?>/retail-orders?status=processing&sort-cols=10&sort-orders=desc&page=25">Retail <?php if(!empty($retail_order_count)) { ?><div class="number-count"><?php echo $retail_order_count ?></div> <?php } ?></a>
                             </li>
                             <li>
                                <a class="<?php echo ($page == 'subscriptions_orders') ? 'active' : '' ?>"
-                                   href="<?php echo base_url(ADMIN); ?>/subscriptions-orders?sort-cols=10&sort-orders=desc&page=25">Subscriptions <?php if(!empty($subscription_order_count)) { ?><div class="number-count"><?php echo $subscription_order_count ?></div> <?php } ?></a>
+                                   href="<?php echo base_url(ADMIN); ?>/subscriptions-orders?status=processing&sort-cols=10&sort-orders=desc&page=25">Subscriptions <?php if(!empty($subscription_order_count)) { ?><div class="number-count"><?php echo $subscription_order_count ?></div> <?php } ?></a>
                             </li>
                             <li>
                                <a class="<?php echo ($page == 'whole_sale_orders') ? 'active' : '' ?>"
-                                   href="<?php echo base_url(ADMIN); ?>/whole-sale-orders?sort-cols=10&sort-orders=desc&page=25">Wholesale <?php if(!empty($wholesale_order_count)) { ?><div class="number-count"><?php echo $wholesale_order_count ?></div> <?php } ?></a>
+                                   href="<?php echo base_url(ADMIN); ?>/whole-sale-orders?status=processing&sort-cols=10&sort-orders=desc&page=25">Wholesale <?php if(!empty($wholesale_order_count)) { ?><div class="number-count"><?php echo $wholesale_order_count ?></div> <?php } ?></a>
                             </li>
                             <li>
                                <a class="<?php echo ($page == 'internal_orders') ? 'active' : '' ?>"
-                                   href="<?php echo base_url(ADMIN); ?>/internal-orders?sort-cols=10&sort-orders=desc&page=25">Internal <?php if(!empty($internal_order_count)) { ?><div class="number-count"><?php echo $internal_order_count ?></div> <?php } ?></a>
+                                   href="<?php echo base_url(ADMIN); ?>/internal-orders?status=processing&sort-cols=10&sort-orders=desc&page=25">Internal <?php if(!empty($internal_order_count)) { ?><div class="number-count"><?php echo $internal_order_count ?></div> <?php } ?></a>
                             </li>
                         </ul>
                     </li>

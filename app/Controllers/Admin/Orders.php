@@ -489,31 +489,31 @@ class Orders extends MyController
 
         $order_counts = [];
 
-        $get_count = $this->master->query('SELECT COUNT(order_id) AS total FROM tbl_orders',true,true);
+        $get_count = $this->master->query("SELECT COUNT(o.order_id) AS total FROM tbl_orders o INNER JOIN tbl_users u ON o.customer_user = u.user_id INNER JOIN tbl_user_roles r ON u.role = r.id WHERE r.id = 4",true,true);
         $order_counts['all'] = $get_count['total'];
 
-        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='completed'",true,true);
+        $get_count = $this->master->query("SELECT COUNT(o.order_id) AS total FROM tbl_orders o INNER JOIN tbl_users u ON o.customer_user = u.user_id INNER JOIN tbl_user_roles r ON u.role = r.id WHERE r.id = 4 and o.status='completed'",true,true);
         $order_counts['completed'] = $get_count['total'];
 
-        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='processing'",true,true);
+        $get_count = $this->master->query("SELECT COUNT(o.order_id) AS total FROM tbl_orders o INNER JOIN tbl_users u ON o.customer_user = u.user_id INNER JOIN tbl_user_roles r ON u.role = r.id WHERE r.id = 4 and o.status='processing'",true,true);
         $order_counts['processing'] = $get_count['total'];
 
-        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='pending'",true,true);
+        $get_count = $this->master->query("SELECT COUNT(o.order_id) AS total FROM tbl_orders o INNER JOIN tbl_users u ON o.customer_user = u.user_id INNER JOIN tbl_user_roles r ON u.role = r.id WHERE r.id = 4 and o.status='pending'",true,true);
         $order_counts['pending'] = $get_count['total'];
 
-        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='ready_to_ship'",true,true);
+        $get_count = $this->master->query("SELECT COUNT(o.order_id) AS total FROM tbl_orders o INNER JOIN tbl_users u ON o.customer_user = u.user_id INNER JOIN tbl_user_roles r ON u.role = r.id WHERE r.id = 4 and o.status='ready_to_ship'",true,true);
         $order_counts['ready_to_ship'] = $get_count['total'];
 
-        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='cancelled'",true,true);
+        $get_count = $this->master->query("SELECT COUNT(o.order_id) AS total FROM tbl_orders o INNER JOIN tbl_users u ON o.customer_user = u.user_id INNER JOIN tbl_user_roles r ON u.role = r.id WHERE r.id = 4 and o.status='cancelled'",true,true);
         $order_counts['cancelled'] = $get_count['total'];
 
-        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='refund'",true,true);
+        $get_count = $this->master->query("SELECT COUNT(o.order_id) AS total FROM tbl_orders o INNER JOIN tbl_users u ON o.customer_user = u.user_id INNER JOIN tbl_user_roles r ON u.role = r.id WHERE r.id = 4 and o.status='refund'",true,true);
         $order_counts['refund'] = $get_count['total'];
 
-        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='failed'",true,true);
+        $get_count = $this->master->query("SELECT COUNT(o.order_id) AS total FROM tbl_orders o INNER JOIN tbl_users u ON o.customer_user = u.user_id INNER JOIN tbl_user_roles r ON u.role = r.id WHERE r.id = 4 and o.status='failed'",true,true);
         $order_counts['failed'] = $get_count['total'];
 
-        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='trashed'",true,true);
+        $get_count = $this->master->query("SELECT COUNT(o.order_id) AS total FROM tbl_orders o INNER JOIN tbl_users u ON o.customer_user = u.user_id INNER JOIN tbl_user_roles r ON u.role = r.id WHERE r.id = 4 and o.status='trashed'",true,true);
         $order_counts['trashed'] = $get_count['total'];
 
         $this->data['status'] = $this->request->getGet('status');
@@ -745,31 +745,35 @@ class Orders extends MyController
 
         $order_counts = [];
 
-        $get_count = $this->master->query('SELECT COUNT(order_id) AS total FROM tbl_orders',true,true);
+        $get_count = $this->master->query("SELECT COUNT(o.order_id) AS total FROM tbl_orders o INNER JOIN tbl_users u ON o.customer_user = u.user_id INNER JOIN tbl_user_roles r ON u.role = r.id WHERE r.id = 9",true,true);
         $order_counts['all'] = $get_count['total'];
 
-        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='completed'",true,true);
+        // $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='completed'",true,true);
+        $get_count = $this->master->query("SELECT COUNT(o.order_id) AS total FROM tbl_orders o INNER JOIN tbl_users u ON o.customer_user = u.user_id INNER JOIN tbl_user_roles r ON u.role = r.id WHERE r.id = 9 and o.status='completed'",true,true);
         $order_counts['completed'] = $get_count['total'];
 
-        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='processing'",true,true);
+        $get_count = $this->master->query("SELECT COUNT(o.order_id) AS total FROM tbl_orders o INNER JOIN tbl_users u ON o.customer_user = u.user_id INNER JOIN tbl_user_roles r ON u.role = r.id WHERE r.id = 9 and o.status='processing'",true,true);
         $order_counts['processing'] = $get_count['total'];
 
-        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='pending'",true,true);
+        $get_count = $this->master->query("SELECT COUNT(o.order_id) AS total FROM tbl_orders o INNER JOIN tbl_users u ON o.customer_user = u.user_id INNER JOIN tbl_user_roles r ON u.role = r.id WHERE r.id = 9 and o.status='on-hold'",true,true);
+        $order_counts['on-hold'] = $get_count['total'];
+
+        $get_count = $this->master->query("SELECT COUNT(o.order_id) AS total FROM tbl_orders o INNER JOIN tbl_users u ON o.customer_user = u.user_id INNER JOIN tbl_user_roles r ON u.role = r.id WHERE r.id = 9 and o.status='pending'",true,true);
         $order_counts['pending'] = $get_count['total'];
 
-        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='ready_to_ship'",true,true);
+        $get_count = $this->master->query("SELECT COUNT(o.order_id) AS total FROM tbl_orders o INNER JOIN tbl_users u ON o.customer_user = u.user_id INNER JOIN tbl_user_roles r ON u.role = r.id WHERE r.id = 9 and o.status='ready_to_ship'",true,true);
         $order_counts['ready_to_ship'] = $get_count['total'];
 
-        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='cancelled'",true,true);
+        $get_count = $this->master->query("SELECT COUNT(o.order_id) AS total FROM tbl_orders o INNER JOIN tbl_users u ON o.customer_user = u.user_id INNER JOIN tbl_user_roles r ON u.role = r.id WHERE r.id = 9 and o.status='cancelled'",true,true);
         $order_counts['cancelled'] = $get_count['total'];
 
-        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='refund'",true,true);
+        $get_count = $this->master->query("SELECT COUNT(o.order_id) AS total FROM tbl_orders o INNER JOIN tbl_users u ON o.customer_user = u.user_id INNER JOIN tbl_user_roles r ON u.role = r.id WHERE r.id = 9 and o.status='refund'",true,true);
         $order_counts['refund'] = $get_count['total'];
 
-        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='failed'",true,true);
+        $get_count = $this->master->query("SELECT COUNT(o.order_id) AS total FROM tbl_orders o INNER JOIN tbl_users u ON o.customer_user = u.user_id INNER JOIN tbl_user_roles r ON u.role = r.id WHERE r.id = 9 and o.status='failed'",true,true);
         $order_counts['failed'] = $get_count['total'];
 
-        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='trashed'",true,true);
+        $get_count = $this->master->query("SELECT COUNT(o.order_id) AS total FROM tbl_orders o INNER JOIN tbl_users u ON o.customer_user = u.user_id INNER JOIN tbl_user_roles r ON u.role = r.id WHERE r.id = 9 and o.status='trashed'",true,true);
         $order_counts['trashed'] = $get_count['total'];
 
         $this->data['status'] = $this->request->getGet('status');
@@ -1000,32 +1004,35 @@ class Orders extends MyController
         }
 
         $order_counts = [];
-
-        $get_count = $this->master->query('SELECT COUNT(order_id) AS total FROM tbl_orders',true,true);
+        // SELECT COUNT(o.order_id) AS total FROM tbl_orders o INNER JOIN tbl_users u ON o.customer_user = u.user_id INNER JOIN tbl_user_roles r ON u.role = r.id WHERE r.id = 2 and o.status='completed'
+        $get_count = $this->master->query("SELECT COUNT(o.order_id) AS total FROM tbl_orders o INNER JOIN tbl_users u ON o.customer_user = u.user_id INNER JOIN tbl_user_roles r ON u.role = r.id WHERE r.id = 2",true,true);
         $order_counts['all'] = $get_count['total'];
 
-        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='completed'",true,true);
+        $get_count = $this->master->query("SELECT COUNT(o.order_id) AS total FROM tbl_orders o INNER JOIN tbl_users u ON o.customer_user = u.user_id INNER JOIN tbl_user_roles r ON u.role = r.id WHERE r.id = 2 and o.status='completed'",true,true);
         $order_counts['completed'] = $get_count['total'];
 
-        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='processing'",true,true);
+        $get_count = $this->master->query("SELECT COUNT(o.order_id) AS total FROM tbl_orders o INNER JOIN tbl_users u ON o.customer_user = u.user_id INNER JOIN tbl_user_roles r ON u.role = r.id WHERE r.id = 2 and o.status='processing'",true,true);
         $order_counts['processing'] = $get_count['total'];
 
-        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='pending'",true,true);
+        $get_count = $this->master->query("SELECT COUNT(o.order_id) AS total FROM tbl_orders o INNER JOIN tbl_users u ON o.customer_user = u.user_id INNER JOIN tbl_user_roles r ON u.role = r.id WHERE r.id = 2 and o.status='pending'",true,true);
         $order_counts['pending'] = $get_count['total'];
 
-        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='ready_to_ship'",true,true);
+        $get_count = $this->master->query("SELECT COUNT(o.order_id) AS total FROM tbl_orders o INNER JOIN tbl_users u ON o.customer_user = u.user_id INNER JOIN tbl_user_roles r ON u.role = r.id WHERE r.id = 2 and o.status='on-hold'",true,true);
+        $order_counts['on-hold'] = $get_count['total'];
+
+        $get_count = $this->master->query("SELECT COUNT(o.order_id) AS total FROM tbl_orders o INNER JOIN tbl_users u ON o.customer_user = u.user_id INNER JOIN tbl_user_roles r ON u.role = r.id WHERE r.id = 2 and o.status='ready_to_ship'",true,true);
         $order_counts['ready_to_ship'] = $get_count['total'];
 
-        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='cancelled'",true,true);
+        $get_count = $this->master->query("SELECT COUNT(o.order_id) AS total FROM tbl_orders o INNER JOIN tbl_users u ON o.customer_user = u.user_id INNER JOIN tbl_user_roles r ON u.role = r.id WHERE r.id = 2 and o.status='cancelled'",true,true);
         $order_counts['cancelled'] = $get_count['total'];
 
-        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='refund'",true,true);
+        $get_count = $this->master->query("SELECT COUNT(o.order_id) AS total FROM tbl_orders o INNER JOIN tbl_users u ON o.customer_user = u.user_id INNER JOIN tbl_user_roles r ON u.role = r.id WHERE r.id = 2 and o.status='refund'",true,true);
         $order_counts['refund'] = $get_count['total'];
 
-        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='failed'",true,true);
+        $get_count = $this->master->query("SELECT COUNT(o.order_id) AS total FROM tbl_orders o INNER JOIN tbl_users u ON o.customer_user = u.user_id INNER JOIN tbl_user_roles r ON u.role = r.id WHERE r.id = 2 and o.status='failed'",true,true);
         $order_counts['failed'] = $get_count['total'];
 
-        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='trashed'",true,true);
+        $get_count = $this->master->query("SELECT COUNT(o.order_id) AS total FROM tbl_orders o INNER JOIN tbl_users u ON o.customer_user = u.user_id INNER JOIN tbl_user_roles r ON u.role = r.id WHERE r.id = 2 and o.status='trashed'",true,true);
         $order_counts['trashed'] = $get_count['total'];
 
         $this->data['status'] = $this->request->getGet('status');
@@ -1257,31 +1264,37 @@ class Orders extends MyController
 
         $order_counts = [];
 
-        $get_count = $this->master->query('SELECT COUNT(order_id) AS total FROM tbl_orders',true,true);
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders where order_type='shop_subscription'",true,true);
         $order_counts['all'] = $get_count['total'];
 
-        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='completed'",true,true);
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE order_type='shop_subscription' and status='completed'",true,true);
         $order_counts['completed'] = $get_count['total'];
 
-        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='processing'",true,true);
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE order_type='shop_subscription' and status='processing'",true,true);
         $order_counts['processing'] = $get_count['total'];
 
-        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='pending'",true,true);
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE order_type='shop_subscription' and status='pending'",true,true);
         $order_counts['pending'] = $get_count['total'];
 
-        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='ready_to_ship'",true,true);
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE order_type='shop_subscription' and status='on-hold'",true,true);
+        $order_counts['on-hold'] = $get_count['total'];
+
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE order_type='shop_subscription' and status='active'",true,true);
+        $order_counts['active'] = $get_count['total'];
+
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE order_type='shop_subscription' and status='ready_to_ship'",true,true);
         $order_counts['ready_to_ship'] = $get_count['total'];
 
-        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='cancelled'",true,true);
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE order_type='shop_subscription' and status='cancelled'",true,true);
         $order_counts['cancelled'] = $get_count['total'];
 
-        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='refund'",true,true);
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE order_type='shop_subscription' and status='refund'",true,true);
         $order_counts['refund'] = $get_count['total'];
 
-        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='failed'",true,true);
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE order_type='shop_subscription' and status='failed'",true,true);
         $order_counts['failed'] = $get_count['total'];
 
-        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE status='trashed'",true,true);
+        $get_count = $this->master->query("SELECT COUNT(order_id) AS total FROM tbl_orders WHERE order_type='shop_subscription' and status='trashed'",true,true);
         $order_counts['trashed'] = $get_count['total'];
 
         $this->data['status'] = $this->request->getGet('status');

@@ -126,7 +126,7 @@
                             if(isset($_GET['sorted'])) {
                                 ?>
                                 &nbsp;
-                                <a href="<?php echo admin_url() ?>orders" class="btn-secondary btn btn-sm" style="margin-top: 7px;padding: 8px 15px 9px">Reset</a>
+                                <a href="<?php echo admin_url() ?>whole-sale-orders?status=processing" class="btn-secondary btn btn-sm" style="margin-top: 7px;padding: 8px 15px 9px">Reset</a>
                                 <?php
                             }
                             ?>
