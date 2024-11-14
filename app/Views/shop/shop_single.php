@@ -281,10 +281,25 @@
 
                                                                     <td style="width: 60%" class="value relative">
                                                                         <?php
+
                                                                             if(!empty($attribute['value'])) {
+
+                                                                                $checking=check_set_value_default_attributes(44152);	
+                                                                                $attributes = json_decode($checking['attributes'], true);
+                                                                                
+
+                                                                                // Find the label with "first_value_default": "1"
+                                                                                $labelWithDefault = null;
+                                                                            
+                                                                                if (isset($attribute['first_value_default']) && $attribute['first_value_default'] === '1') {
+                                                                                    $labelWithDefault = $attribute['label'];
+                                                                                }
+
                                                                                 ?>
                                                                                 <select class="form-control variation_select" name="variations[attribute_<?php echo $label_id ?>]" required data-error="Please select <?php echo $label ?>">
-                                                                                    <option selected value="">Select an option</option>
+                                                                                    <?php if ($label != $labelWithDefault) { ?>
+                                                                                        <option selected value="">Select an option</option>
+                                                                                    <?php } ?>
                                                                                     <?php
                                                                                     foreach($attribute['value'] as $i=>$variation) {
                                                                                         $var_id = strtolower($variation);

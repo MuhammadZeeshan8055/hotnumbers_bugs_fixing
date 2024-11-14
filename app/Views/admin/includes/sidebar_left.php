@@ -67,9 +67,9 @@ if(is_logged_in()) {
                     <li><a class="<?php echo ($page == 'dashboard') ? 'active' : '' ?>"
                            href="<?php echo base_url(ADMIN); ?>/dashboard"><i class="lni lni-dashboard"></i> Dashboard</a></li>
 
-                    <li>
+                    <!-- <li>
                         <a class=" <?php echo ($page == 'notifications') ? 'active' : '' ?>" href="<?php echo base_url(ADMIN); ?>/notifications"> <i class="lni lni-alarm"></i> Notifications <?php if(!empty($unread_notifications)) { ?><div class="number-count"><?php echo $unread_notifications ?></div> <?php } ?></a>
-                    </li>
+                    </li> -->
 
 
                     <li><hr></li>

@@ -80,6 +80,14 @@ function check_manage_stock_for_variations($pid){
     return $q;
 }
 
+//set first value default
+function check_set_value_default_attributes($pid){
+    $sql = "SELECT attributes FROM tbl_products WHERE id = '$pid'";
+    $master = model('MasterModel');
+    $q = $master->query($sql, true, true);
+    return $q;
+}
+
 function get_variable_product_stock($pid) {
         $sql = "SELECT SUM(stock) AS total_stock
         FROM (
