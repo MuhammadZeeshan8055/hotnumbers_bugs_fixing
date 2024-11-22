@@ -29,59 +29,6 @@
     }
    
     
-
-    /* modal  */
-    .modal {
-        color: black;
-        display: none; /* Hidden by default */
-        position: fixed; /* Stay in place */
-        z-index: 1000; /* Sit on top */
-        left: 0;
-        top: 0;
-        width: 100%; /* Full width */
-        height: 100%; /* Full height */
-        overflfdsaow: auto; /* Enable scroll if needed 
-        background-color: rgba(0, 0, 0, 0.7); /* Black w/ opacity */
-        padding-top: 60px; /* Padding at the top */
-    }
-
-    .modal-content {
-        background-color: #fefefe;
-        margin: auto; /* Center horizontally */
-        padding: 30px;
-        border: 1px solid #888;
-        width: 80%; /* Width of the modal */
-        max-width: 500px; /* Maximum width of the modal */
-        border-radius: 5px;
-        position: relative; /* Needed for absolute positioning of children */
-        top: 50%; /* Center vertically */
-        transform: translateY(-50%); /* Adjust for half the height of the modal */
-    }
-
-    .close {
-        color: #aaa;
-        font-size: 28px;
-        font-weight: bold;
-        margin-left: auto; /* Push close button to the right */
-        cursor: pointer; /* Change cursor to pointer */
-        padding: 0 0 10px 0; /* Add padding for better spacing */
-    }
-
-    .close:hover,
-    .close:focus {
-        color: black;
-        text-decoration: none;
-    }
-
-
-    
-  
-    /* .modal-image-wrapper {
-        height: 300px;
-        width: 458px;
-        overflow: hidden;
-    } */
-
     
     @media screen and (max-width: 1024px) {
         .category {
@@ -302,11 +249,6 @@
                             border-radius: 10%;
                         }
 
-                        /* Hover effect */
-                        .products-listing table tbody tr:hover {
-                            border:2px solid var(--red); 
-                            color: white; 
-                        }
 
                         /* cart trollery style  */
                         /* .icon-wrapper {
@@ -413,6 +355,7 @@
                             margin:18px 0 0 0;
                             gap: 10px;
                             align-items:center;
+                            flex-wrap: wrap;
                         }
                         html body .wrapper label{
                             padding:0px;
@@ -444,19 +387,127 @@
                             font-size: .9em;
     
                         }
-                        /* Responsive adjustments */
+                        /* Responsive table for mobile */
                         @media (max-width: 768px) {
+                            .products-listing table, 
+                            .products-listing thead, 
+                            .products-listing tbody, 
+                            .products-listing th, 
+                            .products-listing td, 
+                            .products-listing tr {
+                                display: block; /* Make everything block-level */
+                                width: 100%;
+                            }
+
+                            .products-listing table {
+                                border: 0; /* Remove outer border */
+                            }
+
+                            .products-listing tr {
+                                margin-bottom: 15px; /* Add space between rows */
+                                border-bottom: 1px solid #ccc; /* Separator for rows */
+                            }
+
+                            .products-listing td {
+                                display: flex; /* Use flex for inline layout */
+                                justify-content: space-between; /* Align label and value inline */
+                                padding: 10px;
+                                border: none;
+                            }
+
+                            .products-listing td::before {
+                                content: attr(data-label); /* Use the data-label attribute for the labels */
+                                font-weight: bold;
+                                flex-basis: 40%; /* Label takes up 40% of the width */
+                                text-align: left;
+                                color: #ccc; /* Optional: Label color */
+                            }
+
+                            .products-listing td input, 
+                            .products-listing td img {
+                                flex-basis: 60%; /* Value takes up 60% of the width */
+                                text-align: right; /* Align values to the right */
+                            }
+
+                            .products-listing th {
+                                display: none; /* Hide table headers */
+                            }
+
+                            .products-listing td {
+                                text-align: left; /* Ensure text aligns properly */
+                                border: none; /* Remove borders for individual cells */
+                            }
+                            
+                            .products-listing td input, .products-listing td img{
+                                flex-basis: 0%;
+                                text-align: left;
+                            }
+                            /* .products-listing td {
+                            
+                                justify-content: center;
+                            
+                            } */
+                            input[type="number"] {
+                                width: 46px !important;
+                            }
                             table.custom-table {
                                 font-size: 14px; /* Slightly smaller font size for mobile */
                             }
                         }
+                       
                         @media (max-width: 931px) {
+                            .category-container {
+                                gap: 10px;
+                                width: 100%;
+                            }
                             .products-listing {
-                                width: 130%;
+                                width: 100%;
                                 overflow-x: scroll;
                             }
                         }
+                        @media (max-width: 480px) {
+                            html body ul {
+                                margin-left: 0rem;
+                            }
+                            ul.category-links {
+                                width: 100%;
+                            }
+                            p.category-title {
+                                font-size: 18px;
+                            }
+                            .products-listing {
+                                width: 100%;
+                                overflow-x: scroll;
+                            }
+                            .products-listing table .product-list-image {
+                                height: 60px;
+                                width: 60px;
+                            }
+                            table {
+                                font-size: 18px;
+                            }
+                            label {
+                                font-size: 18px !important;
+                            }
+                            select {
+                                font-size: 18px ! IMPORTANT;
+                            }
+                            
+                            span.base_price {
+                                margin-left: 30%;
+                            }
+                            .select-box-alignment {
+                                align-items: flex-start;
+                                flex-direction: column;
+                            }
+                        }
+                        @media (max-width: 400px) {
+                            span.base_price {
+                                margin-left: 22%;
+                            }
+                        }
                         
+
                         </style>
                     <?php
                         }
@@ -498,21 +549,24 @@
                                                         $attributes = !empty($product['attributes']) && $product['type'] == "variable" ? json_decode($product['attributes'], true) : [];
                                                         ?>
                                                         <tr>
-                                                            <td>
+                                                            <td data-label="Image">
                                                                 <div>
                                                                     <a href="<?php echo site_url($product['url']); ?>">
                                                                         <img src="<?php echo $product['image']; ?>" class="product-list-image" alt="<?php echo htmlspecialchars($product['title']); ?>">
                                                                     </a>
                                                                 </div>
                                                             </td>
-                                                            <td>
+                                                            <td 
+                                                                <?= $product['type'] !== "variable" ? 'data-label="Title"' : '' ?> 
+                                                                style="<?= $product['type'] === "variable" ? 'display: flex; flex-direction: column;' : '' ?>"
+                                                            >
                                                                
-                                                                <a href="<?php echo site_url($product['url']); ?>">
+                                                                <a href="<?php echo site_url($product['url']); ?>" id="title">
                                                                     <span><?php echo $product['title']; ?></span>
                                                                 </a>
-                                                                <br/>
+                                                                
                                                                     <!-- Product attributes (for variable products) -->
-                                                                <div class="select-box-alignment">
+                                                                <div class="select-box-alignment" style="<?= $product['type'] === "variable" ? '' : 'display: none' ?>">
                                                                     <?php if (!empty($attributes) && $product['type'] == "variable") { ?>
                                                                     <?php foreach ($attributes as $attribute) {
                                                                         if (!empty($attribute['attribute_variation'])) {
@@ -521,7 +575,18 @@
                                                                             ?>
                                                                             <label for="attribute_<?php echo $label_id; ?>"><?php echo $label; ?></label>
                                                                             <select name="variations[attribute_<?php echo $label_id; ?>]" data-attribute="<?php echo $label_id; ?>" required form="form_<?php echo $product['id']; ?>">
-                                                                                <option value="">Select an option</option>
+                                                                               
+                                                                                <?php 
+                                                                                     $labelWithDefault = null;
+                                                                            
+                                                                                     if (isset($attribute['first_value_default']) && $attribute['first_value_default'] === '1') {
+                                                                                         $labelWithDefault = $attribute['label'];
+                                                                                     }
+                                                                                ?>
+                                                                                    <?php if ($label != $labelWithDefault) { ?>
+                                                                                        <option selected value="">Select an option</option>
+                                                                                    <?php } ?>
+                                                                                
                                                                                 <?php foreach ($attribute['value'] as $variation) { ?>
                                                                                     <option value="<?php echo $variation; ?>"><?php echo $variation; ?></option>
                                                                                 <?php } ?>
@@ -532,7 +597,7 @@
                                                                 </div>
                                                              
                                                             </td>
-                                                            <td>
+                                                            <td data-label="Price">
                                                                 <?php
                                                                 $productModel = model('ProductsModel');
                                                                 if ($product['type'] == "variable") {
@@ -549,10 +614,10 @@
                                                                     $price_text = '<span class="woocommerce-Price-currencySymbol">' . _price(number_format($price, 2)) . '</span>';
                                                                 }
                                                                 ?>
-                                                                <span class="base_price"><?= $price_text ?></span> <!-- Updated to use class for base price -->
-                                                                <span class="product_price"> </span>
+                                                                <span class="base_price"  style="<?= $product['type'] != "variable" ? 'display: none' : 'display: block;' ?>"><?= $price_text ?></span> <!-- Updated to use class for base price -->
+                                                                <span class="product_price" style="<?= $product['type'] === "variable" ? 'display: block' : 'display: none' ?>"> </span>
                                                             </td>
-                                                            <td style="text-align:center">
+                                                            <td data-label="Action">
                                                                 <!-- Form for adding the product to the cart -->
                                                                 <form id="form_<?php echo $product['id']; ?>" class="variations_form cart validate" action="" method="post" enctype="multipart/form-data">
                                                                     <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
@@ -608,7 +673,7 @@
                                                                 </form>
                                                             </td>
                                                             
-                                                            <td style="text-align:center">
+                                                            <td data-label="Quantity" style="text-align:center">
                                                                 <!-- Quantity field inside the form, linked with the same form ID -->
                                                                 <input type="number" name="quantity" value="1" min="1" style="width: 60px;" form="form_<?php echo $product['id']; ?>">
                                                             </td>
@@ -688,43 +753,7 @@
 <!--------------- footer end -------------------------------->
 
 <script>
-    function openModal(productId) {
-        // Reset the select boxes and price display
-        resetModal(productId);
-        document.getElementById('modal-' + productId).style.display = "block";
-    }
 
-    function closeModal(productId) {
-        document.getElementById('modal-' + productId).style.display = "none";
-    }
-
-    // Reset the select box and price display
-    function resetModal(productId) {
-        // Reset select boxes within the modal
-        var modal = document.getElementById('modal-' + productId);
-        var selectBoxes = modal.querySelectorAll('select.variation_select');
-
-        // Reset each select box to the default option
-        selectBoxes.forEach(function(select) {
-            select.selectedIndex = 0; // Set to "Select an option"
-        });
-
-        // Clear the displayed price
-        modal.querySelector('.product_price').innerHTML = ''; // Clear the price display
-    }
-
-    // Close modal when clicking outside of it
-    window.onclick = function(event) {
-        var modals = document.getElementsByClassName("modal");
-        for (var i = 0; i < modals.length; i++) {
-            if (event.target == modals[i]) {
-                modals[i].style.display = "none";
-            }
-        }
-    }
-</script>
-
-<script>
 $(document).ready(function() {
     // Use event delegation to handle changes on any attribute select
     $(document).on('change', 'select[name^="variations\\[attribute_"]', function() {
@@ -786,6 +815,82 @@ $(document).ready(function() {
 });
 
 
+$(document).ready(function() {
+    // Function to handle price updates
+    function updatePrice($row) {
+        var productId = $row.find("input[name='product_id']").val();
+        var productPriceSpan = $row.find('.product_price');
+        var basePriceSpan = $row.find('.base_price');
+
+        // Get all select boxes in the current row
+        var $selects = $row.find('select[name^="variations\\[attribute_"]');
+
+        // Initialize variables
+        var selectedOption = null;
+        var attributeName = null;
+
+        // Loop through each select box to find the first valid selection
+        $selects.each(function() {
+            var $select = $(this);
+            var value = $select.val();
+
+            // Check if this select has a value
+            if (value) {
+                selectedOption = value; // Store the first valid selection
+                attributeName = $select.data('attribute'); // Store the attribute name
+                return false; // Break the loop after finding the first valid selection
+            }
+        });
+
+        // If no valid selections were found, hide the price display and show base price
+        if (!selectedOption) {
+            productPriceSpan.hide();
+            basePriceSpan.show();
+            return; // Exit early
+        }
+
+        // If a valid selection was found, make the AJAX request
+        if (productId) {
+            $.ajax({
+                url: "<?php echo base_url('/get_price'); ?>",
+                type: "POST",
+                data: {
+                    product_id: productId,
+                    variation: selectedOption,
+                    attribute: attributeName // Send the attribute name for the valid selection
+                },
+                success: function(response) {
+                    var currencySymbol = '£'; // Change this to your desired currency symbol
+                    if (response && response !== "No matching variation found") {
+                        productPriceSpan.html(currencySymbol + response).show();
+                        basePriceSpan.hide();
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.log("Error fetching price: " + textStatus, errorThrown);
+                }
+            });
+        }
+    }
+
+    // Trigger the price update on change for any attribute select
+    $(document).on('change', 'select[name^="variations\\[attribute_"]', function() {
+        var $row = $(this).closest('tr');
+        updatePrice($row);
+    });
+
+    // Automatically trigger the price update on page load for rows with pre-selected values
+    $('tr').each(function() {
+        var $row = $(this);
+        var hasPreselectedValues = $row.find('select[name^="variations\\[attribute_"]').filter(function() {
+            return $(this).val(); // Check if any select has a pre-selected value
+        }).length > 0;
+
+        if (hasPreselectedValues) {
+            updatePrice($row); // Trigger the price update for this row
+        }
+    });
+});
 
 
 </script>
@@ -802,39 +907,21 @@ document.querySelectorAll('.category-links a').forEach(anchor => {
 });
 </script>
 
-
 <script>
+    function showCategory(categoryId) {
+        // Hide all categories
+        const allCategories = document.querySelectorAll('.products-listing');
+        allCategories.forEach(function(category) {
+            category.style.display = 'none';
+        });
 
-    window.addEventListener('scroll', function() {
-        var categoriesList = document.getElementById('stickyCategories');
-        var sticky = categoriesList.offsetTop; // Get the initial position of the categories list
-
-        if (window.pageYOffset > sticky) {
-            categoriesList.classList.add('sticky'); // Add sticky class
-        } else {
-            categoriesList.classList.remove('sticky'); // Remove sticky class
+        // Show the selected category
+        const selectedCategory = document.getElementById('category-' + categoryId);
+        if (selectedCategory) {
+            selectedCategory.style.display = 'block';
         }
-    });
-
-</script>
-
-<script>
-function showCategory(categoryId) {
-    // Hide all categories
-    const allCategories = document.querySelectorAll('.products-listing');
-    allCategories.forEach(function(category) {
-        category.style.display = 'none';
-    });
-
-    // Show the selected category
-    const selectedCategory = document.getElementById('category-' + categoryId);
-    if (selectedCategory) {
-        selectedCategory.style.display = 'block';
     }
-}
-</script>
 
-<script>
     function showCategory(categoryId, element) {
         // Hide all categories
         var categories = document.querySelectorAll('.products-listing');
@@ -855,9 +942,7 @@ function showCategory(categoryId) {
         });
         element.classList.add('active');
     }
-</script>
 
-<script>
     function subscription_switch(productId) {
         var selectBox = document.getElementById('select_' + productId);
         var delivered_every = document.getElementById('delivered_every_' + productId);

@@ -59,29 +59,32 @@
                 $remote_url .= "&status=".$_GET['status'];
             }
             ?>
-            <table id="books_table" data-remote="<?php echo $remote_url ?>" class="ui data_table celled table responsive nowrap table_order"
-                   style="width:100%">
-                <thead>
-                    <tr>
-                        <th width="100">No.</th>
-                        <th>Customer</th>
-                        <th>Orders</th>
-                        <th>Total</th>
-                        <th>Start date</th>
-                        <th>Next payment</th>
-                        <th>Last order</th>
-                        <th>End date</th>
-                        <th>Order count</th>
-                        <th>Status</th>
-                        <th data-sortable="false" width="14%">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
+            <div class="table-wrapper">
+                <table id="books_table" data-remote="<?php echo $remote_url ?>" class="ui data_table celled table responsive nowrap table_order"
+                    style="width:100%">
+                    <thead>
+                        <tr>
+                            <th width="100">No.</th>
+                            <th>Customer</th>
+                            <th>Orders</th>
+                            <th>Total</th>
+                            <th>Start date</th>
+                            <th>Next payment</th>
+                            <th>Last order</th>
+                            <th>End date</th>
+                            <th>Order count</th>
+                            <th>Status</th>
+                            <th data-sortable="false" width="14%">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
 
-                </tbody>
-                <tfoot>
-                </tfoot>
-            </table>
+                    </tbody>
+                    <tfoot>
+                    </tfoot>
+                </table>
+            </div>
+
         </div>
 
         <style>

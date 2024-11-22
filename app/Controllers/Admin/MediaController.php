@@ -18,7 +18,7 @@ class MediaController extends BaseController
     public function index()
     {
         $start = !empty($_GET['page']) ? $_GET['page'] : 1;
-        $page = !empty($_GET['page']) ? $_GET['page'] : 1;
+        $page = !empty($_GET['page']) ? $_GET['page'] : 'media-library';
         $limit = 15;
         if($start && $page > 1) {
             $end = ($limit*$start);

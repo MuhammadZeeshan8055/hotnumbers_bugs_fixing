@@ -529,7 +529,7 @@ class Users extends BaseController
             exit;
         }
 
-        $this->data['page'] = "wholesale-requests";
+        $this->data['page'] = "wholesale-accounts";
 
         $req_count = $this->master->getRow('tbl_request_acc',['status'=>'pending'],'','COUNT(req_id) AS count');
 

@@ -794,7 +794,9 @@ class CartModel extends BaseController {
             }
             // $cart_total = $cart_total + $cart['shipping_cost'];
 
-            $cart['cart_total'] = $cart_total;
+            // $cart['cart_total'] = $cart_total;
+
+            $cart['cart_total'] = number_format($cart_total);
             
             return $cart;
         }

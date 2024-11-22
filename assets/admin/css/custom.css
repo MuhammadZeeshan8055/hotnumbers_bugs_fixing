@@ -10080,6 +10080,109 @@ select.select2:not(.select2-hidden-accessible) {
   max-width: initial;
 }
 
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+#books_table,#cats_table {
+  width: 100%;
+  border-collapse: collapse;
+}
+@media screen and (max-width: 1400px) {
+  #books_table td, 
+  #cats_table td,
+  #cats_table th,
+  #books_table th {
+      display: table-cell !important;
+  }
+  #books_table,#cats_table {
+      display: table !important;
+      width: 100%;
+      overflow-x: auto;
+  }
+}
+.order-preview .swal2-content, .swal2-popup.order-preview {
+  padding: 0;
+}
+.order-preview div#swal2-content {
+  color: #000;
+  font-weight: 400;
+  margin: 0;
+  text-align: left;
+  box-shadow: var(--shadow);
+}
+
+.order-preview .content {
+  padding: 0 16px;
+}
+
+.order-preview {
+  min-width: 900px;
+  margin: auto;
+}
+.order-preview .head {
+  margin-bottom: 1em;
+}
+.order-preview .head, .order-preview .foot {
+  background-color: #f9f9f9;
+  padding: 10px 15px 10px;
+}
+.order-preview .foot {
+  margin-top: 2em;
+}
+.order-preview h1 {
+  font-size: 18px;
+  font-weight: 900;
+  padding: 4px 0;
+}
+.order-preview h2 {
+  font-size: 16px;
+}
+.order-preview label {
+  font-weight: 600;
+  font-size: 15px;
+}
+.order-preview label + p {
+  margin-top: 6px;
+}
+.order-preview table {
+  border-spacing: 0;
+}
+.order-preview table label,
+.order-preview table label + p {
+  font-size: 14px;
+}
+
+.order-preview .order-status {
+  padding: 4px 18px 7px;
+  font-size: 14px;
+  margin-right: 3em;
+}
+
+.order-preview thead {
+  background-color: #eee;
+}
+
+.order-preview th {
+  font-size: 14px;
+}
+
+.order-preview th, .order-preview td {
+  font-size: 14px;
+}
+
+#books_table td:has(.preview-open) {
+  padding-right: 35px;
+}
+#books_table td:has(.sub-order) {
+  padding-right: 60px;
+}
+
+#books_table tr:has([title="Subscription"]) {
+  background-color: #f2f7ff
+}
 .table_order.dataTable {
   padding: 0 !important;
 }

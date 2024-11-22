@@ -5,175 +5,156 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;200&display=swap">
-
     <style>
-        div {font-family: 'Lato', sans-serif;}
-
         body {
             font-family: 'Lato', sans-serif;
             padding: 1em 6em 3em;
             font-size: 14px;
+            margin: 0;
         }
-        html { margin: 0px;}
         h1 {
             font-size: 20px;
+            margin: 0;
         }
         h5 {
             font-size: 14px;
-            margin-bottom: 15px;
+            margin: 15px 0;
         }
         p {
-            margin-top:0;
-            margin-bottom: 0;
+            margin: 0;
             font-size: 12px;
-            font-weight: 400;
             line-height: 18px;
         }
-        td {
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
             font-size: 12px;
-            font-weight: 400;
-        }
-        tr {
-            vertical-align: top;
-        }
-        th {
+            padding: 5px;
             text-align: left;
-            font-size: 13px;
-            padding: 5px 8px;
         }
-        #site-logo {
-            padding-top: 25px;
-            width: 150px;
-            margin-left: 18px;
-        }
-        thead tr, .order_receipt_subtotal tbody th {
+        thead th {
             background-color: #000;
             color: #fff;
-            padding: 5px;
-            vertical-align: middle !important;
-        }
-
-        #site-logo {
-            margin-top: 1em;
-        }
-
-        .address-meta p {
-            line-height: 18px;
-            margin: 0;
-        }
-
-        .address-meta h5 {
-            margin-bottom: 0;
-        }
-
-        .order_receipt tbody tr {
-            border-bottom: 1px solid #eee;
-        }
-        .order_receipt tbody th {
-            font-weight: 400;
-        }
-        .order_receipt tbody td {
-            padding: 5px;
-            font-size: 13px;
-        }
-        .order_receipt_subtotal {
-            float: right;
-            width: 230px !important;
-        }
-        .order_receipt_subtotal tbody th {
-            width: 100px;
-            font-size: 13px;
-            font-weight: 400;
-        }
-        .order_receipt_subtotal tbody td {
-            padding: 5px 10px;
-            font-size: 13px;
         }
         .page_break { page-break-before: always; }
-
-        .item-meta {
-            padding-top: 5px;
-            padding-bottom: 5px;
-        }
         .item-meta p {
             font-size: 11px;
         }
-        .page_break {
-            page-break-after: always; /* Use page-break-after for correct behavior */
+        .address-meta p {
+            line-height: 18px;
+        }
+        .order_receipt tbody tr {
+            border-bottom: 1px solid #eee;
+        }
+        .order_receipt_subtotal {
+            float: right;
+            width: 230px;
+        }
+        .order_receipt_subtotal th, .order_receipt_subtotal td {
+            font-size: 13px;
+        }
+         /* Page Setup */
+         @page {
+            size: auto;
+            margin: 0;
+            padding: 0;
         }
 
-    </style>
+        /* Ensure no margins and padding around pages */
+        body {
+            padding-bottom: 40px;
+            margin-bottom: 40px; /* Make space for footer */
+        }
 
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 12px;
+            padding: 10px 0;
+        }
+
+        .page_number {
+            font-size: 12px;
+            text-align: center;
+            position: relative;
+        }
+
+        .page_number:before {
+            content: "Page " counter(page);
+        }
+
+        .page_break {
+            page-break-before: always;
+        }
+
+        /* Adjust page-break after every packing slip */
+        .packing-slip {
+            page-break-before: always;
+        }
+    </style>
 </head>
 <body>
 <div class="header">
+    <?php if (!empty($slips)) { 
+        foreach ($slips as $i => $slip) { 
+            $totals = ['item_total' => 0, 'tax_total' => 0];
+    ?>
+        <div>
+            <!-- Packing Slip Header -->
+            <table>
+                <tr>
+                    <td width="60%">
+                        <img id="site-logo" width="165" src="<?php echo asset('images/slip-logo.png'); ?>">
+                    </td>
+                    <td>
+                        <div class="address-meta">
+                            <h5><?php echo @$setting['title']; ?></h5>
+                            <p><?php echo @$setting['site_address_1'] . ' ' . @$setting['site_address_2'] . ' ' . @$setting['post_code']; ?></p>
+                            <p><?php echo !empty($setting['contact_number']) ? 'T ' . $setting['contact_number'] : ''; ?> | E:</p>
+                            <p><?php echo @$setting['contact_email']; ?></p>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <h1>PACKING SLIP</h1>
+            <div style="margin-top: 1em;"></div>
 
-    <?php
-    if(!empty($slips)) {
+            <!-- Shipping and Order Details -->
+            <?php 
+                $shipping_address = $slip['shipping_address'];
+                $meta = $slip['order_meta'];
+                $order_items = $slip['order_items'];
+                $order_id = $slip['order_id'];
+                $customer = $slip['customer'];
 
-        foreach($slips as $i=>$slip) {
-            $totals = [
-                'item_total' => 0,
-                'tax_total' => 0,
-            ];
-        ?>
-
-        <table width="100%" border="0">
-            <tr>
-                <td width="60%" align="top" style="vertical-align: middle">
-                    <img id="site-logo" width="165" type="image/png" src="<?php echo asset('images/slip-logo.png') ?>"></td>
-                <td align="top">
-                    <div class="address-meta">
-                        <h5><?php echo @$setting['title'] ?></h5>
-
-                        <p><?php echo @$setting['site_address_1'] ?> <?php echo @$setting['site_address_2'] ?> <?php echo @$setting['post_code'] ?></p>
-                        <p><?php echo !empty($setting['contact_number']) ? 'T '.$setting['contact_number']:'' ?> | E:</p>
-                        <p><?php echo @$setting['contact_email'] ?> </p>
-                    </div>
-                </td>
-            </tr>
-        </table>
-        <div style="margin-top: 2.5em"></div>
-        <h1>PACKING SLIP</h1>
-        <div style="margin-top: 1em"></div>
-        <?php
-
-                    $shipping_address = $slip['shipping_address'];
-                    $meta = $slip['order_meta'];
-                    $order_items = $slip['order_items'];
-                    $order_id = $slip['order_id'];
-                    $shipping_method = '';
-                    $customer = $slip['customer'];
-
-                    foreach($order_items as $item) {
-                        $item_meta = $item['item_meta'];
-                        if(!empty($item_meta['line_subtotal']) && $item['item_type'] === "line_item") {
-                            $totals['item_total'] += $item_meta['line_subtotal'];
-                        }
-                        if(!empty($item_meta['cost']) && $item['item_type'] === "shipping") {
-                            $totals['tax_total'] += $item_meta['cost'];
-                        }
-                        if(!empty($item_meta['tax_amount']) && $item['item_type'] === "tax") {
-                            $totals['tax_total'] += $item_meta['tax_amount'];
-                        }
+                foreach ($order_items as $item) {
+                    $item_meta = $item['item_meta'];
+                    if (!empty($item_meta['line_subtotal']) && $item['item_type'] === "line_item") {
+                        $totals['item_total'] += $item_meta['line_subtotal'];
                     }
-
-                    ?>
-                <div>
-             <table width="100%">
+                    if (!empty($item_meta['cost']) && $item['item_type'] === "shipping") {
+                        $totals['tax_total'] += $item_meta['cost'];
+                    }
+                    if (!empty($item_meta['tax_amount']) && $item['item_type'] === "tax") {
+                        $totals['tax_total'] += $item_meta['tax_amount'];
+                    }
+                }
+            ?>
+            <table>
                 <tr>
                     <td>
-                        <table width="100%">
-                            <tr>
-                                <td>
-                                    <p><?php echo @$shipping_address['shipping_first_name'] ?> <?php echo @$shipping_address['shipping_last_name'] ?></p>
-                                    <p><?php echo @$shipping_address['shipping_address_1'].' '.@$shipping_address['shipping_address_2'] ?></p>
-                                    <p><?php echo @$shipping_address['shipping_city'] ?></p>
-                                    <p><?php echo @$shipping_address['shipping_state'] ?></p>
-                                    <p><?php echo @$shipping_address['shipping_postcode'] ?></p>
-                                </td>
+                        <p><?php echo @$shipping_address['shipping_first_name'] . ' ' . @$shipping_address['shipping_last_name']; ?></p>
+                        <p><?php echo @$shipping_address['shipping_address_1'] . ' ' . @$shipping_address['shipping_address_2']; ?></p>
+                        <p><?php echo @$shipping_address['shipping_city']; ?></p>
+                        <p><?php echo @$shipping_address['shipping_state']; ?></p>
+                        <p><?php echo @$shipping_address['shipping_postcode']; ?></p>
+                    </td>
                                 <td>
                                     <div class="pull-right fr" style="float: right;">
                                         <table width="100%" align="top" cellspacing="2" cellpadding="2">
@@ -189,6 +170,12 @@
                                                 <td width="100">Order Date:</td>
                                                 <td><?php echo !empty($meta['order_date']) ? date(env('date_format'),strtotime($meta['order_date'])) : '' ?></td>
                                             </tr>
+                                            <?php if (!empty($meta['order_comments'])) { ?>
+                                                <tr>
+                                                    <td width="100">Order Note:</td>
+                                                    <td width="100px"><?php echo !empty($meta['order_comments']) ? $meta['order_comments'] : ''; ?></td>
+                                                </tr>
+                                            <?php } ?>
                                             <?php if(!empty($meta['purchase_order_number'])) { ?>
                                                 <tr style="padding-bottom: 5px">
                                                     <td>Purchase order#:</td>
@@ -204,122 +191,77 @@
                                         </table>
                                     </div>
                                 </td>
-                            </tr>
-
-                        </table>
-
-                        <br>
-                        <br>
-
-                        <?php if (!empty($slip['order_items'])) { ?>
-                            <table class="order_receipt table" cellpadding="0" cellspacing="0" width="100%" style="text-align: left">
-                                <thead>
-                                    <tr>
-                                        <th width="80%">Product</th>
-                                        <th>Quantity</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php
-                                    $count = 0;
-                                    foreach ($slip['order_items'] as $item) {
-                                        $product_name = @$item['product_name'];
-                                        $meta = @$item['item_meta'];
-                                        $meta_values = !empty($meta['variation']['values']) ? $meta['variation']['values'] : [];
-                                        
-                                        if ($item['item_type'] === "line_item") {
-                                            // Start a new row for each item
-                                            echo '<tr>';
-                                            echo '<td>';
-                                            echo '<p>' . $product_name . '</p>';
-                                            echo '<div class="item-meta">';
-                                            
-                                            if (!empty($meta_values['sku'])) {
-                                                echo '<p><b>SKU:</b> ' . $meta_values['sku'] . '</p>';
-                                            }
-                                            
-                                            if (!empty($meta['variations'])) {
-                                                foreach (json_decode($meta['variations'], true) as $key => $variation) {
-                                                    $key = str_replace('attribute_', '', $key);
-                                                    $key = str_replace('_', ' ', $key);
-                                                    $key = ucfirst($key);
-                                                    if (is_array($variation)) {
-                                                        $variation = implode(', ', $variation);
-                                                    }
-                                                    echo '<p><b>' . $key . ':</b> ' . $variation . '</p>';
-                                                }
-                                            }
-                                            
-                                            echo '</div>';
-                                            echo '</td>';
-                                            echo '<td>' . $meta['quantity'] . '</td>';
-                                            echo '</tr>';
-                        
-                                            $count++;
-                        
-                                            // Add a page break after every 7 records
-                                            if ($count % 7 == 0) {
-                                                echo '<div class="page_break"></div>'; // Page break after every 10 items
-                                            }
-                                        }
-                                    }
-                                    ?>
-                                </tbody>
-                            </table>
-                        <?php } ?>
-
-
-                        <?php
-//                            echo view('checkout/order_receipt',[
-//                                    'order'=>$slip,
-//                                    'hide_price' => true,
-//                                    'hide_total' => true,
-//                                    'hide_subtotals'=>true
-//                            ]);
-                        ?>
-                    </td>
                 </tr>
-             </table>
-        <?php
+            </table>
+
+            <!-- Order Items -->
+            <?php if (!empty($slip['order_items'])) { ?>
+            <table class="order_receipt" style="margin-top:10%">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($slip['order_items'] as $item) { 
+                        $product_name = @$item['product_name'];
+                        $meta = @$item['item_meta'];
+                        $product_id = $meta['product_id'];
+                        $category_name=order_product_category($product_id);
+                        $meta_values = !empty($meta['variation']['values']) ? $meta['variation']['values'] : [];
+                        if ($item['item_type'] === "line_item") { ?>
+                    <tr>
+                        <td>
+                            <p><?php echo $product_name . (!empty($category_name) ? " - " . $category_name : ""); ?></p>
+                            <div class="item-meta">
+                                <?php if (!empty($meta_values['sku'])) { ?>
+                                    <p><b>SKU:</b> <?php echo $meta_values['sku']; ?></p>
+                                <?php } 
+                                if (!empty($meta['variations'])) {
+                                    foreach (json_decode($meta['variations'], true) as $key => $variation) {
+                                        $key = ucfirst(str_replace(['attribute_', '_'], [' ', ' '], $key));
+                                        if (is_array($variation)) $variation = implode(', ', $variation);
+                                ?>
+                                    <p><b><?php echo $key; ?>:</b> <?php echo $variation; ?></p>
+                                <?php } } ?>
+                            </div>
+                        </td>
+                        <td><?php echo $meta['quantity']; ?></td>
+                    </tr>
+                    <?php } } ?>
+                </tbody>
+            </table>
+            <?php } ?>
+            <?php
             if(count($slips) > 1) {
                 ?>
-                <div style="float: right; width: 320px">
-                    <table width="100%" class="order_receipt order_receipt_subtotal table">
-                        <tr>
-                            <td>Item total:</td>
-                            <td style="text-align: right"><?php echo _price($totals['item_total']) ?></td>
-                        </tr>
-                        <tr>
-                            <td>Item tax:</td>
-                            <td style="text-align: right"><?php echo _price($totals['tax_total']) ?></td>
-                        </tr>
-                        <tr>
-                            <th><div style="width: 120px">Packing slip total:</div></th>
-                            <td style="text-align: right"><?php echo _price($totals['item_total']+$totals['tax_total']) ?></td>
-                        </tr>
-                    </table>
-                </div>
-                <?php
-            }
-            if(count($slips)-1 > $i) {
-            ?>
+
+            <!-- Subtotal -->
+            <div style="float: right; width: 320px;">
+                <table class="order_receipt_subtotal">
+                    <tr>
+                        <td>Item total:</td>
+                        <td style="text-align: right;"><?php echo _price($totals['item_total']); ?></td>
+                    </tr>
+                    <tr>
+                        <td>Item tax:</td>
+                        <td style="text-align: right;"><?php echo _price($totals['tax_total']); ?></td>
+                    </tr>
+                    <tr>
+                        <th>Packing slip total:</th>
+                        <td style="text-align: right;"><?php echo _price($totals['item_total'] + $totals['tax_total']); ?></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <?php  }?>
+        <?php if (count($slips) - 1 > $i) { ?>
             <div class="page_break"></div>
-           <?php
-            }
-            }
-        ?>
-
-
-            <div style="clear: both"></div>
-                </div>
-
-        <?php
-    }
-    ?>
-
-    <div style="margin-top: 8em"></div>
+        <?php } } } ?>
 </div>
+<!-- <footer>
+    <div class="page_number"></div>
+</footer> -->
 </body>
 </html>
-
-

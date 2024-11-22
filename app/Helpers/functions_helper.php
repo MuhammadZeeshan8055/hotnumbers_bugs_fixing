@@ -80,12 +80,18 @@ function check_manage_stock_for_variations($pid){
     return $q;
 }
 
-//set first value default
-function check_set_value_default_attributes($pid){
-    $sql = "SELECT attributes FROM tbl_products WHERE id = '$pid'";
+function check_order_product_type($order_id){
+    $sql = "SELECT tbl_products.type FROM tbl_order_item_meta JOIN tbl_order_items ON tbl_order_items.order_item_id = tbl_order_item_meta.item_id JOIN tbl_products ON tbl_order_item_meta.meta_value = tbl_products.id WHERE tbl_order_items.item_type = 'line_item' AND tbl_order_items.order_id = '$order_id' AND tbl_order_item_meta.meta_key = 'product_id'";
     $master = model('MasterModel');
     $q = $master->query($sql, true, true);
-    return $q;
+    return $q['type'];
+}
+
+function order_product_category($pid){
+    $sql = "SELECT c.name FROM `tbl_categories` as c JOIN tbl_product_categories as p_c on c.id=p_c.category_id where p_c.product_id='$pid'";
+    $master = model('MasterModel');
+    $q = $master->query($sql, true, true);
+    return $q['name'];
 }
 
 function get_variable_product_stock($pid) {

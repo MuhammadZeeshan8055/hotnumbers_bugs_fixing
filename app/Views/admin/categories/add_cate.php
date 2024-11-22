@@ -75,7 +75,7 @@
                             ?>
 
 
-                            <div class="input_field mb-15">
+                            <!-- <div class="input_field mb-15">
                                 <label>Show in menu</label>
                                 <div>
                                     <select name="show_in_menu" class="select2">
@@ -87,7 +87,7 @@
                                         </option>
                                     </select>
                                 </div>
-                            </div>
+                            </div> -->
 
                             <div class="input_field mb-15">
                                 <label>Status</label>

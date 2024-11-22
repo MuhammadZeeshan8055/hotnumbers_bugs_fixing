@@ -63,7 +63,25 @@
                             <?php echo $cate->sort_order ?>
                         </td>
 
-                        <td width="100"><?php echo $cat_img ?><img class="thumb" src="<?php echo base_url( '/assets/images/site-images/'.$prod_images['path'].'') ?>"></td>
+                        <td width="100">
+                            <?php 
+                                echo $cat_img;
+                                if(!empty($prod_images['path'])){
+                                ?>
+                                    
+                                    <img class="thumb" src="<?php echo base_url( '/assets/images/site-images/'.$prod_images['path'].'') ?>">
+
+                                <?php
+                                }else{
+                                ?>
+                                
+                                    <img class="thumb" src="<?php echo base_url( 'public/res.php?src=https%3A%2F%2Fstaging.hotnumberscoffee.co.uk%2Fassets%2Fimages%2Fplaceholder.jpg&w=300&h=300') ?>">
+                                
+                                <?php
+                                }
+                            ?>
+                            
+                        </td>
                         <td><a href="<?php echo $edit_url; ?>"><?php echo $status['title']; ?></a></td>
                         
                        

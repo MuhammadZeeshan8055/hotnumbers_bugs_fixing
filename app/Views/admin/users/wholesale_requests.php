@@ -23,53 +23,56 @@
             }
             ?>
 
-            <table id="books_table" data-remote="<?php echo $remote_url ?>" class="ui data_table celled table responsive nowrap unstackable" style="width:100%">
-                <thead>
-                <tr>
-                    <th>ID</th>
-                    <th width="200">Full name</th>
-                    <th width="200">Company name</th>
-                    <th width="200">Telephone</th>
-                    <th>Email</th>
-                    <th>Message <i class="lni lni-question-circle" title="Click to view full message"></i></th>
-                    <th data-sortable="false">Notes</th>
-                    <th>Status</th>
-                    <th>Date</th>
-                    <th data-sortable="false" width="180">Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-                <?php
-                /*foreach ($user_rows as $user_row) {
-
-                    $user_roles = $userModel->get_user_roles($user_row->user_id);
-
-                    ?>
-                    <tr class="table_row_<?php echo $user_row->user_id ?>">
-                        <td><img width="50" height="50"
-                                 src="<?php echo base_url('assets/images/site-images/users/' . $user_row->img) ?>"></td>
-                        <td> <?php echo $user_row->username ?></td>
-                        <td><?php echo $user_row->display_name ?></td>
-                        <td><?php echo !empty($user_roles) ? implode(', ',$user_roles) : '' ?></td>
-                        <td><?php echo $user_row->email ?></td>
-                        <td><a class="edit_row"
-                               href="<?php echo base_url(ADMIN . '/users/add') ?>/<?php echo $user_row->user_id ?>"><i
-                                        class="icon-edit-alt"></i> </a>
-                            <a class="del_row edit_row"
-                               onclick="del_item('<?php echo base_url(ADMIN . '/users/delete/') ?>/<?php echo $user_row->user_id ?>')"
-                               href="javascript:void(0)"></i><i class="icon-trash"></i></a>
-                        </td>
-
+            <div class="table-wrapper">
+                <table id="books_table" data-remote="<?php echo $remote_url ?>" class="ui data_table celled table responsive nowrap unstackable" style="width:100%">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th width="200">Full name</th>
+                        <th width="200">Company name</th>
+                        <th width="200">Telephone</th>
+                        <th>Email</th>
+                        <th>Message <i class="lni lni-question-circle" title="Click to view full message"></i></th>
+                        <th data-sortable="false">Notes</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th data-sortable="false" width="180">Actions</th>
                     </tr>
-                <?php
-                }*/
-                ?>
+                    </thead>
+                    <tbody>
+                    <?php
+                    /*foreach ($user_rows as $user_row) {
 
-                </tbody>
-                <tfoot>
+                        $user_roles = $userModel->get_user_roles($user_row->user_id);
 
-                </tfoot>
-            </table>
+                        ?>
+                        <tr class="table_row_<?php echo $user_row->user_id ?>">
+                            <td><img width="50" height="50"
+                                    src="<?php echo base_url('assets/images/site-images/users/' . $user_row->img) ?>"></td>
+                            <td> <?php echo $user_row->username ?></td>
+                            <td><?php echo $user_row->display_name ?></td>
+                            <td><?php echo !empty($user_roles) ? implode(', ',$user_roles) : '' ?></td>
+                            <td><?php echo $user_row->email ?></td>
+                            <td><a class="edit_row"
+                                href="<?php echo base_url(ADMIN . '/users/add') ?>/<?php echo $user_row->user_id ?>"><i
+                                            class="icon-edit-alt"></i> </a>
+                                <a class="del_row edit_row"
+                                onclick="del_item('<?php echo base_url(ADMIN . '/users/delete/') ?>/<?php echo $user_row->user_id ?>')"
+                                href="javascript:void(0)"></i><i class="icon-trash"></i></a>
+                            </td>
+
+                        </tr>
+                    <?php
+                    }*/
+                    ?>
+
+                    </tbody>
+                    <tfoot>
+
+                    </tfoot>
+                </table>
+            </div>
+            
 
             <script>
                 let showMessage = (element)=> {

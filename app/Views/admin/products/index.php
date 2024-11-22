@@ -98,61 +98,62 @@
                 </div>
                 &nbsp; &nbsp;
             </div>
-
-            <table id="books_table" data-sortcol="1" data-sortorder="desc" data-remote="?get_table=1<?php echo !empty($_SERVER['QUERY_STRING']) ? '&'.$_SERVER['QUERY_STRING'] : '' ?>" data-filter='filter_by_status,filter_by_category' class="ui data_table table_order celled table responsive nowrap" data-draggable="false" style="width:100%" data-onreorder="onReOrder()">
-                <thead>
-                <tr>
-                    <th width="30" data-orderable="false" data-sortable="false" data-searching="false">
-                        <div class="input_field inline-checkbox"><label><input type="checkbox" class="checkall"> </label></div>
-                    </th>
-                    <th width="40" class="text-center">ID</th>
-                    <th width="350">Title</th>
-                    <th width="300">Description</th>
-                    <th width="150">Price</th>
-                    <th width="260">Categories</th>
-                    <th width="100">Product type</th>
-                    <th width="40">Stock</th>
-                    <th width="40">Stock Status</th>
-                    <th width="60">Sales</th>
-                    <th width="60">Status</th>
-                    <th data-sortable="false" width="180">Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-                <?php
-                /*foreach ($product_rows as $product_row) {
-                    $product_cats = explode(',',$product_row->category);
-                    $cat_names = [];
-                    foreach($product_cats as $cat) {
-                        $getcat = $productModel->get_category_by_id($cat);
-                        $cat_names[] = '<a href="'.site_url('admin/products/?category='.$cat).'">'.$getcat->name.'</a>';
-                    }
-                    $img = explode(',',$product_row->img);
-                    $img_src = $media->get_media_src($img[0],'','thumbnail');
-                    $desc = [limit(strip_tags($product_row->description), 35),limit(strip_tags($product_row->additional_desc), 35)];
-                    $desc = array_filter($desc);
-                    ?>
-                    <tr class="table_row_<?php echo $product_row->id ?>">
-                        <td><img width="50" height="50"
-                                 src="<?php echo $img_src ?>"></td>
-                        <td> <?php echo $product_row->title ?></td>
-                        <td><?php echo implode('<br><br>',$desc) ?></td>
-                        <td><?php echo implode(', ',$cat_names) ?></td>
-                        <td><a class="edit_row" href="<?php echo base_url(ADMIN . '/products/add') ?>/<?php echo $product_row->id ?>"><i class="icon-edit-alt"></i> </a>
-                            <a class="del_row edit_row" onclick="del_item('<?php echo base_url(ADMIN . '/products/delete/') ?>/<?php echo $product_row->id ?>')"
-                               href="javascript:void(0)"></i><i class="icon-trash"></i></a>
-                        </td>
-
+            <div class="table-wrapper">
+                <table id="books_table" data-sortcol="1" data-sortorder="desc" data-remote="?get_table=1<?php echo !empty($_SERVER['QUERY_STRING']) ? '&'.$_SERVER['QUERY_STRING'] : '' ?>" data-filter='filter_by_status,filter_by_category' class="ui data_table table_order celled table responsive nowrap" data-draggable="false" style="width:100%" data-onreorder="onReOrder()">
+                    <thead>
+                    <tr>
+                        <th width="30" data-orderable="false" data-sortable="false" data-searching="false">
+                            <div class="input_field inline-checkbox"><label><input type="checkbox" class="checkall"> </label></div>
+                        </th>
+                        <th width="40" class="text-center">ID</th>
+                        <th width="350">Title</th>
+                        <th width="300">Description</th>
+                        <th width="150">Price</th>
+                        <th width="260">Categories</th>
+                        <th width="100">Product type</th>
+                        <th width="40">Stock</th>
+                        <th width="40">Stock Status</th>
+                        <th width="60">Sales</th>
+                        <th width="60">Status</th>
+                        <th data-sortable="false" width="180">Actions</th>
                     </tr>
-                <?php }*/
-                ?>
+                    </thead>
+                    <tbody>
+                    <?php
+                    /*foreach ($product_rows as $product_row) {
+                        $product_cats = explode(',',$product_row->category);
+                        $cat_names = [];
+                        foreach($product_cats as $cat) {
+                            $getcat = $productModel->get_category_by_id($cat);
+                            $cat_names[] = '<a href="'.site_url('admin/products/?category='.$cat).'">'.$getcat->name.'</a>';
+                        }
+                        $img = explode(',',$product_row->img);
+                        $img_src = $media->get_media_src($img[0],'','thumbnail');
+                        $desc = [limit(strip_tags($product_row->description), 35),limit(strip_tags($product_row->additional_desc), 35)];
+                        $desc = array_filter($desc);
+                        ?>
+                        <tr class="table_row_<?php echo $product_row->id ?>">
+                            <td><img width="50" height="50"
+                                    src="<?php echo $img_src ?>"></td>
+                            <td> <?php echo $product_row->title ?></td>
+                            <td><?php echo implode('<br><br>',$desc) ?></td>
+                            <td><?php echo implode(', ',$cat_names) ?></td>
+                            <td><a class="edit_row" href="<?php echo base_url(ADMIN . '/products/add') ?>/<?php echo $product_row->id ?>"><i class="icon-edit-alt"></i> </a>
+                                <a class="del_row edit_row" onclick="del_item('<?php echo base_url(ADMIN . '/products/delete/') ?>/<?php echo $product_row->id ?>')"
+                                href="javascript:void(0)"></i><i class="icon-trash"></i></a>
+                            </td>
+
+                        </tr>
+                    <?php }*/
+                    ?>
 
 
-                </tbody>
-                <tfoot>
+                    </tbody>
+                    <tfoot>
 
-                </tfoot>
-            </table>
+                    </tfoot>
+                </table>
+            </div>
 
             <style>
                 [class^=status-] {

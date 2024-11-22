@@ -157,49 +157,51 @@
 
 
             <div class="books_listing">
-                <table class="ui celled table responsive nowrap unstackable" style="width:100%">
-                    <thead>
-                    <tr>
-                        <th>Coupon ID</th>
-                        <th>Code</th>
-                        <th>Amount</th>
-                        <th>Type</th>
-                        <th>Valid From</th>
-                        <th>Valid To</th>
-                        <th>Usage limit</th>
-                        <th>Use Count</th>
-                        <th>Status</th>
-                        <th></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <?php
-                    foreach($coupons as $coupon) {
-                        $status = coupon_status($coupon);
-                        ?>
+                <div class="table-wrapper">
+                    <table class="ui celled table responsive nowrap unstackable" style="width:100%">
+                        <thead>
                         <tr>
-                            <td><?php echo $coupon->id ?></td>
-                            <td title="Click to copy" class="coupon_code copyText text-center" data-text="<?php echo $coupon->code ?>"><?php echo $coupon->code ?></td>
-                            <td class="text-center"><?php echo $coupon->amount ?></td>
-                            <td class="text-center"><?php echo ucfirst($coupon->type) ?></td>
-                            <td class="text-center"><?php echo $coupon->valid_from ? _date($coupon->valid_from) : '' ?></td>
-                            <td  class="text-center"><?php echo $coupon->valid_to ? _date($coupon->valid_to) : '' ?></td>
-                            <td class="text-center"><?php echo !$coupon->is_unlimited ? $coupon->use_limit : '∞ unlimited' ?></td>
-                            <td class="text-center"><?php echo $coupon->use_count ?></td>
-                            <td class="text-center"><?php echo ucfirst($status) ?></td>
-                            <td class="text-center">
-                                <div class="btn-group">
-                                    <a class="btn btn-primary btn-sm" href="?edit=<?php echo $coupon->id ?>">Edit</a>
-                                    <a class="btn btn-primary btn-sm bg-black" href="?delete=<?php echo $coupon->id ?>" onclick="return confirm('Delete this coupon?')">Delete</a>
-                                </div>
-                            </td>
+                            <th>Coupon ID</th>
+                            <th>Code</th>
+                            <th>Amount</th>
+                            <th>Type</th>
+                            <th>Valid From</th>
+                            <th>Valid To</th>
+                            <th>Usage limit</th>
+                            <th>Use Count</th>
+                            <th>Status</th>
+                            <th>Actions</th>
                         </tr>
-                    <?php }?>
-                    </tbody>
-                    <tfoot>
+                        </thead>
+                        <tbody>
+                        <?php
+                        foreach($coupons as $coupon) {
+                            $status = coupon_status($coupon);
+                            ?>
+                            <tr>
+                                <td><?php echo $coupon->id ?></td>
+                                <td title="Click to copy" class="coupon_code copyText text-center" data-text="<?php echo $coupon->code ?>"><?php echo $coupon->code ?></td>
+                                <td class="text-center"><?php echo $coupon->amount ?></td>
+                                <td class="text-center"><?php echo ucfirst($coupon->type) ?></td>
+                                <td class="text-center"><?php echo $coupon->valid_from ? _date($coupon->valid_from) : '' ?></td>
+                                <td  class="text-center"><?php echo $coupon->valid_to ? _date($coupon->valid_to) : '' ?></td>
+                                <td class="text-center"><?php echo !$coupon->is_unlimited ? $coupon->use_limit : '∞ unlimited' ?></td>
+                                <td class="text-center"><?php echo $coupon->use_count ?></td>
+                                <td class="text-center"><?php echo ucfirst($status) ?></td>
+                                <td class="text-center">
+                                    <div class="btn-group">
+                                        <a class="btn btn-primary btn-sm" href="?edit=<?php echo $coupon->id ?>">Edit</a>
+                                        <a class="btn btn-primary btn-sm bg-black" href="?delete=<?php echo $coupon->id ?>" onclick="return confirm('Delete this coupon?')">Delete</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php }?>
+                        </tbody>
+                        <tfoot>
 
-                    </tfoot>
-                </table>
+                        </tfoot>
+                    </table>
+                </div>
                 <style>
                     .coupon_code {
                         cursor: pointer;

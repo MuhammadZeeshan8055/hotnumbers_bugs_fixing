@@ -189,8 +189,17 @@ class CheckoutModel extends BaseController {
 
     public function orderCompleteActions($orderID, $customerID) {
 
+         // Check if $orderID is an array and extract the ID if necessary
+        if (is_array($orderID) && isset($orderID['product'])) {
+            $orderID = $orderID['product'];
+        } elseif (is_array($orderID)) {
+            // If the structure of the array is different, adjust accordingly
+            $orderID = reset($orderID); // Gets the first element in the array
+        }
+
         if(get_setting('default_status_on_payment') === 'processing') {
             $this->OrderModel->processing_order_email($orderID);
+            
         }
         if(get_setting('default_status_on_payment') === 'completed') {
             $this->OrderModel->order_complete_email($orderID);
@@ -201,7 +210,7 @@ class CheckoutModel extends BaseController {
         $this->OrderModel->add_note($orderID,'Order placed successfully');
 
         $order_items = $this->OrderModel->order_items($orderID);
-
+      
         $notification = model('NotificationModel');
 
         $productModel = model('ProductsModel');
@@ -248,6 +257,8 @@ class CheckoutModel extends BaseController {
 
         $data = array_merge($request->getPost(), $data);
 
+        
+
         $validation = $this->validateForm($request->getPost());
 
         if(empty($validation['success'])) {
@@ -261,7 +272,7 @@ class CheckoutModel extends BaseController {
         $transaction_id = random_string('alnum',20);
 
         $orderID = $this->CartModel->create_order($data);
-
+       
         if(!empty($data['customer_id'])) {
             $customer_id = $data['customer_id'];
         }else {
@@ -270,7 +281,7 @@ class CheckoutModel extends BaseController {
                 $customer_id = is_logged_in();
             }
         }
-
+      
         if(!empty($orderID)) {
 
             $this->OrderModel->set_transaction_id($orderID, $transaction_id);

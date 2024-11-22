@@ -1391,6 +1391,15 @@ class Orders extends MyController
             $coupon = $post['coupon'];
             $order_subtotal = $post['order-subtotal'];
 
+            $store_discount=$post['store-discount'];
+            $store_discount_type=$post['store-discount-type'];
+            $wholesale_discount=$post['wholesale-discount'];
+            $wholesale_discount_type=$post['wholesale-discount-type'];
+            $user_discount=$post['user-discount'];
+            $user_discount_type=$post['user-discount-type'];
+            $shipping_discount=$post['shipping-discount'];
+            $coupon=$post['coupon'];
+
             $order_tax = 0;
             $include_tax = 'No';
             $subtotal = 0;
@@ -1509,15 +1518,33 @@ class Orders extends MyController
                 'order_shipping'=>$shippingCost,
                 'order_shipping_title'=>$shippingName,
                 'order_shipping_tax'=>$order_tax,
-                'order_total'=>$subtotal,
+                'order_total'=>$order_subtotal,
                 'order_tax' => $order_tax,
                 'cart_discount_tax' => 0,
                 'prices_include_tax' => $include_tax,
                 'paid_date'=>date('Y-m-d h:i:s'),
             ]);
 
-
-
+            // Conditionally add 'global_discount' if $store_discount is not empty
+            if (!empty($store_discount)) {
+                $order_meta['global_discount'] = $store_discount;
+                $order_meta['global_discount_type'] = $store_discount_type;
+            }
+            if (!empty($wholesale_discount)) {
+                $order_meta['wholesale_discount'] = $wholesale_discount;
+                $order_meta['wholesale_discount_type'] = $wholesale_discount_type;
+            }
+            if (!empty($user_discount)) {
+                $order_meta['user_discount'] = $user_discount;
+                $order_meta['user_discount_type'] = $user_discount_type;
+            }
+            if (!empty($shipping_discount)) {
+                $order_meta['shipping_discount'] = $shipping_discount;
+            }
+            if (!empty($coupon)) {
+                $order_meta['coupon_discount'] = $coupon;
+            }
+            
             if(!empty($post['billing_first_name'])) {
                 $order_meta['customer_user'] = $post['customer'];
                 $order_meta['billing_first_name'] = $first_name;
@@ -1541,6 +1568,9 @@ class Orders extends MyController
                 $order_meta['shipping_city'] =$shipping_city;
                 $order_meta['shipping_email'] =$shipping_email;
                 $order_meta['shipping_address_index'] =$first_name.' '.$last_name.' '.$shipping_address1.' '.$shipping_address2.' '.$billing_email.' '.$billing_phone;
+            }
+            if(!empty($post['order_comments'])) {
+                $order_meta['order_comments']= $post['order_comments'];
             }
 
             if(!empty($coupon)) {
@@ -1924,6 +1954,24 @@ class Orders extends MyController
 
             $data = $this->request->getPost();
 
+            if($data['order_status']=='cancelled'){
+                $orderModel= model('OrderModel');
+                $ProductsModel = model('ProductsModel');
+                $order_items = $orderModel->order_items($order_id);
+    
+                if(!empty($order_items)) {
+    
+                    foreach($order_items as $item) {
+                        if(!empty($item['item_meta'])) {
+                            $item_meta = $item['item_meta'];
+                            $ProductsModel->stock_refund($item_meta['product_id'],$item_meta['quantity']);
+                            $ProductsModel->subtract_sale($item_meta['product_id'],$item_meta['quantity']);
+                        }
+                    }
+                }
+            }
+           
+            
             $d = explode('/',$data['date_created']);
             $date = $d[2].'-'.$d[1].'-'.$d[0];
 

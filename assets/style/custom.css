@@ -25192,3 +25192,15 @@ textarea.form-control-lg {
 
 
 /*# sourceMappingURL=custom.css.map */
+@media (max-width: 480px) {
+  .header1 .logo a .logo_front {
+    width: 50px;
+  }
+  .header1 .logo {
+    width: 70px !important;
+  }
+  .header1 .top_nav .top_menu .menu-top-menu-container ul li:last-of-type {
+    margin-right: 0px;
+    font-size: 12px;
+  }
+}

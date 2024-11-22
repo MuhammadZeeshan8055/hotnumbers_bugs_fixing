@@ -153,184 +153,34 @@
         <form id="order-list" method="post">
             <div class="books_listing">
 
-                <table id="books_table" data-sortcol="1" data-sortorder="desc" data-remote="<?php echo $remote_url ?>" class="ui data_table celled table responsive nowrap unstackable table_order" style="width:100%">
-                    <thead>
-                        <tr>
-                            <th data-orderable="false" data-searching="false">
-                                <div class="input_field inline-checkbox"><label><input type="checkbox" class="checkall"> </label></div>
-                            </th>
-                            <th>Order</th>
-                            <th width="120">Date</th>
-                            <th>Status</th>
-                            <th>Customer</th>
-                            <th>Customer Type</th>
-                            <th>Ship to</th>
-                            <th width="140">Payment method</th>
-                            <th width="140">Shipment method</th>
-                            <th>Order type</th>
-                            <th width="80">Subtotal</th>
-                            <th data-orderable="false">Actions</th>
-                        </tr>
-                    </thead>
+                <div class="table-wrapper">
+                    <table id="books_table" data-sortcol="1" data-sortorder="desc" data-remote="<?php echo $remote_url ?>" class="ui data_table celled table responsive nowrap unstackable table_order" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th data-orderable="false" data-searching="false">
+                                    <div class="input_field inline-checkbox"><label><input type="checkbox" class="checkall"> </label></div>
+                                </th>
+                                <th>Order</th>
+                                <th width="120">Date</th>
+                                <th>Status</th>
+                                <th>Customer</th>
+                                <th>Customer Type</th>
+                                <th>Ship to</th>
+                                <th width="140">Payment method</th>
+                                <th width="140">Shipment method</th>
+                                <th>Order type</th>
+                                <th width="80">Subtotal</th>
+                                <th data-orderable="false">Actions</th>
+                            </tr>
+                        </thead>
 
-                    <tfoot>
-                    </tfoot>
-                </table>
+                        <tfoot>
+                        </tfoot>
+                    </table>
+                </div>
+
             </div>
         </form>
-
-        <style>
-            .order-preview .swal2-content, .swal2-popup.order-preview {
-                padding: 0;
-            }
-            .order-preview div#swal2-content {
-                color: #000;
-                font-weight: 400;
-                margin: 0;
-                text-align: left;
-                box-shadow: var(--shadow);
-            }
-
-            .order-preview .content {
-                padding: 0 16px;
-            }
-
-            .order-preview {
-                min-width: 900px;
-                margin: auto;
-            }
-            .order-preview .head {
-                margin-bottom: 1em;
-            }
-            .order-preview .head, .order-preview .foot {
-                background-color: #f9f9f9;
-                padding: 10px 15px 10px;
-            }
-            .order-preview .foot {
-                margin-top: 2em;
-            }
-            .order-preview h1 {
-                font-size: 18px;
-                font-weight: 900;
-                padding: 4px 0;
-            }
-            .order-preview h2 {
-                font-size: 16px;
-            }
-            .order-preview label {
-                font-weight: 600;
-                font-size: 15px;
-            }
-            .order-preview label + p {
-                margin-top: 6px;
-            }
-            .order-preview table {
-                border-spacing: 0;
-            }
-            .order-preview table label,
-            .order-preview table label + p {
-                font-size: 14px;
-            }
-
-            .order-preview .order-status {
-                padding: 4px 18px 7px;
-                font-size: 14px;
-                margin-right: 3em;
-            }
-
-            .order-preview thead {
-                background-color: #eee;
-            }
-
-            .order-preview th {
-                font-size: 14px;
-            }
-
-            .order-preview th, .order-preview td {
-                font-size: 14px;
-            }
-
-            #books_table td:has(.preview-open) {
-                padding-right: 35px;
-            }
-            #books_table td:has(.sub-order) {
-                padding-right: 60px;
-            }
-
-            #books_table tr:has([title="Subscription"]) {
-                background-color: #f2f7ff
-            }
-        </style>
-
-        <script>
-            $(document).on('click','.preview-open', function(e) {
-                e.preventDefault();
-                const oid = $(this).data('id');
-                const config = {
-                    html: '<div class="processing bg-transparent" style="height: 300px"></div>',
-                    showCloseButton: false,
-                    showConfirmButton: false,
-                    allowOutsideClick: false,
-                    showClass: {
-                        popup: 'animated windowIn order-preview'
-                    },
-                    hideClass: {
-                        popup: 'animated windowOut'
-                    }
-                };
-                Swal.fire(config);
-                fetch('<?php echo admin_url() ?>ajax/get-order-preview/'+oid).then(res=>res.text()).then(res=>{
-                    config.html = res;
-                    config.showCloseButton = true;
-                    swal.close();
-                    Swal.fire(config);
-                })
-            });
-
-            $(document).on('click','.order-preview .mark-completed', function(e) {
-                e.preventDefault();
-                if(window.confirm('Are you sure to mark this order as Completed?')) {
-                    const href = this.href;
-                    const win = window.open(href,'_blank');
-                    win.addEventListener('unload', function() {
-                        location.reload();
-                    });
-                }
-            });
-
-            let select_bulk_action = (ele)=> {
-                let selectedOrders = $('[name="product-row[]"]:checked');
-
-                if(selectedOrders.length) {
-                    let selectedOption = $(ele).find('option[value="'+ele.value+'"]');
-                    if(selectedOption.attr('data-prompt')) {
-                        if(!confirm(selectedOption.attr('data-prompt'))) {
-                            selectedOrders.val('');
-                            selectedOrders.trigger('change');
-                            return;
-                        }
-                    }
-                    let selectedOrderIds = selectedOrders.map((idx,element)=>{
-                        return element.value;
-                    });
-                    const Ids = selectedOrderIds.toArray().join();
-                    const action = ele.value+''+Ids;
-                    const win = window.open(action,'_blank');
-                    ele.value = '';
-                    select2_init();
-                    if(selectedOption.data('refresh')) {
-                        win.addEventListener('unload', function() {
-                            location.reload();
-                        });
-                    }
-                }else {
-                    ele.value = '';
-                    select2_init();
-                    notification('No order selected');
-                }
-            }
-        </script>
-
 
     </div>
 </div>

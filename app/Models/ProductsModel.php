@@ -761,6 +761,31 @@ class ProductsModel extends Model {
         }
     }
 
+    public function stock_refund($product_id, $stock_gain=0) {
+        $master = model('MasterModel');
+
+        
+        //for sending notification
+        $notification = model('NotificationModel');
+        
+
+        
+        $master->query("UPDATE tbl_products SET stock = stock+$stock_gain WHERE id='$product_id' AND (stock_managed=1 OR stock_managed='yes')");
+        $get_prod = $master->query("SELECT stock, stock_status FROM tbl_products WHERE id='$product_id'",true,true);
+        if(!empty($get_prod)) {
+            if($get_prod['stock'] == 0) {
+                $master->query("UPDATE tbl_products SET stock_status = 'instock' WHERE id='$product_id' AND (stock_managed=1 OR stock_managed='yes')");
+
+                //for sending notifications
+                $login_uid = is_logged_in();
+                
+                $customerID='1';
+                $notification->create('Product Low Stock/Out of Stock#'.$product_id, 'products/add/'.$product_id,'Product Low Stock/Out of Stock',$login_uid,$customerID);
+               
+            }
+        }
+    }
+
     public function variation_reduce_stock($product_id, $stock_deduct=0,$orderID) {
         
         // working code 
@@ -960,6 +985,10 @@ class ProductsModel extends Model {
     public function add_sale($product_id, $sale_count=0) {
         $master = model('MasterModel');
         $master->query("UPDATE tbl_products SET total_sales = total_sales+$sale_count WHERE id='$product_id'");
+    }
+    public function subtract_sale($product_id, $sale_count=0) {
+        $master = model('MasterModel');
+        $master->query("UPDATE tbl_products SET total_sales = total_sales-$sale_count WHERE id='$product_id'");
     }
 
     public function sales_stats($time='') {

@@ -284,10 +284,6 @@
 
                                                                             if(!empty($attribute['value'])) {
 
-                                                                                $checking=check_set_value_default_attributes(44152);	
-                                                                                $attributes = json_decode($checking['attributes'], true);
-                                                                                
-
                                                                                 // Find the label with "first_value_default": "1"
                                                                                 $labelWithDefault = null;
                                                                             

@@ -108,6 +108,20 @@ if(!empty($order_items)) {
 </script>
 
 <div id="products" class="table-box">
+    
+
+    <?php 
+        $order_meta = $order_data['order_meta'];
+        if(!empty($order_meta['order_comments'])) {
+            ?>
+            <label for="order_comments">Order Notes
+            <input type="text" name="order_comments" value="<?=$order_meta['order_comments']?>" id="order_comments">
+
+            </label>
+            <?php
+        }
+    ?>
+
     <label>Product Information</label>
     <table width="100%" class="table layout-fixed">
         <thead>
@@ -143,8 +157,9 @@ if(!empty($order_items)) {
     <?php
      $order_meta = $order_data['order_meta'];
 
-     function discount_input($input_name, $value, $type_value) {
-      ?>
+     function discount_input($input_name, $value, $type_value)
+     {
+         ?>
          <div class="d-inline-block" style="width: 100px">
              <div class="input-group input_field">
                  <input type="number" name="<?php echo $input_name ?>" step="0.01" min="0" value="<?php echo $value; ?>">
@@ -152,23 +167,24 @@ if(!empty($order_items)) {
          </div>
          <div class="d-inline-block input-group inline-checkbox input_field">
              <label>
-                 <input type="radio" name="<?php echo $input_name ?>-type" <?php echo $type_value == 'percent' ? 'checked':'' ?> value="percent">
+                 <input type="radio" name="<?php echo $input_name ?>-type" <?php echo $type_value == 'percent' ? 'checked' : '' ?> value="percent">
                  <span>%</span>
              </label>
          </div>
          <div class="d-inline-block input-group inline-checkbox input_field">
              <label>
-                 <input type="radio" name="<?php echo $input_name ?>-type" <?php echo $type_value == 'fixed' ? 'checked':'' ?> value="fixed">
+                 <input type="radio" name="<?php echo $input_name ?>-type" <?php echo $type_value == 'fixed' ? 'checked' : '' ?> value="fixed">
                  <span>=</span>
              </label>
          </div>
-        <?php
+         <?php
      }
+
     ?>
 
     <div class="row">
         <div class="col-md-4"></div>
-        <div class="col-md-8">
+        <!-- <div class="col-md-8">
            <div class="pull-right">
                (in development)
                <table class="table layout-fixed text-left" style="width: 30em;">
@@ -281,7 +297,130 @@ if(!empty($order_items)) {
                </div>
                <?php init_subscription_form_script() ?>
            </div>
-        </div>
+        </div> -->
+
+        <!-- working for perc and fixed  -->
+        <div class="col-md-8">
+            <div class="pull-right">
+                (in development)
+                <table class="table layout-fixed text-left" style="width: 30em;">
+                    <tbody>
+                        <tr>
+                            <th width="140">Item subtotal</th>
+                            <td>
+                                <span><?php echo currency_symbol ?></span>
+                                <span id="item-subtotal"><?php echo ($order_meta['product_total']); ?></span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th width="140">Store discount</th>
+                            <td>
+                                <?php discount_input('store-discount', @$order_meta['global_discount'], @$order_meta['global_discount_type']); ?>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th width="140">Wholesale discount</th>
+                            <td>
+                                <?php discount_input('wholesale-discount', @$order_meta['wholesale_discount'], @$order_meta['wholesale_discount_type']); ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th width="140">User discount</th>
+                            <td>
+                                <?php discount_input('user-discount', @$order_meta['user_discount'], @$order_meta['user_discount_type']); ?>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th width="120">Shipping discount</th>
+                            <td>
+                                <?php discount_input('shipping-discount', @$order_meta['shipping_discount'], @$order_meta['shipping_discount_type']); ?>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>Shipping</th>
+                            <td id="shipping-input" width="220">
+                                <select id="select-order-shipping" name="order-shipping" class="select2" disabled data-search="false">
+                                    <option value="0" data-amount="0">Select shipping method</option>
+
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <?php
+                            if(get_setting('enable_product_coupons')) {
+                                $curr_date = date('Y-m-d h:i:s');
+                                ?>
+                                <th width="120">Coupon</th>
+                                <td id="coupon-input">
+                                    <div class="input-group input_field">
+                                        <div class="rel">
+                                            <div>
+                                                <select onchange="applyCoupon(this)" name="coupon" data-search="false" class="select2" style="width: 200px;">
+                                                    <option value="0">Select coupon</option>
+                                                    <?php
+                                                    foreach($coupons as $coupon) {
+                                                        if($coupon->has_expiration && !date_between($curr_date,$coupon->valid_from,$coupon->valid_to)) {
+                                                            continue;
+                                                        }
+                                                        $selected = '';
+                                                        if(!empty($order_meta['coupon_id'])) {
+                                                            if($coupon->id === $order_meta['coupon_id']) {
+                                                                $selected = 'selected';
+                                                            }
+                                                        }
+                                                        ?>
+                                                        <option <?php echo $selected ?> data-type="<?php echo $coupon->type ?>" data-amount="<?php echo $coupon->amount ?>" value="<?php echo $coupon->id ?>"><?php echo $coupon->code ?></option>
+                                                        <?php
+                                                    } ?>
+                                                </select>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </td>
+                            <?php } ?>
+                        </tr>
+
+                        <tr>
+                            <th width="120">Coupon discount</th>
+                            <td><span><?php echo currency_symbol ?></span><span id="item-subtotal">0.00</span></td>
+                        </tr>
+
+                        <tr>
+                            <th width="120">Tax class</th>
+                            <td>
+                                <div class="input-group input_field">
+                                    <input type="number" id="order-discount" step="0.01" min="0" id="order-discount" onchange="apply_discount(this)" class="form-control" style="width: 200px" value="<?php echo !empty($order_meta['cart_discount']) ? $order_meta['cart_discount']:0 ?>" name="discount">
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>Order total</th>
+                            <td>
+                                <span><?php echo currency_symbol ?></span>
+                                <span id="order-subtotal">0.00</span>
+                                <input type="hidden" name="order-subtotal" class="form-control" id="order-subtotal-input" value="0">
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+                <div class="mt-8"></div>
+                <div class="pull-right">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="recalculateTotal()">Recalculate</button>
+                </div>
+            </div>
+        </div> 
+        
+
+
+      
+
     </div>
 </div>
 
@@ -690,3 +829,132 @@ if(!empty($order_data)) {
         display: block;
     }
 </style>
+<script>
+    // Function to recalculate order total
+    // document.querySelector('#recalculate-btn').addEventListener('click', function () {
+    //     // Get field values
+    //     const productTotal = parseFloat(document.querySelector('#product-total').textContent) || 0;
+    //     const storeDiscount = parseFloat(document.querySelector('#store-discount-input').value) || 0;
+    //     const wholesaleDiscount = parseFloat(document.querySelector('#wholesale-discount-input').value) || 0;
+    //     const userDiscount = parseFloat(document.querySelector('#user-discount-input').value) || 0;
+    //     const shippingDiscount = parseFloat(document.querySelector('#shipping-discount-input').value) || 0;
+    //     const taxClass = parseFloat(document.querySelector('#tax-class-input').value) || 0;
+    //     const shippingCost = parseFloat(document.querySelector('#select-order-shipping').selectedOptions[0].dataset.amount) || 0;
+
+    //     // Calculate total
+    //     const totalDiscount = storeDiscount + wholesaleDiscount + userDiscount + shippingDiscount;
+    //     const subtotal = productTotal - totalDiscount;
+    //     const tax = (subtotal * taxClass) / 100;
+    //     const orderTotal = subtotal + tax + shippingCost;
+
+    //     // Update order total on the page
+    //     document.querySelector('#order-subtotal').textContent = orderTotal.toFixed(2);
+    //     document.querySelector('#order-subtotal-input').value = orderTotal.toFixed(2);
+    // });
+
+    // working code for perc and fixed
+    document.addEventListener('DOMContentLoaded', function () {
+        const itemSubtotalElement = document.getElementById('item-subtotal');
+        const orderSubtotalElement = document.getElementById('order-subtotal');
+        const orderSubtotalInput = document.getElementById('order-subtotal-input');
+        const discountFields = [
+            'store-discount',
+            'wholesale-discount',
+            'user-discount',
+            'shipping-discount',
+        ];
+
+        // Function to recalculate order total
+        function recalculateTotal() {
+            let itemSubtotal = parseFloat(itemSubtotalElement.textContent) || 0;
+            let totalDiscount = 0;
+
+            discountFields.forEach((field) => {
+                const discountInput = document.querySelector(`input[name="${field}"]`);
+                const discountType = document.querySelector(`input[name="${field}-type"]:checked`);
+
+                if (discountInput && discountType) {
+                    const discountValue = parseFloat(discountInput.value) || 0;
+                    const discountTypeValue = discountType.value;
+
+                    if (discountTypeValue === 'percent') {
+                        totalDiscount += (itemSubtotal * discountValue) / 100;
+                    } else if (discountTypeValue === 'fixed') {
+                        totalDiscount += discountValue;
+                    }
+                }
+            });
+
+            // Update order total
+            const orderTotal = Math.max(0, itemSubtotal - totalDiscount); // Ensure no negative total
+            orderSubtotalElement.textContent = orderTotal.toFixed(2);
+            orderSubtotalInput.value = orderTotal.toFixed(2);
+        }
+
+        // Attach event listeners to discount fields
+        discountFields.forEach((field) => {
+            const discountInput = document.querySelector(`input[name="${field}"]`);
+            const discountTypeRadios = document.querySelectorAll(`input[name="${field}-type"]`);
+
+            if (discountInput) {
+                discountInput.addEventListener('input', recalculateTotal);
+            }
+
+            if (discountTypeRadios) {
+                discountTypeRadios.forEach((radio) =>
+                    radio.addEventListener('change', recalculateTotal)
+                );
+            }
+        });
+
+        // Initial calculation
+        recalculateTotal();
+    });
+
+    // document.addEventListener('DOMContentLoaded', function () {
+    //     const itemSubtotalElement = document.getElementById('item-subtotal');
+    //     const orderSubtotalElement = document.getElementById('order-subtotal');
+    //     const orderSubtotalInput = document.getElementById('order-subtotal-input');
+    //     const discountFields = [
+    //         'store-discount',
+    //         'wholesale-discount',
+    //         'user-discount',
+    //         'shipping-discount',
+    //     ];
+
+    //     // Function to recalculate order total
+    //     function recalculateTotal() {
+    //         let itemSubtotal = parseFloat(itemSubtotalElement.textContent) || 0;
+    //         let totalDiscount = 0;
+
+    //         discountFields.forEach((field) => {
+    //             const discountInput = document.querySelector(`input[name="${field}"]`);
+    //             const discountType = document.querySelector(`input[name="${field}-type"]:checked`);
+
+    //             if (discountInput && discountType) {
+    //                 const discountValue = parseFloat(discountInput.value) || 0;
+    //                 const discountTypeValue = discountType.value;
+
+    //                 if (discountTypeValue === 'percent') {
+    //                     totalDiscount += (itemSubtotal * discountValue) / 100;
+    //                 } else if (discountTypeValue === 'fixed') {
+    //                     totalDiscount += discountValue;
+    //                 }
+    //             }
+    //         });
+
+    //         // Update order total
+    //         const orderTotal = Math.max(0, itemSubtotal - totalDiscount); // Ensure no negative total
+    //         orderSubtotalElement.textContent = orderTotal.toFixed(2);
+    //         orderSubtotalInput.value = orderTotal.toFixed(2);
+    //     }
+
+    //     // Attach the recalculateTotal function to the button click
+    //     const recalculateButton = document.querySelector('button[onclick="recalculateTotal()"]');
+    //     if (recalculateButton) {
+    //         recalculateButton.addEventListener('click', recalculateTotal);
+    //     }
+    // });
+
+
+</script>
