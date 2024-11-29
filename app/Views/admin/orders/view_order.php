@@ -67,11 +67,14 @@
                         if(!empty($order_meta['order_comments'])){
                         ?>
                         
-                            <label>Order Notes : <?=$order_meta['order_comments']?></label>
-                        
+                        <!-- <label>Order Notes :</label>  <?=$order_meta['order_comments']?> -->
+                        <p><strong>Order Notes : </strong> <?=$order_meta['order_comments']?></p>
+
                         <?php
                         }
                     ?>
+                </div>
+                <div id="products" class="table-box">
 
                     <label>Product details
                     </label>

@@ -112,15 +112,20 @@ if(!empty($order_items)) {
 
     <?php 
         $order_meta = $order_data['order_meta'];
-        if(!empty($order_meta['order_comments'])) {
+        // if(!empty($order_meta['order_comments'])) {
             ?>
-            <label for="order_comments">Order Notes
-            <input type="text" name="order_comments" value="<?=$order_meta['order_comments']?>" id="order_comments">
 
-            </label>
+            <div class="order-notes" style="display:flex;align-items:center">
+                <p><strong>Order Notes : </strong></p>
+                <input type="text" name="order_comments" value="<?=$order_meta['order_comments']?>" id="order_comments" style="width:85%">
+            </div>
+            
             <?php
-        }
+        // }
     ?>
+</div>
+
+<div id="products" class="table-box">
 
     <label>Product Information</label>
     <table width="100%" class="table layout-fixed">
@@ -171,7 +176,8 @@ if(!empty($order_items)) {
                  <span>%</span>
              </label>
          </div>
-         <div class="d-inline-block input-group inline-checkbox input_field">
+            | &nbsp;&nbsp;&nbsp;
+            £ &nbsp;<div class="d-inline-block input-group inline-checkbox input_field">
              <label>
                  <input type="radio" name="<?php echo $input_name ?>-type" <?php echo $type_value == 'fixed' ? 'checked' : '' ?> value="fixed">
                  <span>=</span>

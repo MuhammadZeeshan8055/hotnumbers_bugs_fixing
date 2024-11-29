@@ -1526,24 +1526,25 @@ class Orders extends MyController
             ]);
 
             // Conditionally add 'global_discount' if $store_discount is not empty
-            if (!empty($store_discount)) {
+            if (isset($store_discount)) {
                 $order_meta['global_discount'] = $store_discount;
                 $order_meta['global_discount_type'] = $store_discount_type;
             }
-            if (!empty($wholesale_discount)) {
+            if (isset($wholesale_discount)) {
                 $order_meta['wholesale_discount'] = $wholesale_discount;
                 $order_meta['wholesale_discount_type'] = $wholesale_discount_type;
             }
-            if (!empty($user_discount)) {
+            if (isset($user_discount)) {
                 $order_meta['user_discount'] = $user_discount;
                 $order_meta['user_discount_type'] = $user_discount_type;
             }
-            if (!empty($shipping_discount)) {
+            if (isset($shipping_discount)) {
                 $order_meta['shipping_discount'] = $shipping_discount;
             }
-            if (!empty($coupon)) {
+            if (isset($coupon)) {
                 $order_meta['coupon_discount'] = $coupon;
             }
+            
             
             if(!empty($post['billing_first_name'])) {
                 $order_meta['customer_user'] = $post['customer'];

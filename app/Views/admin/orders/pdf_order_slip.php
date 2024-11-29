@@ -56,47 +56,7 @@
         .order_receipt_subtotal th, .order_receipt_subtotal td {
             font-size: 13px;
         }
-         /* Page Setup */
-         @page {
-            size: auto;
-            margin: 0;
-            padding: 0;
-        }
-
-        /* Ensure no margins and padding around pages */
-        body {
-            padding-bottom: 40px;
-            margin-bottom: 40px; /* Make space for footer */
-        }
-
-        footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            text-align: center;
-            font-size: 12px;
-            padding: 10px 0;
-        }
-
-        .page_number {
-            font-size: 12px;
-            text-align: center;
-            position: relative;
-        }
-
-        .page_number:before {
-            content: "Page " counter(page);
-        }
-
-        .page_break {
-            page-break-before: always;
-        }
-
-        /* Adjust page-break after every packing slip */
-        .packing-slip {
-            page-break-before: always;
-        }
+        
     </style>
 </head>
 <body>
@@ -260,8 +220,6 @@
             <div class="page_break"></div>
         <?php } } } ?>
 </div>
-<!-- <footer>
-    <div class="page_number"></div>
-</footer> -->
+
 </body>
 </html>

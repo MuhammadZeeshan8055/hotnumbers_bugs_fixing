@@ -614,8 +614,8 @@
                                                                     $price_text = '<span class="woocommerce-Price-currencySymbol">' . _price(number_format($price, 2)) . '</span>';
                                                                 }
                                                                 ?>
-                                                                <span class="base_price"  style="<?= $product['type'] != "variable" ? 'display: none' : 'display: block;' ?>"><?= $price_text ?></span> <!-- Updated to use class for base price -->
-                                                                <span class="product_price" style="<?= $product['type'] === "variable" ? 'display: block' : 'display: none' ?>"> </span>
+                                                                <span class="base_price" ><?= $price_text ?></span> <!-- Updated to use class for base price -->
+                                                                <span class="product_price"> </span>
                                                             </td>
                                                             <td data-label="Action">
                                                                 <!-- Form for adding the product to the cart -->

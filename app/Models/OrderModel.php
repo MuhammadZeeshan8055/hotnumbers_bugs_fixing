@@ -100,12 +100,12 @@ class OrderModel extends Model {
                 LEFT JOIN tbl_users AS user ON user.user_id=o.customer_user 
                 LEFT JOIN tbl_order_meta AS meta ON meta.order_id=o.order_id 
                 WHERE 1=1 $extra_query";
-        
+
         // If no GROUP BY is specified, add it to avoid potential issues
         if (strpos($extra_query, "GROUP BY") === false) {
-            $query .= " GROUP BY o.order_id";
+            $query .= " GROUP BY o.order_id order by o.order_id desc";
         }
-
+     
         $db_orders = $this->db->query($query)->getResultArray();
         
         if ($db_orders) {
@@ -710,16 +710,49 @@ class OrderModel extends Model {
         }
     }
 
-    public function generate_order_slip($order_ids=[]) {
+    // public function generate_order_slip($order_ids=[]) {
 
+    //     $options = new Options();
+    //     $options->set('isRemoteEnabled', true);
+    //     $dompdf = new Dompdf($options);
+    //     $userModel = model('UserModel');
+
+    //     $slips = [];
+
+    //     foreach($order_ids as $order_id) {
+    //         $order = $this->get_order_by_id($order_id);
+    //         $order['customer'] = $userModel->get_user($order['customer_user']);
+    //         $slips[] = $order;
+    //     }
+
+    //     $this->data['slips'] = $slips;
+
+    //     $settings = $this->db->query("SELECT value FROM tbl_settings WHERE title='website'")->getRowArray();
+
+    //     $this->data['setting'] = json_decode($settings['value'],true);
+
+    //     $slip_view = view('admin/orders/pdf_order_slip',$this->data);
+
+    //     $dompdf->loadHtml($slip_view);
+
+    //     $dompdf->render();
+
+    //     $dompdf->stream(implode('-',$order_ids)." - Order Slip.pdf", array("Attachment" => false));
+
+    //     exit;
+    // }
+
+    public function generate_order_slip($order_ids = [])
+    {
         $options = new Options();
-        $options->set('isRemoteEnabled', true);
+        $options->set('isRemoteEnabled', true); // Enable remote resources (e.g., images, fonts)
+        $options->set('defaultFont', 'Lato');  // Set default font
         $dompdf = new Dompdf($options);
-        $userModel = model('UserModel');
 
+        $userModel = model('UserModel');
         $slips = [];
 
-        foreach($order_ids as $order_id) {
+        foreach ($order_ids as $order_id) {
             $order = $this->get_order_by_id($order_id);
             $order['customer'] = $userModel->get_user($order['customer_user']);
             $slips[] = $order;
@@ -728,16 +761,37 @@ class OrderModel extends Model {
         $this->data['slips'] = $slips;
 
         $settings = $this->db->query("SELECT value FROM tbl_settings WHERE title='website'")->getRowArray();
+        $this->data['setting'] = json_decode($settings['value'], true);
 
-        $this->data['setting'] = json_decode($settings['value'],true);
+        // Generate HTML for the slip
+        $slip_view = view('admin/orders/pdf_order_slip', $this->data);
 
-        $slip_view = view('admin/orders/pdf_order_slip',$this->data);
-
+        // Load the HTML into Dompdf
         $dompdf->loadHtml($slip_view);
 
+        // Set paper size and orientation
+        $dompdf->setPaper('A4', 'portrait');
+
+        // Render the HTML as PDF
         $dompdf->render();
 
-        $dompdf->stream(implode('-',$order_ids)." - Order Slip.pdf", array("Attachment" => false));
+        // Add page numbers
+        $canvas = $dompdf->getCanvas();
+        $pageCount = $canvas->get_page_count();
+        $pageWidth = $canvas->get_width();
+        for ($i = 1; $i <= $pageCount; $i++) {
+            $canvas->page_text(
+                520, // X position (from the left)
+                820, // Y position (from the top)
+                "Page {PAGE_NUM} of {PAGE_COUNT}", // Text to display
+                null, // Font
+                10,   // Font size
+                [0, 0, 0] // Color in RGB
+            );
+        }
+
+        // Stream the PDF to the browser
+        $dompdf->stream(implode('-', $order_ids) . " - Order Slip.pdf", ["Attachment" => false]);
 
         exit;
     }
@@ -985,6 +1039,3 @@ class OrderModel extends Model {
 
 
 }
-
-
- 

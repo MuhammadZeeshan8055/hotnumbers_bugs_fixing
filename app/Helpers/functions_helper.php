@@ -97,29 +97,26 @@ function order_product_category($pid){
 function get_variable_product_stock($pid) {
         $sql = "SELECT SUM(stock) AS total_stock
         FROM (
-        SELECT JSON_UNQUOTE(JSON_EXTRACT(variation, CONCAT('$[', idx, '].values.stock'))) AS stock
-        FROM tbl_product_variations
-        JOIN (
-            SELECT 0 AS idx UNION ALL
-            SELECT 1 UNION ALL
-            SELECT 2 UNION ALL
-            SELECT 3 UNION ALL
-            SELECT 4 UNION ALL
-            SELECT 5 UNION ALL
-            SELECT 6 UNION ALL
-            SELECT 7 UNION ALL
-            SELECT 8 UNION ALL
-            SELECT 9
-        ) AS indices
-            WHERE product_id = '$pid'
+            SELECT 
+                JSON_UNQUOTE(JSON_EXTRACT(variation, CONCAT('$[', idx, '].values.stock'))) AS stock,
+                JSON_UNQUOTE(JSON_EXTRACT(variation, CONCAT('$[', idx, '].values.manage_stock'))) AS manage_stock
+            FROM tbl_product_variations
+            JOIN (
+                SELECT 0 AS idx UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 
+                UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 
+                UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9
+            ) AS indices
+            WHERE product_id = '$pid' 
             AND idx < JSON_LENGTH(variation)
         ) AS stock_values
+        WHERE manage_stock = 'yes'
         ";
         
         $master = model('MasterModel');
         $q = $master->query($sql, true, true);
         return $q;
 }
+
 function get_variable_product_stock_zero($pid) {
 
     // $sql = "
@@ -324,15 +321,15 @@ function order_statuses() {
     return [
         'completed' => 'Completed',
         'processing' => 'Processing',
-        'pending' => 'Pending Payment',
-        'active' => 'active',
+        // 'pending' => 'Pending Payment',
+        // 'active' => 'active',
         'on-hold' => 'On Hold',
         //'ready_to_ship' => 'Ready to ship',
         'cancelled' => 'Cancelled',
         'refund' => 'Refunded',
-        'failed' => 'Failed',
+        // 'failed' => 'Failed',
         'trashed' => 'Bin',
-        'renew-failed' => 'Renew failed'
+        // 'renew-failed' => 'Renew failed'
        
     ];
 }
@@ -343,6 +340,7 @@ function order_form_statuses() {
         'processing' => 'Processing',
         'cancelled' => 'Cancelled',
         'refund' => 'Refunded',
+        'on-hold' => 'On Hold',
     ];
 }
 

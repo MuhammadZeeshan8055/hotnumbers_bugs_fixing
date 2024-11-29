@@ -631,7 +631,19 @@
                                         ?>
                                         <li class="product post-<?php echo $product['id'] ?> <?php echo $product['img'] ? 'has-post-thumbnail':'' ?>">
                                             <a href="<?php echo site_url('shop/product/'.$product['slug']) ?>">
-                                                <img width="300" height="200" src="<?php echo $image_url ?>" class="thumbnail" alt="<?php echo $product['title'] ?>" loading="lazy"></a>
+                                            
+                                            <!-- <img width="300" height="200" src="<?php echo $image_url ?>" class="thumbnail" alt="<?php echo $product['title'] ?>" loading="lazy"></a> -->
+
+                                            <img 
+                                            width="300" 
+                                            height="200" 
+                                            src="<?php 
+                                                $return = base_url().'/assets/images/placeholder.jpg';
+                                                echo !empty($image_url) ? $image_url : base_url('public/res.php?src='.$return.'&w=300&h=300'); ?>" 
+                                            class="thumbnail" 
+                                            alt="<?php echo $product['title']; ?>" 
+                                            loading="lazy">
+                                             
                                             <a href="<?php echo site_url('shop/product/'.$product['slug']) ?>">
                                                 <div class="details">
                                                     <div class="content">

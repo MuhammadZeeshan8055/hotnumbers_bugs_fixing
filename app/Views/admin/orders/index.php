@@ -184,3 +184,73 @@
 
     </div>
 </div>
+
+<script>
+    $(document).on('click','.preview-open', function(e) {
+        e.preventDefault();
+        const oid = $(this).data('id');
+        
+        const config = {
+            html: '<div class="processing bg-transparent" style="height: 300px"></div>',
+            showCloseButton: false,
+            showConfirmButton: false,
+            allowOutsideClick: false,
+            showClass: {
+                popup: 'animated windowIn order-preview'
+            },
+            hideClass: {
+                popup: 'animated windowOut'
+            }
+        };
+        Swal.fire(config);
+        fetch('<?php echo admin_url() ?>ajax/get-order-preview/'+oid).then(res=>res.text()).then(res=>{
+            config.html = res;
+            config.showCloseButton = true;
+            swal.close();
+            Swal.fire(config);
+        })
+    });
+
+    $(document).on('click','.order-preview .mark-completed', function(e) {
+        e.preventDefault();
+        if(window.confirm('Are you sure to mark this order as Completed?')) {
+            const href = this.href;
+            const win = window.open(href,'_blank');
+            win.addEventListener('unload', function() {
+                location.reload();
+            });
+        }
+    });
+
+    let select_bulk_action = (ele)=> {
+        let selectedOrders = $('[name="product-row[]"]:checked');
+        
+        if(selectedOrders.length) {
+            let selectedOption = $(ele).find('option[value="'+ele.value+'"]');
+            if(selectedOption.attr('data-prompt')) {
+                if(!confirm(selectedOption.attr('data-prompt'))) {
+                    selectedOrders.val('');
+                    selectedOrders.trigger('change');
+                    return;
+                }
+            }
+            let selectedOrderIds = selectedOrders.map((idx,element)=>{
+                return element.value;
+            });
+            const Ids = selectedOrderIds.toArray().join();
+            const action = ele.value+''+Ids;
+            const win = window.open(action,'_blank');
+            ele.value = '';
+            select2_init();
+            if(selectedOption.data('refresh')) {
+                win.addEventListener('unload', function() {
+                    location.reload();
+                });
+            }
+        }else {
+            ele.value = '';
+            select2_init();
+            notification('No order selected');
+        }
+    }
+</script>

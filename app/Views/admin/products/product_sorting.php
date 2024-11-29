@@ -75,7 +75,8 @@
                                 }else{
                                 ?>
                                 
-                                    <img class="thumb" src="<?php echo base_url( 'public/res.php?src=https%3A%2F%2Fstaging.hotnumberscoffee.co.uk%2Fassets%2Fimages%2Fplaceholder.jpg&w=300&h=300') ?>">
+                                    <img class="thumb" src="<?php $return = base_url().'/assets/images/placeholder.jpg';
+                                            echo !empty($image_url) ? $image_url : base_url('public/res.php?src='.$return.'&w=300&h=300'); ?>">
                                 
                                 <?php
                                 }
