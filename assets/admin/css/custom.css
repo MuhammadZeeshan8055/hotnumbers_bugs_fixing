@@ -11779,9 +11779,9 @@ input:focus, select:focus, textarea:focus {
   padding: 5px;
 }
 
-.upload_media_images_gallery {
+/* .upload_media_images_gallery {
   max-height: 48vmax;
-}
+} */
 .upload_media_images_gallery .header {
   text-align: left;
   border-bottom: 1px solid #eee;

@@ -796,7 +796,11 @@ class CartModel extends BaseController {
 
             // $cart['cart_total'] = $cart_total;
 
-            $cart['cart_total'] = number_format($cart_total);
+            if (abs($cart_total) < 1e-10) {
+                $cart['cart_total'] = 0;
+            } else {
+                $cart['cart_total'] = $cart_total;
+            }
             
             return $cart;
         }
@@ -1388,9 +1392,16 @@ class CartModel extends BaseController {
         });
     
         $order_ids = [];
+
+        $is_internal=is_internal();
+        $is_wholesaler=is_wholesaler();
+
+        // Set post status to 'processing' for internal users or wholesalers, otherwise 'pending' by default
+        $getPost['post_status'] = ($is_internal || $is_wholesaler) ? 'processing' : ($getPost['post_status'] ?? 'pending');
     
         // Create order for subscription items if present
         if (!empty($subscription_items)) {
+
             $order_data = [
                 'status'=>!empty($getPost['post_status']) ? $getPost['post_status'] : 'pending',
                 'order_title' => 'Subscription Order &ndash; '.date('F d, Y').' @ '.date('h:i A'),
@@ -1401,7 +1412,8 @@ class CartModel extends BaseController {
                 'order_currency'=>env('default_currency_code'),
                 'billing_address' => json_encode($billing_info),
                 'shipping_address' => json_encode($shipping_info),
-                'cart_id' => $cart_products['cart_id']
+                'cart_id' => $cart_products['cart_id'],
+                'order_type' => 'shop_subscription'
             ];
     
             $order_ids['subscription'] = $master->insertData('tbl_orders', $order_data);
@@ -1433,7 +1445,24 @@ class CartModel extends BaseController {
                     $master->insertData('tbl_order_item_meta', ['meta_key'=>$key,'meta_value'=>$value,'item_id'=>$item_id]);
                 }
             }
-    
+
+            $shipping_discount = 0;
+            $shipping_add = 0;
+            $shipping_options = '';
+
+            if (!empty($cart_products['user_discount_text'])) {
+                // Remove '%' if present and convert to a number
+                $discount_percentage = (float)str_replace('%', '', $cart_products['user_discount_text']);
+                
+                // Calculate the discount
+                $user_discount = $subs_item_price * ($discount_percentage / 100);
+
+                $subscription_order_total=$subs_item_price-$user_discount;
+            }else{
+                $subscription_order_total=$subs_item_price;
+            }
+
+
             $order_meta = array_merge($cart_products, [
                 'customer_user' => $customer_id,
                 'payment_method' => $payment_method,
@@ -1454,7 +1483,7 @@ class CartModel extends BaseController {
                 'order_shipping_tax' => $cart_products['shipping_tax'],
 
                 // 'order_total' => $cart_products['cart_total'],
-                'order_total' => $subs_item_price,
+                'order_total' => $subscription_order_total,
                
                 'order_tax' => $cart_products['total_tax'],
                 'price_with_tax' => $price_with_tax,
@@ -1468,7 +1497,8 @@ class CartModel extends BaseController {
                 'paid_date' => !empty($getPost['order_paid']) ? date('Y-m-d h:i:s') : '',
                 'order_date' => date('Y-m-d h:i:s'),
                 'purchase_order_number' => $getPost['purchase_order_number'] ?? '',
-                
+                'user_discount' => $user_discount,
+
                 'billing_first_name'=>$first_name,
                 'billing_last_name'=>$last_name,
                 'billing_address_1'=>$billing_address1,
@@ -1492,7 +1522,7 @@ class CartModel extends BaseController {
                 'shipping_address_index'=>$first_name.' '.$last_name.' '.$shipping_address1.' '.$shipping_address2.' '.$billing_email.' '.$billing_phone,
                 'shipping_discount' => $shipping_discount,
                 'shipping_add' => $shipping_add,
-                'shipping_options' => $shipping_options
+                'shipping_options' => $shipping_options,
             ]);
     
             foreach($order_meta as $key=>$value) {
@@ -1517,13 +1547,6 @@ class CartModel extends BaseController {
     
         // Create order for other products if present
         if (!empty($other_items)) {
-
-            $is_internal=is_internal();
-            $is_wholesaler=is_wholesaler();
-
-            // Set post status to 'processing' for internal users or wholesalers, otherwise 'pending' by default
-            $getPost['post_status'] = ($is_internal || $is_wholesaler) ? 'processing' : ($getPost['post_status'] ?? 'pending');
-
 
             $order_data = [
                 'status' => $getPost['post_status'],
@@ -1560,7 +1583,31 @@ class CartModel extends BaseController {
                     $master->insertData('tbl_order_item_meta', ['meta_key'=>$key,'meta_value'=>$value,'item_id'=>$item_id]);
                 }
             }
-    
+
+            $shipping_discount = 0;
+            $shipping_add = 0;
+            $shipping_options = '';
+
+            if (!empty($subs_item_price)) {
+                $other_items_total = $cart_products['product_total'] - $subs_item_price;
+            } else {
+                $other_items_total = $cart_products['product_total'];
+            }
+
+            if (!empty($cart_products['user_discount_text'])) {
+                // Remove '%' if present and convert to a number
+                $discount_percentage = (float)str_replace('%', '', $cart_products['user_discount_text']);
+                
+              
+
+                // Calculate the discount
+                $user_discount = $other_items_total * ($discount_percentage / 100);
+
+                $other_items_order_total=$other_items_total - $user_discount;
+            }else{
+                $other_items_order_total= $other_items_total;
+            }
+
             $order_meta = array_merge($cart_products, [
                 'customer_user' => $customer_id,
                 'payment_method' => $payment_method,
@@ -1578,7 +1625,9 @@ class CartModel extends BaseController {
                 'order_shipping_tax' => $cart_products['shipping_tax'],
                 
                 // 'order_total' => $cart_products['cart_total'],
-                'order_total' => $cart_products['cart_total'] - $subs_item_price,
+                // 'order_total' => $cart_products['cart_total'] - $subs_item_price,
+
+                'order_total' => $other_items_order_total,
                 
                 'order_tax' => $cart_products['total_tax'],
                 'price_with_tax' => $price_with_tax,
@@ -1592,6 +1641,7 @@ class CartModel extends BaseController {
                 'paid_date' => !empty($getPost['order_paid']) ? date('Y-m-d h:i:s') : '',
                 'order_date' => date('Y-m-d h:i:s'),
                 'purchase_order_number' => $getPost['purchase_order_number'] ?? '',
+                'user_discount' => $user_discount,
                 
                 'billing_first_name'=>$first_name,
                 'billing_last_name'=>$last_name,

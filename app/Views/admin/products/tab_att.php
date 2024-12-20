@@ -172,7 +172,7 @@ if(!empty($product_row['id'])) {
                                                         <div class="row" >
                                                             <div class=" col-md-4 input_field mb-15">
                                                                 <label>Stock quantity</label>
-                                                                <input type="number" min="0" name="variations[<?php echo $idx ?>][values][stock]" value="<?php echo !empty($vdata['stock']) ? $vdata['stock'] : "" ?>">
+                                                                <input type="number" min="0" name="variations[<?php echo $idx ?>][values][stock]" value="<?php echo isset($vdata['stock']) ? $vdata['stock'] : "" ?>">
                                                             </div>
 
                                                             <div class=" col-md-4 input_field mb-15">

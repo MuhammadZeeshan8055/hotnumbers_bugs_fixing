@@ -319,16 +319,16 @@ function check_user_role($customer_id) {
 
 function order_statuses() {
     return [
-        'completed' => 'Completed',
         'processing' => 'Processing',
+        'completed' => 'Completed',
+        'on-hold' => 'On Hold',
+        'refund' => 'Refunded',
+        'cancelled' => 'Cancelled',
+        'trashed' => 'Bin',
         // 'pending' => 'Pending Payment',
         // 'active' => 'active',
-        'on-hold' => 'On Hold',
         //'ready_to_ship' => 'Ready to ship',
-        'cancelled' => 'Cancelled',
-        'refund' => 'Refunded',
         // 'failed' => 'Failed',
-        'trashed' => 'Bin',
         // 'renew-failed' => 'Renew failed'
        
     ];

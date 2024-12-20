@@ -367,10 +367,11 @@
                             color: white;
                         }
                         .swal2-container.swal2-bottom-end.swal2-backdrop-show {
-                            width: 250px !important;
+                            width: 350px !important;
                         }
                         .swal2-popup.swal2-toast.animated.fadeInDown.single_add_to_cart.error {
                             width: 250px !important;
+                            height:60px !important;
                         }
 
                         .subscription_checkbox {
@@ -815,82 +816,82 @@ $(document).ready(function() {
 });
 
 
-$(document).ready(function() {
-    // Function to handle price updates
-    function updatePrice($row) {
-        var productId = $row.find("input[name='product_id']").val();
-        var productPriceSpan = $row.find('.product_price');
-        var basePriceSpan = $row.find('.base_price');
+// $(document).ready(function() {
+//     // Function to handle price updates
+//     function updatePrice($row) {
+//         var productId = $row.find("input[name='product_id']").val();
+//         var productPriceSpan = $row.find('.product_price');
+//         var basePriceSpan = $row.find('.base_price');
 
-        // Get all select boxes in the current row
-        var $selects = $row.find('select[name^="variations\\[attribute_"]');
+//         // Get all select boxes in the current row
+//         var $selects = $row.find('select[name^="variations\\[attribute_"]');
 
-        // Initialize variables
-        var selectedOption = null;
-        var attributeName = null;
+//         // Initialize variables
+//         var selectedOption = null;
+//         var attributeName = null;
 
-        // Loop through each select box to find the first valid selection
-        $selects.each(function() {
-            var $select = $(this);
-            var value = $select.val();
+//         // Loop through each select box to find the first valid selection
+//         $selects.each(function() {
+//             var $select = $(this);
+//             var value = $select.val();
 
-            // Check if this select has a value
-            if (value) {
-                selectedOption = value; // Store the first valid selection
-                attributeName = $select.data('attribute'); // Store the attribute name
-                return false; // Break the loop after finding the first valid selection
-            }
-        });
+//             // Check if this select has a value
+//             if (value) {
+//                 selectedOption = value; // Store the first valid selection
+//                 attributeName = $select.data('attribute'); // Store the attribute name
+//                 return false; // Break the loop after finding the first valid selection
+//             }
+//         });
 
-        // If no valid selections were found, hide the price display and show base price
-        if (!selectedOption) {
-            productPriceSpan.hide();
-            basePriceSpan.show();
-            return; // Exit early
-        }
+//         // If no valid selections were found, hide the price display and show base price
+//         if (!selectedOption) {
+//             productPriceSpan.hide();
+//             basePriceSpan.show();
+//             return; // Exit early
+//         }
 
-        // If a valid selection was found, make the AJAX request
-        if (productId) {
-            $.ajax({
-                url: "<?php echo base_url('/get_price'); ?>",
-                type: "POST",
-                data: {
-                    product_id: productId,
-                    variation: selectedOption,
-                    attribute: attributeName // Send the attribute name for the valid selection
-                },
-                success: function(response) {
-                    var currencySymbol = '£'; // Change this to your desired currency symbol
-                    if (response && response !== "No matching variation found") {
-                        productPriceSpan.html(currencySymbol + response).show();
-                        basePriceSpan.hide();
-                    }
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    console.log("Error fetching price: " + textStatus, errorThrown);
-                }
-            });
-        }
-    }
+//         // If a valid selection was found, make the AJAX request
+//         if (productId) {
+//             $.ajax({
+//                 url: "<?php echo base_url('/get_price'); ?>",
+//                 type: "POST",
+//                 data: {
+//                     product_id: productId,
+//                     variation: selectedOption,
+//                     attribute: attributeName // Send the attribute name for the valid selection
+//                 },
+//                 success: function(response) {
+//                     var currencySymbol = '£'; // Change this to your desired currency symbol
+//                     if (response && response !== "No matching variation found") {
+//                         productPriceSpan.html(currencySymbol + response).show();
+//                         basePriceSpan.hide();
+//                     }
+//                 },
+//                 error: function(jqXHR, textStatus, errorThrown) {
+//                     console.log("Error fetching price: " + textStatus, errorThrown);
+//                 }
+//             });
+//         }
+//     }
 
-    // Trigger the price update on change for any attribute select
-    $(document).on('change', 'select[name^="variations\\[attribute_"]', function() {
-        var $row = $(this).closest('tr');
-        updatePrice($row);
-    });
+//     // Trigger the price update on change for any attribute select
+//     $(document).on('change', 'select[name^="variations\\[attribute_"]', function() {
+//         var $row = $(this).closest('tr');
+//         updatePrice($row);
+//     });
 
-    // Automatically trigger the price update on page load for rows with pre-selected values
-    $('tr').each(function() {
-        var $row = $(this);
-        var hasPreselectedValues = $row.find('select[name^="variations\\[attribute_"]').filter(function() {
-            return $(this).val(); // Check if any select has a pre-selected value
-        }).length > 0;
+//     // Automatically trigger the price update on page load for rows with pre-selected values
+//     $('tr').each(function() {
+//         var $row = $(this);
+//         var hasPreselectedValues = $row.find('select[name^="variations\\[attribute_"]').filter(function() {
+//             return $(this).val(); // Check if any select has a pre-selected value
+//         }).length > 0;
 
-        if (hasPreselectedValues) {
-            updatePrice($row); // Trigger the price update for this row
-        }
-    });
-});
+//         if (hasPreselectedValues) {
+//             updatePrice($row); // Trigger the price update for this row
+//         }
+//     });
+// });
 
 
 </script>

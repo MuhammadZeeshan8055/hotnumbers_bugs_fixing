@@ -62,18 +62,20 @@
         <div class="row">
             <div class="col-md-9">
                 <?php echo view('admin/orders/order_info_box',['order'=>$order]) ?>
-                <div id="products" class="table-box">
                     <?php
                         if(!empty($order_meta['order_comments'])){
                         ?>
-                        
-                        <!-- <label>Order Notes :</label>  <?=$order_meta['order_comments']?> -->
-                        <p><strong>Order Notes : </strong> <?=$order_meta['order_comments']?></p>
+                            <div id="products" class="table-box">
+                                
+                                    
+                                    <!-- <label>Order Notes :</label>  <?=$order_meta['order_comments']?> -->
+                                    <p><strong>Order Notes : </strong> <?=$order_meta['order_comments']?></p>
 
-                        <?php
+                                    
+                            </div>
+                    <?php
                         }
                     ?>
-                </div>
                 <div id="products" class="table-box">
 
                     <label>Product details

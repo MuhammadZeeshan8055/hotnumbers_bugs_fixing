@@ -1534,7 +1534,14 @@ class Orders extends MyController
                 $order_meta['wholesale_discount'] = $wholesale_discount;
                 $order_meta['wholesale_discount_type'] = $wholesale_discount_type;
             }
-            if (isset($user_discount)) {
+            // if (isset($user_discount)) {
+            //     $order_meta['user_discount'] = $user_discount;
+            //     $order_meta['user_discount_type'] = $user_discount_type;
+            // }
+            if($user_discount_type=='fixed'){
+                $order_meta['user_discount'] = $user_discount;
+                $order_meta['user_discount_type'] = $user_discount_type;
+            }else{
                 $order_meta['user_discount'] = $user_discount;
                 $order_meta['user_discount_type'] = $user_discount_type;
             }
@@ -1544,8 +1551,8 @@ class Orders extends MyController
             if (isset($coupon)) {
                 $order_meta['coupon_discount'] = $coupon;
             }
-            
-            
+
+
             if(!empty($post['billing_first_name'])) {
                 $order_meta['customer_user'] = $post['customer'];
                 $order_meta['billing_first_name'] = $first_name;

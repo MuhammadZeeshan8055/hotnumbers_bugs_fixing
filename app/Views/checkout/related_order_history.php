@@ -16,6 +16,9 @@
         font: normal normal normal 1em / 1 "lineicons";
         margin: 6px;
     }
+    .desc, .asc {
+        background-color: #f9f9f9;
+    }
 </style>
 <?php
 if(!empty($order)) {

@@ -28,45 +28,17 @@ class Shop extends BaseController
         $values = get_variation_product_price($productId);
         $variations = json_decode($values['variation'], true);
     
-        // Search through variations to find the one that matches the target variation
+       
         foreach ($variations as $variation) {
-            // Check if targetVariation matches the dynamically sent attribute name
+           
             if (isset($variation['keys']["attribute_$attributeName"]) && $variation['keys']["attribute_$attributeName"] == $targetVariation) {
                 echo $variation['values']['regular_price'];
                 return; // Stop after finding the match
             }
         }
     
-        // If no matching variation is found, display a message
-        // echo "No matching variation found.";
+        
     }
-
-
-
-
-    // public function get_price() {
-    //     $productId = '3488';
-    //     $targetVariation = '250g'; // The variation you want to find
-    
-    //     // Get the variation product price
-    //     $values = get_variation_product_price($productId);
-    
-    //     // Decode the JSON string in the 'variation' key
-    //     $variations = json_decode($values['variation'], true);
-    
-    //     // Search through variations to find the one that matches the target variation
-    //     foreach ($variations as $variation) {
-    //         if ($variation['keys']['attribute_weight'] == $targetVariation) {
-    //             // If matching variation is found, print the price
-    //             echo $variation['values']['regular_price'];
-    //             return; // Stop after finding the match
-    //         }
-    //     }
-    
-    //     // If no matching variation is found, display a message
-    //     echo "No matching variation found.";
-    // }
-    
 
     //// fetch shop categories data
     // public function index()

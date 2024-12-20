@@ -161,7 +161,7 @@
                                                     <input type="text" name="override_text" placeholder="Override Text" value="<?php echo @$data['override_text'] ?>" maxlength="100">
                                                 </div>
                                             </div>
-                                            <div class="col-md-4 mb-15" id="tax_status" <?php echo $data['type'] == "external" ? 'hidden' : ''; ?>>
+                                            <div class="col-md-6 mb-15" id="tax_status" <?php echo $data['type'] == "external" ? 'hidden' : ''; ?>>
                                                 <div class="input_field">
                                                     <label>Tax Status <i class="lni lni-question-circle" data-tooltip title="Define whether or not the entire product is taxable, or just the cost of shipping it."></i> </label>
                                                     <div>
@@ -177,7 +177,7 @@
                                             </div>
 
 
-                                            <div class="col-md-4 mb-15" id="tax_class" <?php echo $data['type'] == "external" ? 'hidden' : ''; ?>>
+                                            <div class="col-md-6 mb-15" id="tax_class" <?php echo $data['type'] == "external" ? 'hidden' : ''; ?>>
                                                 <div class="input_field">
                                                     <label>Tax Class <?php echo help_text('Choose a tax class for this product. Tax classes are used to apply different tax rates specific to certain types of product.') ?></label>
                                                     <div>
@@ -207,7 +207,7 @@
                                                 </div>
                                             </div> -->
 
-                                            <div class="col-md-4 mb-15">
+                                            <div class="col-md-6 mb-15">
                                                 <div class="input_field">
                                                     <label>Xero Code</label>
                                                     <input type="text" name="" value="" placeholder="Xero Code">
@@ -240,7 +240,7 @@
                             <div class="col-lg-6">
                                 <div class="row">
 
-                                    <div class="col-md-12 mb-15 input_field">
+                                    <div class="col-md-12 input_field">
                                         <label for="id_label_multiple">Select Category</label>
                                         <div>
                                             <select class="select2 form-control" multiple="multiple" name="category[]">
@@ -270,7 +270,17 @@
                                                    value="<?php echo $data['address'] ?>">
                                         </div>
                                     </div>
-
+                                    <div class="col-md-4 mb-15">
+                                                <div class="input_field">
+                                                    <label>Stock status</label>
+                                                    <div>
+                                                        <select class="select2 form-control" name="stock_status_input" value="<?php echo $data['stock_status'] ?>">
+                                                            <option value="instock">In Stock</option>
+                                                            <option value="outofstock">Out of Stock</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
 
                                     <div id="stock_management_check" class="col-lg-12 pt-30" style="display:<?php echo $data['type'] == "external" ? 'none':'block' ?>">
                                         <div>
@@ -285,17 +295,7 @@
 
                                     <div id="stock_control" class="col-md-12" style="display:<?php echo $data['type'] == "external" ? 'none':'block' ?>">
                                         <div class="row">
-                                            <div class="col-md-4 mb-15">
-                                                <div class="input_field">
-                                                    <label>Stock status</label>
-                                                    <div>
-                                                        <select class="select2 form-control" name="stock_status_input" value="<?php echo $data['stock_status'] ?>">
-                                                            <option value="instock">In Stock</option>
-                                                            <option value="outofstock">Out of Stock</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            
 
                                             <div class="col-md-4 mb-15">
                                                 <div class="input_field">
@@ -306,7 +306,7 @@
 
                                             <div class="col-md-4 mb-15">
                                                 <div class="input_field mb-20">
-                                                    <label>Low stock threshold</label>
+                                                    <label style="width: 150%;">Low stock threshold</label>
                                                     <input type="number" name="stock_threshold" <?php echo empty($data['stock_managed']) || $data['stock_managed'] == 'no' ? 'disabled':'' ?> class="stock_manage_input" min="0" value="<?php echo !empty($data['stock_threshold']) ? $data['stock_threshold'] : 0 ?>">
                                                 </div>
                                             </div>

@@ -238,7 +238,7 @@
 
                                             <form class="variations_form cart validate" action="" method="post" enctype="multipart/form-data">
 
-                                                <table class="variations" cellspacing="0" style="">
+                                                <table class="variations" cellspacing="0">
                                                     <tbody>
                                                     <?php
                                                     $is_variation = false;

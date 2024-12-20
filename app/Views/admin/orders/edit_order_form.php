@@ -335,7 +335,8 @@ if(!empty($order_items)) {
                         <tr>
                             <th width="140">User discount</th>
                             <td>
-                                <?php discount_input('user-discount', @$order_meta['user_discount'], @$order_meta['user_discount_type']); ?>
+                                <!-- <?php discount_input('user-discount', @$order_meta['user_discount'], @$order_meta['user_discount_type']); ?> -->
+                                <?php discount_input('user-discount', (int) str_replace('%', '', $order_meta['user_discount_text']), @$order_meta['user_discount_type']); ?>
                             </td>
                         </tr>
 
@@ -400,7 +401,8 @@ if(!empty($order_items)) {
                             <th width="120">Tax class</th>
                             <td>
                                 <div class="input-group input_field">
-                                    <input type="number" id="order-discount" step="0.01" min="0" id="order-discount" onchange="apply_discount(this)" class="form-control" style="width: 200px" value="<?php echo !empty($order_meta['cart_discount']) ? $order_meta['cart_discount']:0 ?>" name="discount">
+                                    <!-- <input type="number" id="order-discount" step="0.01" min="0" id="order-discount" onchange="apply_discount(this)" class="form-control" style="width: 200px" value="<?php echo !empty($order_meta['cart_discount']) ? $order_meta['cart_discount']:0 ?>" name="discount"> -->
+                                    <input type="number" id="order-discount" step="0.01" min="0" onchange="apply_discount(this)" class="form-control" style="width: 200px" value="0" name="discount">
                                 </div>
                             </td>
                         </tr>

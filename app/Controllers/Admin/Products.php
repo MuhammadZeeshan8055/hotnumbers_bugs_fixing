@@ -331,10 +331,10 @@ class Products extends BaseController
                 
                 }
 
-                if ($row['type'] == 'variable' && $manage_stock == 'no') {
+                if ($row['type'] == 'variable' && $row['stock_status'] == 'outofstock') {
                     $stock = '-';
                     $stock_status_class = 'stock stock_outofstock';
-                    $stock_status = '-';
+                    $stock_status = 'Out of Stock';
                     $zero_stock_value_mark = '';
                 }
                 
@@ -498,8 +498,8 @@ href="javascript:void(0)"></i> <i class="lni lni-trash-can"></i></a> &nbsp;';
             if ($this->request->getGet('clone')) {
                 // Remove ID to force insertion as new record
                 unset($data['id']);
-                $data['title'] .= ' - Cafe Use Only-copy';
-                $data['product_url'] .= ' ---cafe-use-only-copy'; // Optionally modify the title or slug to indicate a clone
+                $data['title'] .= '-copy';
+                $data['product_url'] .= '-copy'; // Optionally modify the title or slug to indicate a clone
             
             }
 
@@ -514,6 +514,15 @@ href="javascript:void(0)"></i> <i class="lni lni-trash-can"></i></a> &nbsp;';
             
             //handling products attributes
             if(!empty($data['id'])){
+                $attributes = [];
+                if(!empty($data['attributes'])) {
+                    $attributes = ($data['attributes']);
+                    foreach ($attributes as $i => $attribute) {
+                        $attribute['value'] = explode(' | ', $attribute['value']);
+                        $attributes[$i] = $attribute;
+                    }
+                }
+            }elseif($this->request->getGet('clone')){
                 $attributes = [];
                 if(!empty($data['attributes'])) {
                     $attributes = ($data['attributes']);
@@ -552,9 +561,6 @@ href="javascript:void(0)"></i> <i class="lni lni-trash-can"></i></a> &nbsp;';
                 }
             }
 
-           
-            
-             
 
             $dbdata = [
                 'title'=>$data['title'],

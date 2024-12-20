@@ -130,12 +130,6 @@
                                                 <td width="100">Order Date:</td>
                                                 <td><?php echo !empty($meta['order_date']) ? date(env('date_format'),strtotime($meta['order_date'])) : '' ?></td>
                                             </tr>
-                                            <?php if (!empty($meta['order_comments'])) { ?>
-                                                <tr>
-                                                    <td width="100">Order Note:</td>
-                                                    <td width="100px"><?php echo !empty($meta['order_comments']) ? $meta['order_comments'] : ''; ?></td>
-                                                </tr>
-                                            <?php } ?>
                                             <?php if(!empty($meta['purchase_order_number'])) { ?>
                                                 <tr style="padding-bottom: 5px">
                                                     <td>Purchase order#:</td>
@@ -153,10 +147,15 @@
                                 </td>
                 </tr>
             </table>
+           <br>
+            <?php if (!empty($meta['order_comments'])) { ?>
+                <p>Order Note: <?php echo !empty($meta['order_comments']) ? $meta['order_comments'] : ''; ?></p>
+            <?php } ?>
+            <br>
 
             <!-- Order Items -->
             <?php if (!empty($slip['order_items'])) { ?>
-            <table class="order_receipt" style="margin-top:10%">
+            <table class="order_receipt">
                 <thead>
                     <tr>
                         <th>Product</th>

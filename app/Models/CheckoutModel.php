@@ -9,6 +9,7 @@ class CheckoutModel extends BaseController {
 
     private $payment_method_nonce;
     private $device_data;
+    private $transaction_id;
     private $billing_email;
     private $first_name;
     private $last_name;
@@ -229,7 +230,15 @@ class CheckoutModel extends BaseController {
 
                     $this->ProductsModel->reduce_stock($item_meta['product_id'],$item_meta['quantity']);
 
-                    $this->ProductsModel->variation_reduce_stock($item_meta['product_id'],$item_meta['quantity'],$orderID);
+                    // $this->ProductsModel->variation_reduce_stock($item_meta['product_id'],$item_meta['quantity'],$orderID);
+
+                    // Check if "manage_stock" is "yes" before calling variation_reduce_stock
+                    $variation = !empty($item_meta['variation']) ? json_decode($item_meta['variation'], true) : [];
+                    if (isset($variation['values']['manage_stock']) && $variation['values']['manage_stock'] === 'yes') {
+                        $this->ProductsModel->variation_reduce_stock($item_meta['product_id'], $item_meta['quantity'], $orderID);
+                    }
+
+
 
                     $this->ProductsModel->add_sale($item_meta['product_id'],$item_meta['quantity']);
 
@@ -271,7 +280,7 @@ class CheckoutModel extends BaseController {
 
         $transaction_id = random_string('alnum',20);
 
-        $orderID = $this->CartModel->create_order($data);
+        $orderIDs = $this->CartModel->create_order($data);
        
         if(!empty($data['customer_id'])) {
             $customer_id = $data['customer_id'];
@@ -282,11 +291,21 @@ class CheckoutModel extends BaseController {
             }
         }
       
-        if(!empty($orderID)) {
+        if(!empty($orderIDs)) {
+            if (!is_array($orderIDs)) {
+                $orderIDs = [$orderIDs]; // Ensure orderIDs is an array
+            }
+    
+            foreach ($orderIDs as $orderID) {
+                // Assign transaction ID to each order
+                $this->OrderModel->set_transaction_id($orderID, $transaction_id);
+    
+                // Perform post-order actions
+                $this->orderCompleteActions($orderID, $customer_id);
+            }
+            // $this->OrderModel->set_transaction_id($orderID, $transaction_id);
 
-            $this->OrderModel->set_transaction_id($orderID, $transaction_id);
-
-            $this->orderCompleteActions($orderID, $customer_id);
+            // $this->orderCompleteActions($orderID, $customer_id);
 
             return ['success'=>1,'message'=>$this->successMessage,'orderID'=>$transaction_id];
         }
