@@ -111,7 +111,7 @@ class Users extends BaseController
 
         $this->data['content'] = ADMIN . "/users/index";
 
-        $this->data['roles'] = $this->userModel->get_roles();
+        $this->data['roles'] = $this->userModel->get_roles('WHERE role!="min_ws_order_amt"');
 
         _render_page('/' . ADMIN . '/index', $this->data);
     }
@@ -143,7 +143,7 @@ class Users extends BaseController
         $this->data['user_row'] = $this->userModel->get_user($user_id);
         $this->data['user_meta'] = $this->userModel->get_user_meta($user_id);
         $this->data['user_roles'] = $this->userModel->get_user_roles($user_id);
-        $this->data['roles'] = $this->userModel->get_roles();
+        $this->data['roles'] = $this->userModel->get_roles('WHERE role!="min_ws_order_amt"');
         $this->data['content'] = ADMIN . "/users/add_user";
         $this->data['form_error'] = session()->get('form_error');
 
@@ -341,7 +341,7 @@ class Users extends BaseController
 
         }
 
-        $this->data['roles'] = $this->userModel->get_roles();
+        $this->data['roles'] = $this->userModel->get_roles('WHERE role!="min_ws_order_amt"');
         $this->data['user_roles'] = $this->userModel->get_user_roles(-1);
 
         $this->data['form_error'] = session()->get('form_error');

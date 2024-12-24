@@ -279,10 +279,45 @@
 
                                 </div>
 
-                                <div class="wc-proceed-to-checkout">
-                                    <button id="proceed_to_cart" <?php echo $hasError ? 'disabled':'' ?> type="submit" class="button btn-sm">Proceed to checkout</button>
-                                </div>
+                                <?php 
+                                    $curr_user_role = is_wholesaler(); // Determine if the current user is a wholesaler
+                                    $disable_checkout = false; // Initialize a variable to disable the checkout button
 
+                                    if ($curr_user_role) { 
+                                        // Get the total cart amount
+                                        $cart_total_amount = number_format($cart['cart_total']);
+                                        
+                                        // Get user role discounts
+                                        $user_role_discounts = get_setting('user_discount', true);
+
+                                        if ($user_role_discounts) {
+                                            $role_discount = [];
+                                            foreach ($user_role_discounts as $_discount) {
+                                                if ($_discount['role_id'] == '10') { // Assuming '10' is the relevant role_id
+                                                    $role_discount = $_discount;
+                                                    break;
+                                                }
+                                            }
+
+                                            if (!empty($role_discount['role_discount']) && $role_discount['role_discount_type'] != 'off') {
+                                                // Check if role_discount is 100 and type is percent, and compare it with cart_total_amount
+                                                if ($role_discount['role_discount_type'] == 'percent') {
+                                                    if ($cart_total_amount < $role_discount['role_discount']) {
+                                                        // Set the flag to disable the checkout button
+                                                        $disable_checkout = true;
+
+                                                        // Display the message
+                                                        echo "<p>Your order amount of '£{$role_discount['role_discount']}' has not been reached. In order to proceed with the order, the amount should exceed '£{$role_discount['role_discount']}'.</p>";
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                ?>
+
+                                <div class="wc-proceed-to-checkout">
+                                    <button id="proceed_to_cart" <?php echo $disable_checkout ? 'disabled' : '' ?> type="submit" class="button btn-sm">Proceed to checkout</button>
+                                </div>
 
                             </div>
                         </form>

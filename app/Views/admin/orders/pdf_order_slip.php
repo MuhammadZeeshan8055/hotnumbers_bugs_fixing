@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;200&display=swap">
     <style>
@@ -12,6 +11,9 @@
             padding: 1em 6em 3em;
             font-size: 14px;
             margin: 0;
+            position: relative;
+            min-height: 100%;
+            padding-bottom: 2.5em; /* Space for footer */
         }
         h1 {
             font-size: 20px;
@@ -56,6 +58,16 @@
         .order_receipt_subtotal th, .order_receipt_subtotal td {
             font-size: 13px;
         }
+
+        /* Footer Style */
+        .footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            font-size: 12px; 
+            float: left;
+        }
+
         
     </style>
 </head>
@@ -214,11 +226,17 @@
                 </table>
             </div>
         </div>
-        <?php  }?>
-        <?php if (count($slips) - 1 > $i) { ?>
-            <div class="page_break"></div>
-        <?php } } } ?>
-</div>
+        <?php  } ?>
+    </div>
 
+    <!-- Footer displayed on every page -->
+    <div class="footer">
+        <p>Customer: <?php echo @$shipping_address['shipping_first_name'] . ' ' . @$shipping_address['shipping_last_name'].', '. ' Order Id: ' . $order_id;?> </p>
+    </div>
+
+    <?php if (count($slips) - 1 > $i) { ?>
+        <div class="page_break"></div>
+    <?php } } } ?>
+</div>
 </body>
 </html>

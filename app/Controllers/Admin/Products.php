@@ -253,10 +253,11 @@ class Products extends BaseController
                     $values = get_variable_product_stock($row['id']);
                     
                     $variation_stock= $values['total_stock'];
+                    $total_variations= $values['total_variations'];
     
                     $zero_stock_value=get_variable_product_stock_zero($row['id']);
                    
-                    if(!empty($zero_stock_value['has_zero_stock'] && $row['type'] == 'variable')){
+                    if(!empty($zero_stock_value['has_zero_stock'] && $total_variations > 1 && !empty($variation_stock))){
                         $zero_stock_value_mark="<span style='font-weight:bold;color:red'>!</span>";
                     }
                 }

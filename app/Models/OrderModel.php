@@ -748,53 +748,64 @@ class OrderModel extends Model {
         $options->set('isRemoteEnabled', true); // Enable remote resources (e.g., images, fonts)
         $options->set('defaultFont', 'Lato');  // Set default font
         $dompdf = new Dompdf($options);
-
+    
         $userModel = model('UserModel');
         $slips = [];
-
+    
         foreach ($order_ids as $order_id) {
             $order = $this->get_order_by_id($order_id);
             $order['customer'] = $userModel->get_user($order['customer_user']);
             $slips[] = $order;
         }
-
+    
         $this->data['slips'] = $slips;
-
+    
         $settings = $this->db->query("SELECT value FROM tbl_settings WHERE title='website'")->getRowArray();
         $this->data['setting'] = json_decode($settings['value'], true);
-
+    
         // Generate HTML for the slip
         $slip_view = view('admin/orders/pdf_order_slip', $this->data);
-
+    
         // Load the HTML into Dompdf
         $dompdf->loadHtml($slip_view);
-
+    
         // Set paper size and orientation
         $dompdf->setPaper('A4', 'portrait');
-
+    
         // Render the HTML as PDF
         $dompdf->render();
-
-        // Add page numbers
+    
+        // Add customer name and order ID at the bottom of each page
         $canvas = $dompdf->getCanvas();
         $pageCount = $canvas->get_page_count();
         $pageWidth = $canvas->get_width();
-        for ($i = 1; $i <= $pageCount; $i++) {
-            $canvas->page_text(
-                520, // X position (from the left)
-                820, // Y position (from the top)
-                "Page {PAGE_NUM} of {PAGE_COUNT}", // Text to display
-                null, // Font
-                10,   // Font size
-                [0, 0, 0] // Color in RGB
-            );
-        }
-
+    
+        // Loop through each order and set the page text for each
+        // foreach ($slips as $index => $slip) {
+        //     $customerName = $slip['customer']->fname ?? 'Unknown Customer';
+        //     $orderId = $slip['order_id'] ?? 'Unknown Order ID';
+    
+        //     // Loop through each page in the PDF and add text for each
+        //     for ($i = 1; $i <= $pageCount; $i++) {
+        //         $canvas->page_text(
+        //             40, // X position (from the left)
+        //             820, // Y position (from the top)
+        //             "Customer: {$customerName} | Order ID: {$orderId} | Page {PAGE_NUM} of {PAGE_COUNT}", // Text to display
+        //             // "Customer: {$customerName} | Order ID: {$orderId} | Page {PAGE_NUM} of {PAGE_COUNT}", // Text to display
+        //             null, // Font
+        //             10,   // Font size
+        //             [0, 0, 0] // Color in RGB
+        //         );
+        //     }
+        // }
+    
         // Stream the PDF to the browser
         $dompdf->stream(implode('-', $order_ids) . " - Order Slip.pdf", ["Attachment" => false]);
-
+    
         exit;
     }
+    
+
 
     public function generate_wholesale_invoice($order_ids=[], $save_file=false) {
 
@@ -835,73 +846,171 @@ class OrderModel extends Model {
         }
     }
 
-    public function generate_order_csv($order_ids=[]) {
+    // public function generate_order_csv($order_ids=[]) {
+    //     $csv_array = [
+    //         ['Order ID','Order Date','Customer Name (Billing)','Customer Role','Item name','Category','Item cost','Quantity','Item total','Shipping','Discount','Subtotal']
+    //     ];
+    //     $userModel = model('UserModel');
+    //     $productModel = model('ProductsModel');
+    //     $file_name = '';
+
+    //     foreach($order_ids as $i=>$order_id) {
+    //         $order = $this->get_order_by_id($order_id);
+    //         if($i === 0) {
+    //             $first_order = $order;
+    //         }
+    //         if($i === count($order_ids)-1) {
+    //             $last_order = $order;
+    //             $fodata = date('Y-m-d',strtotime($first_order['order_date']));
+    //             $lodate = date('Y-m-d',strtotime($last_order['order_date']));
+    //             $file_name = 'orders-'.$fodata.'-'.$lodate.'.csv';
+    //         }
+
+    //         if(!empty($order)) {
+    //             $meta = $order['order_meta'];
+    //             $customerId = $meta['customer_user'];
+    //             $customerRoles = $userModel->get_user_roles($customerId);
+    //             $order_items = $order['order_items'];
+    //             $productCatList = [];
+    //             $productCount = 0;
+    //             $discount = _price($meta['cart_discount']);
+    //             $shipping_title = $meta['order_shipping_title'];
+    //             $shipping = _price($meta['order_shipping']);
+    //             $subtotal = _price($meta['order_total']);
+
+    //             $row_array = [
+    //                 $order['order_id'],
+    //                 _date($order['order_date']),
+    //                 @$meta['billing_first_name'].' '.@$meta['billing_last_name'],
+    //                 implode(', ',$customerRoles),
+    //                 '',
+    //                 '',
+    //                 '',
+    //                 '',
+    //                 '',
+    //                 $shipping.' ('.$shipping_title.')',
+    //                 $discount,
+    //                 $subtotal,
+    //             ];
+
+    //             foreach($order_items as $j=>$item) {
+    //                 $item_meta = $item['item_meta'];
+    //                 if(!empty($item_meta['product_id'])) {
+    //                     $productCats = $productModel->product_categories($item_meta['product_id']);
+    //                     foreach($productCats as $cat) {
+    //                         $productCatList[] = $cat['name'];
+    //                     }
+    //                     $productCatList = array_unique($productCatList);
+
+
+    //                     $productName = $item['product_name'];
+    //                     $line_subtotal = _price($item_meta['item_price']*$item_meta['quantity']);
+
+    //                     $row_array[4] = $productName;
+    //                     $row_array[5] = implode(', ',$productCatList);
+    //                     $row_array[6] = _price($item_meta['item_price']);
+    //                     $row_array[7] = $item_meta['quantity'];
+    //                     $row_array[8] =  $line_subtotal;
+
+    //                     if($j > 0) {
+    //                         $row_array[0] = '';
+    //                         $row_array[1] = '';
+    //                         $row_array[2] = '';
+    //                         $row_array[3] = '';
+    //                         $row_array[9] = '';
+    //                         $row_array[10] = '';
+    //                         $row_array[11] = '';
+    //                     }
+
+    //                     $csv_array[] = $row_array;
+    //                 }
+    //             }
+    //         }
+    //     }
+
+    //      //pr($csv_array);
+
+    //     if(!empty($csv_array)) {
+    //         header("Content-type: application/csv; charset=UTF-8");
+    //         header("Content-Disposition: attachment; filename=$file_name");
+    //         $fp = fopen('php://output', 'w'); // or use php://stdout
+    //         echo "\xEF\xBB\xBF";
+    //         foreach ($csv_array as $row) {
+    //             fputcsv($fp, $row);
+    //         }
+    //     }else {
+    //         echo 'Could not create file';
+    //     }
+    //     exit;
+    // }
+
+    public function generate_order_csv($order_ids = [])
+    {
         $csv_array = [
-            ['Order ID','Order Date','Customer Name (Billing)','Customer Role','Item name','Category','Item cost','Quantity','Item total','Shipping','Discount','Subtotal']
+            ['Order ID', 'Order Date', 'Customer Name (Billing)', 'Customer Role', 'Item name', 'Category', 'Item cost', 'Quantity', 'Item total', 'Shipping', 'Discount', 'Subtotal']
         ];
         $userModel = model('UserModel');
         $productModel = model('ProductsModel');
         $file_name = '';
 
-        foreach($order_ids as $i=>$order_id) {
+        foreach ($order_ids as $i => $order_id) {
             $order = $this->get_order_by_id($order_id);
-            if($i === 0) {
+            if ($i === 0) {
                 $first_order = $order;
             }
-            if($i === count($order_ids)-1) {
+            if ($i === count($order_ids) - 1) {
                 $last_order = $order;
-                $fodata = date('Y-m-d',strtotime($first_order['order_date']));
-                $lodate = date('Y-m-d',strtotime($last_order['order_date']));
-                $file_name = 'orders-'.$fodata.'-'.$lodate.'.csv';
+                $fodata = date('Y-m-d', strtotime($first_order['order_date']));
+                $lodate = date('Y-m-d', strtotime($last_order['order_date']));
+                $file_name = 'orders-' . $fodata . '-' . $lodate . '.csv';
             }
 
-            if(!empty($order)) {
+            if (!empty($order)) {
                 $meta = $order['order_meta'];
                 $customerId = $meta['customer_user'];
                 $customerRoles = $userModel->get_user_roles($customerId);
                 $order_items = $order['order_items'];
                 $productCatList = [];
                 $productCount = 0;
-                $discount = _price($meta['cart_discount']);
+                $discount = _price((float)$meta['cart_discount']);
                 $shipping_title = $meta['order_shipping_title'];
-                $shipping = _price($meta['order_shipping']);
-                $subtotal = _price($meta['order_total']);
+                $shipping = _price((float)$meta['order_shipping']);
+                $subtotal = _price((float)$meta['order_total']);
 
                 $row_array = [
                     $order['order_id'],
                     _date($order['order_date']),
-                    @$meta['billing_first_name'].' '.@$meta['billing_last_name'],
-                    implode(', ',$customerRoles),
+                    @$meta['billing_first_name'] . ' ' . @$meta['billing_last_name'],
+                    implode(', ', $customerRoles),
                     '',
                     '',
                     '',
                     '',
                     '',
-                    $shipping.' ('.$shipping_title.')',
+                    $shipping . ' (' . $shipping_title . ')',
                     $discount,
                     $subtotal,
                 ];
 
-                foreach($order_items as $j=>$item) {
+                foreach ($order_items as $j => $item) {
                     $item_meta = $item['item_meta'];
-                    if(!empty($item_meta['product_id'])) {
+                    if (!empty($item_meta['product_id'])) {
                         $productCats = $productModel->product_categories($item_meta['product_id']);
-                        foreach($productCats as $cat) {
+                        foreach ($productCats as $cat) {
                             $productCatList[] = $cat['name'];
                         }
                         $productCatList = array_unique($productCatList);
 
-
                         $productName = $item['product_name'];
-                        $line_subtotal = _price($item_meta['item_price']*$item_meta['quantity']);
+                        $line_subtotal = _price((float)$item_meta['item_price'] * (float)$item_meta['quantity']);
 
                         $row_array[4] = $productName;
-                        $row_array[5] = implode(', ',$productCatList);
-                        $row_array[6] = _price($item_meta['item_price']);
-                        $row_array[7] = $item_meta['quantity'];
-                        $row_array[8] =  $line_subtotal;
+                        $row_array[5] = implode(', ', $productCatList);
+                        $row_array[6] = _price((float)$item_meta['item_price']);
+                        $row_array[7] = (int)$item_meta['quantity'];
+                        $row_array[8] = $line_subtotal;
 
-                        if($j > 0) {
+                        if ($j > 0) {
                             $row_array[0] = '';
                             $row_array[1] = '';
                             $row_array[2] = '';
@@ -917,17 +1026,15 @@ class OrderModel extends Model {
             }
         }
 
-         //pr($csv_array);
-
-        if(!empty($csv_array)) {
+        if (!empty($csv_array)) {
             header("Content-type: application/csv; charset=UTF-8");
             header("Content-Disposition: attachment; filename=$file_name");
-            $fp = fopen('php://output', 'w'); // or use php://stdout
+            $fp = fopen('php://output', 'w');
             echo "\xEF\xBB\xBF";
             foreach ($csv_array as $row) {
                 fputcsv($fp, $row);
             }
-        }else {
+        } else {
             echo 'Could not create file';
         }
         exit;

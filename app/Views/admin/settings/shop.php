@@ -174,13 +174,18 @@
                                         <label style="color: var(--color-2)"><?php echo $role->name ?></label>
                                     </div>
                                     <div class="d-inline-block input_field" style="vertical-align: top;">
-                                        <label>Discount</label>
+                                        <label>
+                                            <?php 
+                                                // Change label to "Amount" if the role is "Wholesale Min Amt"
+                                                echo $role->name === 'Wholesale Min Amt' ? 'Amount' : 'Discount';
+                                            ?>
+                                        </label>
                                         <div class="mt-4">
                                             <input type="hidden" name="user_discount[<?php echo $role->id ?>][role_id]" value="<?php echo $role->id ?>">
                                             <input class="form-control" min="0" <?php echo $get_discount['role_discount_type'] == 'off' ? 'readonly':'' ?> type="number" name="user_discount[<?php echo $role->id ?>][role_discount]" value="<?php echo @$get_discount['role_discount']?>">
                                         </div>
                                     </div>
-                                    <div class="d-inline-block input_field" style="vertical-align: top;">
+                                    <div class="d-inline-block input_field" style="vertical-align: top; <?php echo $role->name === 'Wholesale Min Amt' ? 'display: none;' : ''; ?>">
                                         <label>Discount type</label>
                                         <div class="mt-4">
                                             <select class="form-control select2" name="user_discount[<?php echo $role->id ?>][role_discount_type]" style="min-width: 150px" value="<?php echo @$get_discount['role_discount_type']?>">
