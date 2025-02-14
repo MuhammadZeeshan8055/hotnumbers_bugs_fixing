@@ -831,7 +831,7 @@ class SubscriptionModel extends Model {
 
     public function current_day_renewals() {
         $master = $this->masterModel;
-        $curr_date = date(env('CURRENT_DATE'));
+        $curr_date = date('Y-m-d');
 
        // $sch_end_query = "(SELECT meta_value FROM tbl_order_meta WHERE order_id=o.order_id AND meta_key='schedule_end' LIMIT 1)";
         $sub_item_query = "(SELECT meta.meta_value FROM tbl_order_items AS item JOIN tbl_order_item_meta AS meta ON meta.item_id=item.order_item_id WHERE item.order_id=o.order_id AND item.item_type='line_item' AND meta.meta_key='subscription' LIMIT 1)";
@@ -843,7 +843,7 @@ class SubscriptionModel extends Model {
         $sql = "SELECT o.order_id, o.parent_id, meta.*, $date_diff AS payment_date_diff, $sub_item_query AS item_subscription, $sub_item_id_query AS item_id FROM tbl_orders AS o JOIN tbl_order_meta AS meta ON meta.order_id=o.order_id WHERE meta.meta_value <= '$curr_date' AND meta.meta_key='schedule_next_payment' AND meta.meta_value !=0 AND meta.meta_value IS NOT NULL AND $date_diff <= 0 AND o.status='active'";
 
         $query = $master->query($sql);
-
+        
         return $query;
     }
 

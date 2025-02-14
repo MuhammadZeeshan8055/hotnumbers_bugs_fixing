@@ -35,6 +35,7 @@ $routes->setAutoRoute(false);
  * --------------------------------------------------------------------
  */
 
+$routes->get('/test_renew_subscription', 'Cron::subscriptions');
 $routes->get('/testing_email', 'Cron::testing_send_email');
 $routes->get('/check_14days_expiry', 'Cron::check_14_days_expiry');
 $routes->get('/check_07days_expiry', 'Cron::check_07_days_expiry');
