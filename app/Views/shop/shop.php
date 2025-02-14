@@ -118,6 +118,7 @@
         <?php
 
             $internal_user=is_internal();
+            $wholesale_user=is_wholesaler();
             
             $contains = uri_string(); // shop/category/coffee
             $disable_style_and_products = (strpos($contains, 'shop/category/') === 0 && count(explode('/', $contains)) == 3);
@@ -125,7 +126,7 @@
                 
             
 
-                if(!$disable_style_and_products && $internal_user)
+                if(!$disable_style_and_products && ($internal_user || $wholesale_user))
                     { 
                 ?>
 
@@ -513,7 +514,7 @@
                     <?php
                         }
 
-                        if(!$disable_style_and_products && $internal_user)
+                        if(!$disable_style_and_products && ($internal_user || $wholesale_user))
                         { 
                             ?>
 
@@ -803,7 +804,7 @@ $(document).ready(function() {
                 success: function(response) {
                     var currencySymbol = '£'; // Change this to your desired currency symbol
                     if (response && response !== "No matching variation found") {
-                        productPriceSpan.html(currencySymbol + response).show();
+                        productPriceSpan.html(currencySymbol + parseFloat(response).toFixed(2)).show();
                         basePriceSpan.hide();
                     } 
                 },

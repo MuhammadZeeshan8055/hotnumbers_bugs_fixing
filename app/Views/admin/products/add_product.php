@@ -207,7 +207,7 @@
                                                 </div>
                                             </div> -->
 
-                                            <div class="col-md-6 mb-15">
+                                            <!-- <div class="col-md-6 mb-15">
                                                 <div class="input_field">
                                                     <label>Xero Code</label>
                                                     <input type="text" name="" value="" placeholder="Xero Code">
@@ -226,7 +226,7 @@
                                                         </select>
                                                     </div>
                                                 </div>
-                                            </div>
+                                            </div> -->
 
                                         </div>
                                     </div>

@@ -1,11 +1,11 @@
 <div class="container">
-    <?php echo admin_page_title(!empty($categories_row['id']) ? 'Edit Category':'Add Category') ?>
+    <?php echo admin_page_title(!empty($categories_row['id']) ? 'Edit Category' : 'Add Category') ?>
     <div>
 
         <form
-                action="<?php echo base_url(ADMIN . '/product-categories/add') ?><?php echo !empty($categories_row['id']) ? '/' . $categories_row['id'] : '' ?>"
-                method="post"
-                enctype="multipart/form-data">
+            action="<?php echo base_url(ADMIN . '/product-categories/add') ?><?php echo !empty($categories_row['id']) ? '/' . $categories_row['id'] : '' ?>"
+            method="post"
+            enctype="multipart/form-data">
 
             <input type="hidden" name="id" value="<?php echo !empty($categories_row['id']) ? $categories_row['id'] : '' ?>">
 
@@ -24,10 +24,10 @@
                         <div class="col-md-12 mt-19">
                             <div style="max-width: 600px">
                                 <?php
-                                $images = !empty($categories_row['img']) ? array_values(explode(',',$categories_row['img'])) : [];
+                                $images = !empty($categories_row['img']) ? array_values(explode(',', $categories_row['img'])) : [];
                                 upload_media_box([
-                                    'input_name'=>'img',
-                                    'replacemedia'=>1,
+                                    'input_name' => 'img',
+                                    'replacemedia' => 1,
                                     'images' =>  $images
                                 ]);
                                 ?>
@@ -51,12 +51,18 @@
                                 </div>
                             </div>
 
-                            <div>
+                            <!-- <div>
                                 <div class="input_field mb-10">
                                     <label>Description</label>
                                     <textarea class="input_field" name="description" style="width: 100%" rows="5"><?php echo !empty($categories_row['description']) ? $categories_row['description'] : '' ?></textarea>
                                 </div>
 
+                            </div> -->
+                            <div class="input_field mb-10">
+                                <div class="input_field">
+                                    <label>Xero Code</label>
+                                    <input type="text" name="" value="">
+                                </div>
                             </div>
 
                             <input type="hidden" name="group_name" value="<?php echo !empty($group) ? $group : '' ?>">
@@ -66,11 +72,11 @@
                             $roles = shop_roles();
                             $allowed_permissions = [];
                             $deny_permissions = [];
-                            if(!empty($categories_row['allow_permission'])) {
-                                $allowed_permissions = explode(',',$categories_row['allow_permission']);
+                            if (!empty($categories_row['allow_permission'])) {
+                                $allowed_permissions = explode(',', $categories_row['allow_permission']);
                             }
-                            if(!empty($categories_row['deny_permission'])) {
-                                $deny_permissions = explode(',',$categories_row['deny_permission']);
+                            if (!empty($categories_row['deny_permission'])) {
+                                $deny_permissions = explode(',', $categories_row['deny_permission']);
                             }
                             ?>
 

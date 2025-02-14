@@ -342,6 +342,60 @@ class UserModel extends Model {
         }
     }
 
+    public function generate_user_csv($user_ids = [])
+    {
+        $csv_array = [
+            ['User ID', 'Username', 'First Name', 'Last Name', 'Display Name', 'Email', 'Role Name', 'Invoice Checkout', 'Status', 'Guest', 'Date Created']
+        ];
+    
+        $userModel = model('UserModel');
+        $file_name = 'users.csv';
+    
+        foreach ($user_ids as $i => $user_id) {
+        
+            $user = $this->get_user($user_id);
+        
+            if (!empty($user) && is_object($user)) {
+
+                $invoice_checkout = (int) $user->invoice_checkout === 1 ? 'Yes' : 'No';
+                $status = (int) $user->status === 1 ? 'Active' : 'Inactive';
+                $guest = (int) $user->is_guest === 1 ? 'Yes' : 'No';
+                
+                $row_array = [
+                    $user->user_id,    
+                    $user->username,  
+                    $user->fname,      
+                    $user->lname,      
+                    $user->display_name,  
+                    $user->email,     
+                    $user->role_name,  
+                    $invoice_checkout,
+                    $status,
+                    $guest,
+                    _date($user->date_created)
+                ];
+    
+                // Add the row to the CSV array
+                $csv_array[] = $row_array;
+            }
+        }
+    
+        // Generate the CSV file
+        if (count($csv_array) > 1) { // Ensure there is data beyond the header
+            header("Content-type: application/csv; charset=UTF-8");
+            header("Content-Disposition: attachment; filename=$file_name");
+            $fp = fopen('php://output', 'w');
+            echo "\xEF\xBB\xBF"; // UTF-8 BOM for UTF-8 support
+            foreach ($csv_array as $row) {
+                fputcsv($fp, $row);
+            }
+            fclose($fp);
+        } else {
+            echo 'No valid user data found';
+        }
+        exit;
+    }
+    
     public function register_wholesaler($data) {
 
         $notification = model('NotificationModel');

@@ -290,7 +290,7 @@ class Shop extends BaseController
                             $error['error'] = $available['error'];
                         }
                         $prod_variations = $available['variations'];
-                        $prod_variations = $this->productModel->product_variation($get_variations['product_id'], $variation_list);
+                        $prod_variations = $this->productModel->product_variation_for_edit($get_variations['product_id'], $variation_list);
                         if(!empty($prod_variations['values'])) {
                             $variation_vals = $prod_variations['values'];
                             if(!empty($variation_vals['manage_stock']) && $variation_vals['manage_stock']==="yes") {

@@ -1,40 +1,40 @@
 <!--- style ---->
 <style>
-.header1 .top_nav .top_menu .menu-top-menu-container ul li:last-of-type a {
-    color: #ffffff !important;
-}
+    .header1 .top_nav .top_menu .menu-top-menu-container ul li:last-of-type a {
+        color: #ffffff !important;
+    }
 
-.header1 .top_nav .top_menu .menu-top-menu-container ul li:last-of-type {
-    background-color: #d62135;
-    padding-right: 1em;
-    margin-right: 8px;
-}
+    .header1 .top_nav .top_menu .menu-top-menu-container ul li:last-of-type {
+        background-color: #d62135;
+        padding-right: 1em;
+        margin-right: 8px;
+    }
 </style>
 
 
 <?php
 
- $masterModel = model('MasterModel');
+$masterModel = model('MasterModel');
 $productModel = model('ProductsModel');
 
-if(!is_logged_in()){
-// $categories = $masterModel->query("SELECT 
-//     tbl_categories.id, 
-//     tbl_categories.name, 
-//     tbl_categories.slug 
-// FROM 
-//     tbl_categories 
-// JOIN 
-//     tbl_user_role_meta 
-//     ON FIND_IN_SET(tbl_categories.id, tbl_user_role_meta.meta_value) > 0
-// WHERE 
-//    tbl_user_role_meta.role_id = '8' 
-// ORDER BY 
-//     sort_order"); 
+if (!is_logged_in()) {
+    // $categories = $masterModel->query("SELECT 
+    //     tbl_categories.id, 
+    //     tbl_categories.name, 
+    //     tbl_categories.slug 
+    // FROM 
+    //     tbl_categories 
+    // JOIN 
+    //     tbl_user_role_meta 
+    //     ON FIND_IN_SET(tbl_categories.id, tbl_user_role_meta.meta_value) > 0
+    // WHERE 
+    //    tbl_user_role_meta.role_id = '8' 
+    // ORDER BY 
+    //     sort_order"); 
 
 
-     
-$categories = $masterModel->query("
+
+    $categories = $masterModel->query("
     SELECT 
     tbl_categories.id, 
     tbl_categories.name, 
@@ -91,14 +91,14 @@ ORDER BY
     tbl_categories.id
 
 ");
+} else {
+    $role = current_user_role();
+    $user_role_id = $role['id'];
 
- 
-}else{
-$role = current_user_role();
-$user_role_id = $role['id'];
- 
+    $user_category_visibility = 'user_cat_visibility_' . is_logged_in();
+    $category_visibility_by_user = $masterModel->query("SELECT * FROM `tbl_settings` WHERE title = '$user_category_visibility'");
 
-$categories = $masterModel->query("
+    $categories = $masterModel->query("
 SELECT 
     tbl_categories.id, 
     tbl_categories.name, 
@@ -115,11 +115,17 @@ WHERE
         )
         AND tbl_categories.id NOT IN (
             SELECT DISTINCT
-                SUBSTRING_INDEX(SUBSTRING_INDEX(meta_value, ',', numbers.n), ',', -1) AS category_id
+                TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(meta_value, ',', numbers.n), ',', -1)) AS category_id
             FROM 
                 tbl_user_role_meta
             JOIN
-                (SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10) numbers
+                (
+                    SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 
+                    UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 
+                    UNION ALL SELECT 9 UNION ALL SELECT 10 UNION ALL SELECT 11 UNION ALL SELECT 12 
+                    UNION ALL SELECT 13 UNION ALL SELECT 14 UNION ALL SELECT 15 UNION ALL SELECT 16
+                    UNION ALL SELECT 17 UNION ALL SELECT 18 UNION ALL SELECT 19 UNION ALL SELECT 20
+                ) numbers
                 ON LENGTH(meta_value) - LENGTH(REPLACE(meta_value, ',', '')) >= numbers.n - 1
             WHERE
                 role_id = '$user_role_id'
@@ -137,11 +143,17 @@ WHERE
         )
         AND tbl_categories.id IN (
             SELECT DISTINCT
-                SUBSTRING_INDEX(SUBSTRING_INDEX(meta_value, ',', numbers.n), ',', -1) AS category_id
+                TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(meta_value, ',', numbers.n), ',', -1)) AS category_id
             FROM 
                 tbl_user_role_meta
             JOIN
-                (SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10) numbers
+                (
+                    SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 
+                    UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 
+                    UNION ALL SELECT 9 UNION ALL SELECT 10 UNION ALL SELECT 11 UNION ALL SELECT 12 
+                    UNION ALL SELECT 13 UNION ALL SELECT 14 UNION ALL SELECT 15 UNION ALL SELECT 16
+                    UNION ALL SELECT 17 UNION ALL SELECT 18 UNION ALL SELECT 19 UNION ALL SELECT 20
+                ) numbers
                 ON LENGTH(meta_value) - LENGTH(REPLACE(meta_value, ',', '')) >= numbers.n - 1
             WHERE
                 role_id = '$user_role_id'
@@ -155,8 +167,6 @@ ORDER BY
     tbl_categories.id;
 
 ");
-
-
 }
 
 
@@ -184,72 +194,118 @@ ORDER BY
                     <a href="<?php echo base_url('shop/category/barista-training') ?>">Barista Training</a>
                 </li>*/ ?>
 
-                <?php
-                            foreach($categories as $category) {
+                        <?php
+                        // Fetch the first record
+                        $record = $category_visibility_by_user[0];
+
+                        // Decode the JSON value
+                        $value_data = json_decode($record->value, true);
+
+                        // Extract user permission and category IDs
+                        $user_id = $value_data['user_id'];
+                        $category_ids = explode(',', $value_data['category_id']);
+                        $permission = $value_data['permission'];
+
+                        if ($permission == 'allow') {
+                            foreach ($category_ids as $category_id) {
+                                $category_details = get_cate_name($category_id);
+                        ?>
+                                <li class="menu-item">
+                                    <a href="<?php echo base_url('shop/category/' . $category_details['slug']) ?>">
+                                        <?php echo $category_details['name'] ?>
+                                    </a>
+                                </li>
+                            <?php
+                            }
+                        } elseif ($permission == 'disallow') {
+                            // Skip categories in $category_ids and show only others
+                            foreach ($categories as $category) {
+                                if (in_array($category->id, $category_ids)) {
+                                    continue; // Skip disallowed category IDs
+                                }
                                 $catID = $category->id;
                                 $cat_rule = $productModel->user_role_categories($user_role_id, $catID);
-                                if(!empty($cat_rule) && $cat_rule['role_category_mode'] == 'hide') {
-                                    continue;
+                                if (!empty($cat_rule) && $cat_rule['role_category_mode'] == 'hide') {
+                                    continue; // Skip hidden categories
                                 }
-                                ?>
-                <li class="menu-item"><a
-                        href="<?php echo base_url('shop/category/'.$category->slug) ?>"><?php echo $category->name ?></a>
-                </li>
-                <?php
+                            ?>
+                                <li class="menu-item">
+                                    <a href="<?php echo base_url('shop/category/' . $category->slug) ?>">
+                                        <?php echo $category->name ?>
+                                    </a>
+                                </li>
+                            <?php
                             }
+                        } else {
+                            // Default behavior if permission is neither "allow" nor "disallowed"
+                            foreach ($categories as $category) {
+                                $catID = $category->id;
+                                $cat_rule = $productModel->user_role_categories($user_role_id, $catID);
+                                if (!empty($cat_rule) && $cat_rule['role_category_mode'] == 'hide') {
+                                    continue; // Skip hidden categories
+                                }
+                            ?>
+                                <li class="menu-item">
+                                    <a href="<?php echo base_url('shop/category/' . $category->slug) ?>">
+                                        <?php echo $category->name ?>
+                                    </a>
+                                </li>
+                        <?php
+                            }
+                        }
                         ?>
 
 
-                <li class="menu-item mt-15" style="margin-top: 18px">
-                    <a href="<?php echo base_url('coffee-club-subscription') ?>">Subscriptions</a>
-                </li>
-               
-            </ul>
-            </li>
-            <li class="separator"></li>
-            <li class="menu-item"><span>Our locations</span></li>
-            <li class="menu-item">
-                <a href="<?php echo base_url('the-roastery') ?>">The Roastery</a>
-            </li>
-            <li class="menu-item">
-                <a href="<?php echo base_url('gwydir-st') ?>">Gwydir St.</a>
-            </li>
-            <li class="menu-item">
-                <a href="<?php echo base_url('trumpington-st') ?>">Trumpington St.</a>
-            </li>
-            <li class="separator"></li>
-            <li class="gap_above"><a href="<?php echo base_url('hotnumbers-menu') ?>">Our Menu</a></li>
-            <li class="menu-item">
-                <a href="<?php echo base_url('about-us-cafe') ?>">About Hot Numbers</a>
-            </li>
-            <li class="menu-item">
-                <a href="<?php echo base_url('gigs-events') ?>">Gigs &#038; Events</a>
-            </li>
 
-            <?php if (!empty($pages)) {
+                        <li class="menu-item mt-15" style="margin-top: 18px">
+                            <a href="<?php echo base_url('coffee-club-subscription') ?>">Subscriptions</a>
+                        </li>
+
+                    </ul>
+                </li>
+                <li class="separator"></li>
+                <li class="menu-item"><span>Our locations</span></li>
+                <li class="menu-item">
+                    <a href="<?php echo base_url('the-roastery') ?>">The Roastery</a>
+                </li>
+                <li class="menu-item">
+                    <a href="<?php echo base_url('gwydir-st') ?>">Gwydir St.</a>
+                </li>
+                <li class="menu-item">
+                    <a href="<?php echo base_url('trumpington-st') ?>">Trumpington St.</a>
+                </li>
+                <li class="separator"></li>
+                <li class="gap_above"><a href="<?php echo base_url('hotnumbers-menu') ?>">Our Menu</a></li>
+                <li class="menu-item">
+                    <a href="<?php echo base_url('about-us-cafe') ?>">About Hot Numbers</a>
+                </li>
+                <li class="menu-item">
+                    <a href="<?php echo base_url('gigs-events') ?>">Gigs &#038; Events</a>
+                </li>
+
+                <?php if (!empty($pages)) {
                     foreach ($pages as $page) {
-                        if(!empty($page->slug))
-                        {
-                            ?>
-            <li class="menu-item">
-                <a href="<?php echo base_url('pages/'.$page->slug ) ?>"><?php echo $page->page_title ?></a>
-            </li>
-            <?php
+                        if (!empty($page->slug)) {
+                ?>
+                            <li class="menu-item">
+                                <a href="<?php echo base_url('pages/' . $page->slug) ?>"><?php echo $page->page_title ?></a>
+                            </li>
+                <?php
                         }
-                         }
+                    }
                 } ?>
 
-            <li class="menu-item">
-                <a href="<?php echo base_url('blog') ?>">Blog</a>
-            </li>
+                <li class="menu-item">
+                    <a href="<?php echo base_url('blog') ?>">Blog</a>
+                </li>
 
-            <li class="menu-item">
-                <a href="<?php echo base_url('contact-us') ?>">Contact Us</a>
-            </li>
-            <li class="menu-item">
-                <a href="<?php echo base_url('become-wholesale-customer') ?>">Wholesale</a>
-            </li>
-            <li class="menu-item"><a href="<?php echo base_url('work-with-us') ?>">Work with us!</a></li>
+                <li class="menu-item">
+                    <a href="<?php echo base_url('contact-us') ?>">Contact Us</a>
+                </li>
+                <li class="menu-item">
+                    <a href="<?php echo base_url('become-wholesale-customer') ?>">Wholesale</a>
+                </li>
+                <li class="menu-item"><a href="<?php echo base_url('work-with-us') ?>">Work with us!</a></li>
             </ul>
         </div>
     </div>
@@ -284,28 +340,28 @@ ORDER BY
                         </li>
 
                         <?php
-                        if(is_logged_in() || is_admin()) {
-                            ?>
+                        if (is_logged_in() || is_admin()) {
+                        ?>
 
-                        <li class="nmr-logged-in show-mob menu-item">
-                            <a href="<?php echo base_url('account') ?>">My Account</a>
-                        </li>
-                        <?php if(is_admin()) {
-                                ?>
-                        <li class="nmr-logged-in show-mob menu-item">
-                            <a href="<?php echo base_url('admin/dashboard') ?>" target="_blank">Admin Dashboard</a>
-                        </li>
-                        <?php
-                            }?>
-                        <li class="nmr-logged-in menu-account menu-item"><a class="logout-btn"
-                                href="<?php echo base_url('account/logout') ?>"> Logout</a>
-                        </li>
-                        <?php
-                        }else {
+                            <li class="nmr-logged-in show-mob menu-item">
+                                <a href="<?php echo base_url('account') ?>">My Account</a>
+                            </li>
+                            <?php if (is_admin()) {
                             ?>
-                        <li class="nmr-logged-out menu-account show-mob menu-item">
-                            <a href="<?php echo base_url('account') ?>"> Login </a>
-                        </li>
+                                <li class="nmr-logged-in show-mob menu-item">
+                                    <a href="<?php echo base_url('admin/dashboard') ?>" target="_blank">Admin Dashboard</a>
+                                </li>
+                            <?php
+                            } ?>
+                            <li class="nmr-logged-in menu-account menu-item"><a class="logout-btn"
+                                    href="<?php echo base_url('account/logout') ?>"> Logout</a>
+                            </li>
+                        <?php
+                        } else {
+                        ?>
+                            <li class="nmr-logged-out menu-account show-mob menu-item">
+                                <a href="<?php echo base_url('account') ?>"> Login </a>
+                            </li>
                         <?php
                         } ?>
 

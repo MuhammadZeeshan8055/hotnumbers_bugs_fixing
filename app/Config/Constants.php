@@ -85,4 +85,4 @@ defined('curr_time') || define('curr_time', $date);
 define('GUEST_ROLE_ID', 8);
 define('CUSTOMER_ROLE_ID', 2);
 define('COFFEE_CAT_ID', 21);
-define('SUBSCRIPTION_PRODUCT_ID', 44068);
+define('SUBSCRIPTION_PRODUCT_ID', 44225);

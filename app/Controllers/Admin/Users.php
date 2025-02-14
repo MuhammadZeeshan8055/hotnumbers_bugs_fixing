@@ -90,6 +90,7 @@ class Users extends BaseController
                 }
 
                 $output['data'][] = [
+                    '<div class="input_field inline-checkbox"><label><input type="checkbox" class="checkrow" name="product-row[]" value="' . $row['user_id'] . '"></label></div>',
                     '#'.$row['user_id'],
                     $row['status'] ? '<span class="active">Active</span>':'<span class="inactive" style="color: red">Inactive</span>',
                     $row['username'],
@@ -114,6 +115,12 @@ class Users extends BaseController
         $this->data['roles'] = $this->userModel->get_roles('WHERE role!="min_ws_order_amt"');
 
         _render_page('/' . ADMIN . '/index', $this->data);
+    }
+    public function generate_user_csv($user_ids)
+    {
+        $slip_ids = explode(',', $user_ids);
+        $userModel = model('UserModel');
+        $userModel->generate_user_csv($slip_ids);
     }
 
     public function administrators()

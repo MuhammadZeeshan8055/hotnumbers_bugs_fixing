@@ -35,6 +35,9 @@ $routes->setAutoRoute(false);
  * --------------------------------------------------------------------
  */
 
+$routes->get('/testing_email', 'Cron::testing_send_email');
+$routes->get('/check_14days_expiry', 'Cron::check_14_days_expiry');
+$routes->get('/check_07days_expiry', 'Cron::check_07_days_expiry');
 $routes->get('/crone-subscriptions', 'Cron::subscriptions');
 
 $routes->get( 'account', 'LoginController::index');
@@ -203,6 +206,7 @@ $routes->group('admin', ['filter' => 'AdminFilter'], static function ($routes) {
     $routes->match(['get', 'post'], 'settings(:any)', 'Admin/AdminController::settings');
 
     $routes->get('users', 'Admin/Users::index');
+    $routes->get('generate-user-csv/(:any)', 'Admin\Users::generate_user_csv/$1');
     $routes->get('users/login/(:any)', 'Admin\Users::force_user_login/$1');
     $routes->get('administrators', 'Admin/Users::administrators');
     $routes->get('guests', 'Admin/Users::guests');

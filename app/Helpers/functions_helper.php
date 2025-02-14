@@ -23,6 +23,17 @@ function has_subscription($uid) {
 //     return $q;
 // }
 
+function activeSubscription() {
+    $db = db_connect();
+    
+    $query = "SELECT * FROM tbl_orders WHERE status='active' AND order_type='shop_subscription'";
+    
+    $records = $db->query($query)->getResultArray();
+
+    return $records;
+}
+
+
 function get_product_status_by_id($pid){
     $sql = "SELECT title,status,img FROM `tbl_products` WHERE status='publish' and id='$pid'";
     $master = model('MasterModel');
@@ -324,16 +335,25 @@ function order_editable($order) {
     $customer_id=$order['customer_user'];
 
     // checking for internal customers
+    
     $check_role=check_user_role($customer_id);
    
-    if($order['status'] == "processing" && $check_role == '9'){
+    if($order['status'] == "processing" && $check_role == '9' && $order['payment_method'] != "Credit/Debit Card"){
         $can_edit = true;
     }elseif(($order['status'] != "processing" && $order['status'] != "completed")) {
         $can_edit = true;
-    }
-    if($order['payment_method'] == 'invoice' && $order['status'] != "completed") {
+    }elseif(($order['payment_method'] != "Credit/Debit Card")) {
+        $can_edit = true;
+    }elseif (
+        ($order['status'] == "processing") && 
+        ($order['payment_method'] == "invoice" || 
+         $order['payment_method'] == "Zero Charge" || 
+         $order['payment_method'] == "direct")
+    ) {
         $can_edit = true;
     }
+    
+   
     return $can_edit;
 }
 
@@ -384,18 +404,25 @@ function subscription_statuses() {
 //        'cancelled' => 'Cancelled',
 //        'renew-failed' => 'Renew failed'
 //    ];
-    return [
-        'completed' => 'Completed',
-        'processing' => 'Processing',
-        //'pending' => 'Pending Payment',
-        //'active' => 'Active',
-        //'on-hold' => 'Pause',
-        //'ready_to_ship' => 'Ready to ship',
+    // return [
+    //     'completed' => 'Completed',
+    //     'processing' => 'Processing',
+    //     //'pending' => 'Pending Payment',
+    //     //'active' => 'Active',
+    //     //'on-hold' => 'Pause',
+    //     //'ready_to_ship' => 'Ready to ship',
+    //     'cancelled' => 'Cancelled',
+    //     'refund' => 'Refunded',
+    //     //'failed' => 'Failed',
+    //     //'trashed' => 'Bin',
+    //     //'renew-failed' => 'Renew failed'
+    // ];
+
+    return [ 
+        'active' => 'Active',
+        'on-hold' => 'Paused',
         'cancelled' => 'Cancelled',
-        'refund' => 'Refunded',
-        //'failed' => 'Failed',
-        //'trashed' => 'Bin',
-        //'renew-failed' => 'Renew failed'
+        'on-hold' => 'On Hold',
     ];
 }
 
@@ -517,18 +544,20 @@ function is_password_strong($password)
 
 function get_cate_name($id)
 {
-    if(!$id) {
-        return '<strong style="color:red"> no parent</strong>';
+    if (!$id) {
+        return ['name' => 'no parent', 'slug' => 'no-parent'];
     }
+
     $db = db_connect();
-    $row = $db->query("select * from tbl_categories where id = " . $id);
-    if($row) {
-        $row = $row->getRow();
-        return $row->name;
-    }else {
-        return '<strong style="color:red"> no parent</strong>';
+    $query = $db->query("SELECT name, slug FROM tbl_categories WHERE id = " . (int)$id);
+
+    if ($query && $row = $query->getRow()) {
+        return ['name' => $row->name, 'slug' => $row->slug]; // Return as an array
+    } else {
+        return ['name' => 'no parent', 'slug' => 'no-parent'];
     }
 }
+
 
 function get_child_category($id)
 {

@@ -665,11 +665,11 @@
                                                                     $smallest_price = min($regular_prices);
                                                                                                                                     
                                                             ?>
-                                                                <span class="amount">From <span><?php echo currency_symbol ?></span><?php echo  $smallest_price ?></span>
+                                                                <span class="amount">From <span><?php echo currency_symbol ?></span><?php echo number_format($smallest_price, 2) ?></span>
                                                             <?php
                                                                 }else{
                                                             ?>
-                                                                <span class="amount">From <span><?php echo currency_symbol ?></span><?php echo (int)$product['price'] ?></span>
+                                                                <span class="amount">From <span><?php echo currency_symbol ?></span><?php echo number_format((float)$product['price'], 2) ?></span>
                                                             <?php
                                                                 }
                                                             ?>
